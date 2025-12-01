@@ -1,0 +1,866 @@
+# GetCited v1.0.4 — Changes Document
+
+**Created:** December 1, 2025  
+**Status:** Ready for Development
+
+---
+
+## Implementation Priority
+
+| Order | Section | Type | Effort |
+|-------|---------|------|--------|
+| 1 | Section 3: Wizard bug fix | **Bug Fix** | 15 min |
+| 2 | Section 4: Health button fix | **Bug Fix** | 30 min |
+| 3 | Section 1: Expand site types | Enhancement | 2-3 hrs |
+| 4 | Section 2: Granular settings | Enhancement | 1-2 hrs |
+
+**Recommendation:** Fix bugs first (3-4), then site types (1), then granular settings (2).
+
+**Note:** The Site Scanner feature has been moved to a separate document: `CHANGES-v1.1.0.md`
+
+---
+
+## 1. Expand Site Type Options
+
+### Current State (v1.0.3)
+
+5 site types available:
+- `blog` — Blog
+- `business` — Business
+- `news` — News/Magazine
+- `ecommerce` — E-commerce
+- `other` — Other
+
+### Proposed Changes
+
+Expand to 9 site types:
+
+| Slug | Label | Description |
+|------|-------|-------------|
+| `blog` | Blog | Personal or professional blogs, content creators |
+| `business` | Business | Company sites, service providers, local businesses |
+| `news` | News / Magazine | Publications, news sites, editorial content |
+| `ecommerce` | E-commerce | Online stores, WooCommerce, product sales |
+| `portfolio` | Portfolio | Photographers, designers, artists, creative professionals |
+| `nonprofit` | Nonprofit | Charities, causes, donation-driven organizations |
+| `education` | Education / Courses | Schools, online courses, LMS sites, tutorials |
+| `community` | Community / Forum | Forums, membership sites, discussion communities |
+| `other` | Other | General purpose, custom sites |
+
+### Files to Modify
+
+#### 1.1 `includes/class-settings.php`
+
+**Location:** `sanitize_setting()` method, `site_type` case (~line 300-302)
+
+**Current:**
+```php
+case 'site_type':
+    $valid_types = array( 'blog', 'business', 'news', 'ecommerce', 'other' );
+    return in_array( $value, $valid_types, true ) ? $value : 'blog';
+```
+
+**Change to:**
+```php
+case 'site_type':
+    $valid_types = array( 
+        'blog', 
+        'business', 
+        'news', 
+        'ecommerce', 
+        'portfolio',
+        'nonprofit',
+        'education',
+        'community',
+        'other' 
+    );
+    return in_array( $value, $valid_types, true ) ? $value : 'blog';
+```
+
+---
+
+#### 1.2 `includes/class-llms-txt.php`
+
+**Location:** `generate_template()` method (~line 133-148)
+
+**Current:**
+```php
+$templates = array(
+    'blog' => $this->get_blog_template( $site_name, $site_desc, $site_url ),
+    'business' => $this->get_business_template( $site_name, $site_desc, $site_url ),
+    'news' => $this->get_news_template( $site_name, $site_desc, $site_url ),
+    'ecommerce' => $this->get_ecommerce_template( $site_name, $site_desc, $site_url ),
+    'other' => $this->get_generic_template( $site_name, $site_desc, $site_url ),
+);
+```
+
+**Change to:**
+```php
+$templates = array(
+    'blog' => $this->get_blog_template( $site_name, $site_desc, $site_url ),
+    'business' => $this->get_business_template( $site_name, $site_desc, $site_url ),
+    'news' => $this->get_news_template( $site_name, $site_desc, $site_url ),
+    'ecommerce' => $this->get_ecommerce_template( $site_name, $site_desc, $site_url ),
+    'portfolio' => $this->get_portfolio_template( $site_name, $site_desc, $site_url ),
+    'nonprofit' => $this->get_nonprofit_template( $site_name, $site_desc, $site_url ),
+    'education' => $this->get_education_template( $site_name, $site_desc, $site_url ),
+    'community' => $this->get_community_template( $site_name, $site_desc, $site_url ),
+    'other' => $this->get_generic_template( $site_name, $site_desc, $site_url ),
+);
+```
+
+**Add new template methods** (after the existing template methods, ~line 250+):
+
+```php
+/**
+ * Get portfolio site template
+ */
+private function get_portfolio_template( $site_name, $site_desc, $site_url ) {
+    $template = "# {$site_name}\n\n";
+    
+    if ( $site_desc ) {
+        $template .= "> {$site_desc}\n\n";
+    }
+    
+    $template .= "## About the Artist\n\n";
+    $template .= "This file helps AI systems understand our creative portfolio.\n\n";
+    $template .= "- Website: {$site_url}\n";
+    $template .= "- Content Type: Portfolio/Creative Work\n\n";
+    
+    $template .= "## Work & Projects\n\n";
+    $template .= "- [Portfolio]({$site_url}/portfolio): Browse creative work and projects\n";
+    $template .= "- [Services]({$site_url}/services): Available for hire\n";
+    $template .= "- [About]({$site_url}/about): Background and artistic vision\n\n";
+    
+    $template .= "## Specialties\n\n";
+    $template .= "[Add your creative specialties, mediums, or focus areas]\n\n";
+    
+    $template .= "## Contact & Commissions\n\n";
+    $template .= "For inquiries, collaborations, or commissions, please visit our contact page.\n\n";
+    
+    $template .= "---\n";
+    $template .= "# Generated by GetCited";
+    
+    return $template;
+}
+
+/**
+ * Get nonprofit site template
+ */
+private function get_nonprofit_template( $site_name, $site_desc, $site_url ) {
+    $template = "# {$site_name}\n\n";
+    
+    if ( $site_desc ) {
+        $template .= "> {$site_desc}\n\n";
+    }
+    
+    $template .= "## Our Mission\n\n";
+    $template .= "This file helps AI systems understand our nonprofit organization.\n\n";
+    $template .= "- Website: {$site_url}\n";
+    $template .= "- Organization Type: Nonprofit\n\n";
+    
+    $template .= "## What We Do\n\n";
+    $template .= "- [About Us]({$site_url}/about): Our mission, vision, and values\n";
+    $template .= "- [Programs]({$site_url}/programs): Our initiatives and services\n";
+    $template .= "- [Impact]({$site_url}/impact): Stories and outcomes\n\n";
+    
+    $template .= "## Get Involved\n\n";
+    $template .= "- [Donate]({$site_url}/donate): Support our mission\n";
+    $template .= "- [Volunteer]({$site_url}/volunteer): Join our team\n";
+    $template .= "- [Events]({$site_url}/events): Upcoming activities\n\n";
+    
+    $template .= "## Contact\n\n";
+    $template .= "For partnerships, media inquiries, or general questions, please visit our contact page.\n\n";
+    
+    $template .= "---\n";
+    $template .= "# Generated by GetCited";
+    
+    return $template;
+}
+
+/**
+ * Get education site template
+ */
+private function get_education_template( $site_name, $site_desc, $site_url ) {
+    $template = "# {$site_name}\n\n";
+    
+    if ( $site_desc ) {
+        $template .= "> {$site_desc}\n\n";
+    }
+    
+    $template .= "## About\n\n";
+    $template .= "This file helps AI systems understand our educational content.\n\n";
+    $template .= "- Website: {$site_url}\n";
+    $template .= "- Content Type: Education/Courses\n\n";
+    
+    $template .= "## Learning Resources\n\n";
+    $template .= "- [Courses]({$site_url}/courses): Available courses and programs\n";
+    $template .= "- [Resources]({$site_url}/resources): Free learning materials\n";
+    $template .= "- [Blog]({$site_url}/blog): Educational articles and tutorials\n\n";
+    
+    $template .= "## Topics Covered\n\n";
+    $template .= "[Add your main subject areas or course categories]\n\n";
+    
+    $template .= "## Instructors\n\n";
+    $template .= "- [About]({$site_url}/about): Meet our instructors and their expertise\n\n";
+    
+    $template .= "## Enroll\n\n";
+    $template .= "For enrollment information or questions, please visit our contact page.\n\n";
+    
+    $template .= "---\n";
+    $template .= "# Generated by GetCited";
+    
+    return $template;
+}
+
+/**
+ * Get community/forum site template
+ */
+private function get_community_template( $site_name, $site_desc, $site_url ) {
+    $template = "# {$site_name}\n\n";
+    
+    if ( $site_desc ) {
+        $template .= "> {$site_desc}\n\n";
+    }
+    
+    $template .= "## About Our Community\n\n";
+    $template .= "This file helps AI systems understand our community platform.\n\n";
+    $template .= "- Website: {$site_url}\n";
+    $template .= "- Platform Type: Community/Forum\n\n";
+    
+    $template .= "## Discussion Areas\n\n";
+    $template .= "- [Forums]({$site_url}/forums): Browse discussion topics\n";
+    $template .= "- [Groups]({$site_url}/groups): Join interest-based groups\n";
+    $template .= "- [Members]({$site_url}/members): Community directory\n\n";
+    
+    $template .= "## Topics\n\n";
+    $template .= "[Add your main discussion categories or focus areas]\n\n";
+    
+    $template .= "## Join Us\n\n";
+    $template .= "- [Register]({$site_url}/register): Create an account\n";
+    $template .= "- [Guidelines]({$site_url}/guidelines): Community rules and etiquette\n";
+    $template .= "- [FAQ]({$site_url}/faq): Common questions answered\n\n";
+    
+    $template .= "---\n";
+    $template .= "# Generated by GetCited";
+    
+    return $template;
+}
+```
+
+---
+
+#### 1.3 `includes/class-dashboard.php`
+
+**Location:** `ajax_load_template()` method (~line 191)
+
+**Current:**
+```php
+$valid_types = array( 'blog', 'business', 'news', 'ecommerce', 'other' );
+```
+
+**Change to:**
+```php
+$valid_types = array( 'blog', 'business', 'news', 'ecommerce', 'portfolio', 'nonprofit', 'education', 'community', 'other' );
+```
+
+---
+
+#### 1.4 `templates/wizard.php`
+
+**Location:** Step 2 site type selection (~line 45-75)
+
+**Current HTML structure shows 5 options in a 2-column grid.**
+
+**Replace entire Step 2 content with:**
+
+```php
+<!-- Step 2: Site Type -->
+<div class="getcited-wizard-step" data-step="2" style="display: none;">
+    <h2><?php esc_html_e( 'What type of site is this?', 'getcited' ); ?></h2>
+    <p class="description"><?php esc_html_e( 'This helps us generate the right llms.txt template and schema settings.', 'getcited' ); ?></p>
+    
+    <div class="getcited-site-type-grid">
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="blog" checked>
+            <span class="option-card">
+                <span class="dashicons dashicons-edit"></span>
+                <span class="option-label"><?php esc_html_e( 'Blog', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Personal or professional blog', 'getcited' ); ?></span>
+            </span>
+        </label>
+        
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="business">
+            <span class="option-card">
+                <span class="dashicons dashicons-building"></span>
+                <span class="option-label"><?php esc_html_e( 'Business', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Company or service provider', 'getcited' ); ?></span>
+            </span>
+        </label>
+        
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="news">
+            <span class="option-card">
+                <span class="dashicons dashicons-media-text"></span>
+                <span class="option-label"><?php esc_html_e( 'News / Magazine', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Publication or editorial', 'getcited' ); ?></span>
+            </span>
+        </label>
+        
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="ecommerce">
+            <span class="option-card">
+                <span class="dashicons dashicons-cart"></span>
+                <span class="option-label"><?php esc_html_e( 'E-commerce', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Online store or products', 'getcited' ); ?></span>
+            </span>
+        </label>
+        
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="portfolio">
+            <span class="option-card">
+                <span class="dashicons dashicons-portfolio"></span>
+                <span class="option-label"><?php esc_html_e( 'Portfolio', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Creative work showcase', 'getcited' ); ?></span>
+            </span>
+        </label>
+        
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="nonprofit">
+            <span class="option-card">
+                <span class="dashicons dashicons-heart"></span>
+                <span class="option-label"><?php esc_html_e( 'Nonprofit', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Charity or cause', 'getcited' ); ?></span>
+            </span>
+        </label>
+        
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="education">
+            <span class="option-card">
+                <span class="dashicons dashicons-welcome-learn-more"></span>
+                <span class="option-label"><?php esc_html_e( 'Education', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Courses or tutorials', 'getcited' ); ?></span>
+            </span>
+        </label>
+        
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="community">
+            <span class="option-card">
+                <span class="dashicons dashicons-groups"></span>
+                <span class="option-label"><?php esc_html_e( 'Community', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Forum or membership', 'getcited' ); ?></span>
+            </span>
+        </label>
+        
+        <label class="getcited-site-type-option">
+            <input type="radio" name="site_type" value="other">
+            <span class="option-card">
+                <span class="dashicons dashicons-admin-generic"></span>
+                <span class="option-label"><?php esc_html_e( 'Other', 'getcited' ); ?></span>
+                <span class="option-desc"><?php esc_html_e( 'Something else', 'getcited' ); ?></span>
+            </span>
+        </label>
+    </div>
+    
+    <div class="getcited-wizard-nav">
+        <button type="button" class="button getcited-wizard-prev"><?php esc_html_e( '← Back', 'getcited' ); ?></button>
+        <button type="button" class="button button-primary getcited-wizard-next"><?php esc_html_e( 'Continue →', 'getcited' ); ?></button>
+    </div>
+</div>
+```
+
+---
+
+#### 1.5 `templates/settings.php`
+
+**Location:** Site type dropdown (~line 85-95)
+
+**Current:**
+```php
+<select name="getcited_settings[site_type]" id="site_type">
+    <option value="blog" <?php selected( $site_type, 'blog' ); ?>><?php esc_html_e( 'Blog', 'getcited' ); ?></option>
+    <option value="business" <?php selected( $site_type, 'business' ); ?>><?php esc_html_e( 'Business', 'getcited' ); ?></option>
+    <option value="news" <?php selected( $site_type, 'news' ); ?>><?php esc_html_e( 'News / Magazine', 'getcited' ); ?></option>
+    <option value="ecommerce" <?php selected( $site_type, 'ecommerce' ); ?>><?php esc_html_e( 'E-commerce', 'getcited' ); ?></option>
+    <option value="other" <?php selected( $site_type, 'other' ); ?>><?php esc_html_e( 'Other', 'getcited' ); ?></option>
+</select>
+```
+
+**Change to:**
+```php
+<select name="getcited_settings[site_type]" id="site_type">
+    <option value="blog" <?php selected( $site_type, 'blog' ); ?>><?php esc_html_e( 'Blog', 'getcited' ); ?></option>
+    <option value="business" <?php selected( $site_type, 'business' ); ?>><?php esc_html_e( 'Business', 'getcited' ); ?></option>
+    <option value="news" <?php selected( $site_type, 'news' ); ?>><?php esc_html_e( 'News / Magazine', 'getcited' ); ?></option>
+    <option value="ecommerce" <?php selected( $site_type, 'ecommerce' ); ?>><?php esc_html_e( 'E-commerce', 'getcited' ); ?></option>
+    <option value="portfolio" <?php selected( $site_type, 'portfolio' ); ?>><?php esc_html_e( 'Portfolio', 'getcited' ); ?></option>
+    <option value="nonprofit" <?php selected( $site_type, 'nonprofit' ); ?>><?php esc_html_e( 'Nonprofit', 'getcited' ); ?></option>
+    <option value="education" <?php selected( $site_type, 'education' ); ?>><?php esc_html_e( 'Education / Courses', 'getcited' ); ?></option>
+    <option value="community" <?php selected( $site_type, 'community' ); ?>><?php esc_html_e( 'Community / Forum', 'getcited' ); ?></option>
+    <option value="other" <?php selected( $site_type, 'other' ); ?>><?php esc_html_e( 'Other', 'getcited' ); ?></option>
+</select>
+```
+
+---
+
+#### 1.6 `assets/css/admin.css`
+
+**Location:** Wizard styles section
+
+**Add/modify grid styles for 9 options (3×3 layout):**
+
+```css
+/* Site Type Grid - 3x3 for 9 options */
+.getcited-site-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--getcited-space-md);
+    margin: var(--getcited-space-lg) 0;
+}
+
+@media (max-width: 782px) {
+    .getcited-site-type-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .getcited-site-type-grid {
+        grid-template-columns: 1fr;
+    }
+}
+```
+
+---
+
+## 2. Site Type-Specific Default Settings (Granular Configuration)
+
+### Rationale
+
+Different site types benefit from different schema configurations. A blog needs Article and Author schema; a business site needs FAQ schema more than Author.
+
+### Schema Defaults by Site Type
+
+| Site Type | Organization | Article | Author | FAQ |
+|-----------|:------------:|:-------:|:------:|:---:|
+| Blog | ✅ | ✅ | ✅ | ✅ |
+| Business | ✅ | ⚪ | ⚪ | ✅ |
+| News | ✅ | ✅ | ✅ | ⚪ |
+| E-commerce | ✅ | ⚪ | ⚪ | ✅ |
+| Portfolio | ✅ | ⚪ | ✅ | ⚪ |
+| Nonprofit | ✅ | ✅ | ⚪ | ✅ |
+| Education | ✅ | ✅ | ✅ | ✅ |
+| Community | ✅ | ⚪ | ⚪ | ✅ |
+| Other | ✅ | ✅ | ✅ | ✅ |
+
+**Legend:** ✅ = Enabled by default, ⚪ = Disabled by default
+
+### Files to Modify
+
+#### 2.1 `includes/class-settings.php`
+
+**Add new method** (~after `get_defaults()`, around line 150):
+
+```php
+/**
+ * Get schema defaults for a specific site type
+ *
+ * @param string $site_type The site type slug
+ * @return array Schema type defaults
+ */
+public function get_schema_defaults_for_site_type( $site_type ) {
+    $defaults = array(
+        'blog' => array(
+            'organization' => true,
+            'article' => true,
+            'author' => true,
+            'faq' => true,
+        ),
+        'business' => array(
+            'organization' => true,
+            'article' => false,
+            'author' => false,
+            'faq' => true,
+        ),
+        'news' => array(
+            'organization' => true,
+            'article' => true,
+            'author' => true,
+            'faq' => false,
+        ),
+        'ecommerce' => array(
+            'organization' => true,
+            'article' => false,
+            'author' => false,
+            'faq' => true,
+        ),
+        'portfolio' => array(
+            'organization' => true,
+            'article' => false,
+            'author' => true,
+            'faq' => false,
+        ),
+        'nonprofit' => array(
+            'organization' => true,
+            'article' => true,
+            'author' => false,
+            'faq' => true,
+        ),
+        'education' => array(
+            'organization' => true,
+            'article' => true,
+            'author' => true,
+            'faq' => true,
+        ),
+        'community' => array(
+            'organization' => true,
+            'article' => false,
+            'author' => false,
+            'faq' => true,
+        ),
+        'other' => array(
+            'organization' => true,
+            'article' => true,
+            'author' => true,
+            'faq' => true,
+        ),
+    );
+    
+    return isset( $defaults[ $site_type ] ) ? $defaults[ $site_type ] : $defaults['other'];
+}
+```
+
+---
+
+#### 2.2 `includes/class-wizard.php`
+
+**In wizard completion logic**, apply schema presets:
+
+```php
+/**
+ * Apply schema presets based on site type selection
+ */
+private function apply_site_type_presets( $site_type ) {
+    $settings_manager = GetCited_Settings::instance();
+    $schema_defaults = $settings_manager->get_schema_defaults_for_site_type( $site_type );
+    
+    $settings = get_option( 'getcited_settings', array() );
+    
+    // Only apply if schema_types not already customized
+    if ( empty( $settings['schema_types'] ) ) {
+        $settings['schema_types'] = $schema_defaults;
+        update_option( 'getcited_settings', $settings );
+    }
+}
+```
+
+---
+
+#### 2.3 `templates/settings.php`
+
+**Add JavaScript to update schema checkboxes when site type changes:**
+
+```php
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const siteTypeSelect = document.getElementById('site_type');
+    if (!siteTypeSelect) return;
+    
+    const schemaDefaults = <?php echo wp_json_encode( array(
+        'blog' => array( 'organization' => true, 'article' => true, 'author' => true, 'faq' => true ),
+        'business' => array( 'organization' => true, 'article' => false, 'author' => false, 'faq' => true ),
+        'news' => array( 'organization' => true, 'article' => true, 'author' => true, 'faq' => false ),
+        'ecommerce' => array( 'organization' => true, 'article' => false, 'author' => false, 'faq' => true ),
+        'portfolio' => array( 'organization' => true, 'article' => false, 'author' => true, 'faq' => false ),
+        'nonprofit' => array( 'organization' => true, 'article' => true, 'author' => false, 'faq' => true ),
+        'education' => array( 'organization' => true, 'article' => true, 'author' => true, 'faq' => true ),
+        'community' => array( 'organization' => true, 'article' => false, 'author' => false, 'faq' => true ),
+        'other' => array( 'organization' => true, 'article' => true, 'author' => true, 'faq' => true ),
+    ) ); ?>;
+    
+    siteTypeSelect.addEventListener('change', function() {
+        const type = this.value;
+        const defaults = schemaDefaults[type];
+        
+        if (defaults && confirm(getcited_admin.strings.apply_schema_preset)) {
+            Object.keys(defaults).forEach(function(schemaType) {
+                const checkbox = document.querySelector('input[name="getcited_settings[schema_types][' + schemaType + ']"]');
+                if (checkbox) {
+                    checkbox.checked = defaults[schemaType];
+                }
+            });
+        }
+    });
+});
+</script>
+```
+
+---
+
+#### 2.4 `getcited.php`
+
+**Add localized string:**
+
+```php
+// In admin_enqueue_scripts(), add to $strings array:
+'apply_schema_preset' => __( 'Apply recommended schema settings for this site type?', 'getcited' ),
+```
+
+---
+
+## 3. Bug Fix: Wizard Steps Not Displaying
+
+### The Problem
+
+User reported: "I ran the Setup Wizard and it gets stuck here with nothing I can do or see other than the 1-5 steps."
+
+The wizard progress bar is visible, but no step content appears.
+
+### Root Cause
+
+In `assets/js/admin.js`, the `initWizard()` function sets up event handlers but never calls `showStep(0)` to initialize the first step. The code relies on HTML having `style="display: none;"` on steps 2-5 but NOT on step 1. If CSS conflicts hide all `.getcited-wizard-step` elements, nothing shows.
+
+### The Fix
+
+**File:** `assets/js/admin.js`
+
+**Location:** End of `initWizard()` function (~line 882)
+
+**Add this line at the end of the function, after all event handlers are set up:**
+
+```javascript
+// Initialize first step - ensure it's visible on page load
+showStep(0);
+```
+
+**Also add defensive logging in `showStep()` function:**
+
+```javascript
+function showStep(index) {
+    // Hide all steps
+    steps.forEach(function(step, i) {
+        const stepEl = document.querySelector('[data-step="' + step + '"]');
+        if (stepEl) {
+            stepEl.style.display = (i === index) ? 'block' : 'none';
+        } else {
+            console.warn('GetCited: Wizard step element not found:', step);
+        }
+    });
+    
+    // Update progress indicators
+    updateProgress(index);
+    currentStep = index;
+}
+```
+
+### Testing
+
+1. Deactivate and reactivate the plugin
+2. Wizard should appear with Step 1 visible
+3. Check browser console for any "GetCited: Wizard step element not found" warnings
+
+---
+
+## 4. Bug Fix: Health Check Expand Buttons Not Working
+
+### The Problem
+
+User reported: "Before or after clicking Run Check button, the down arrow buttons don't do anything. I can click, but nothing happens."
+
+### Root Cause
+
+The expand button click handler (~lines 535-553 in `admin.js`) fails silently if:
+1. The clicked element doesn't have the expected class
+2. The `data-check` attribute is missing
+3. The corresponding `.getcited-health-details[data-check="${checkKey}"]` element doesn't exist
+
+Additionally, the buttons may have browser default styling that makes them look like `<select>` dropdowns.
+
+### The Fix
+
+**File:** `assets/js/admin.js`
+
+**Replace the expand button handler (~lines 535-553) with:**
+
+```javascript
+// Health check expand buttons
+document.querySelectorAll('.getcited-health-expand').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const item = this.closest('.getcited-health-item');
+        if (!item) {
+            console.warn('GetCited: Could not find parent .getcited-health-item');
+            return;
+        }
+        
+        const checkKey = item.dataset.check;
+        if (!checkKey) {
+            console.warn('GetCited: No data-check attribute on health item');
+            return;
+        }
+        
+        // Try to find details by data attribute first
+        let details = document.querySelector('.getcited-health-details[data-check="' + checkKey + '"]');
+        
+        // Fallback: look for details as sibling element
+        if (!details) {
+            details = item.querySelector('.getcited-health-details');
+        }
+        
+        // Fallback: look for next sibling
+        if (!details) {
+            details = item.nextElementSibling;
+            if (details && !details.classList.contains('getcited-health-details')) {
+                details = null;
+            }
+        }
+        
+        if (!details) {
+            console.warn('GetCited: Could not find details element for check:', checkKey);
+            return;
+        }
+        
+        // Toggle visibility
+        toggleDetails(details, this);
+    });
+});
+
+/**
+ * Toggle details visibility with animation
+ */
+function toggleDetails(detailsEl, buttonEl) {
+    const isHidden = detailsEl.style.display === 'none' || !detailsEl.style.display;
+    
+    if (isHidden) {
+        detailsEl.style.display = 'block';
+        buttonEl.classList.add('expanded');
+        buttonEl.setAttribute('aria-expanded', 'true');
+    } else {
+        detailsEl.style.display = 'none';
+        buttonEl.classList.remove('expanded');
+        buttonEl.setAttribute('aria-expanded', 'false');
+    }
+}
+```
+
+---
+
+**File:** `assets/css/admin.css`
+
+**Add explicit button styling to prevent browser defaults:**
+
+```css
+/* Health Check Expand Buttons - Explicit Styling */
+.getcited-health-section .getcited-health-expand {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--getcited-gray-300);
+    border-radius: var(--getcited-radius-sm);
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.getcited-health-section .getcited-health-expand:hover {
+    background: var(--getcited-gray-100);
+    border-color: var(--getcited-gray-400);
+}
+
+.getcited-health-section .getcited-health-expand:focus {
+    outline: 2px solid var(--getcited-primary);
+    outline-offset: 2px;
+}
+
+.getcited-health-section .getcited-health-expand .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.getcited-health-section .getcited-health-expand.expanded .dashicons {
+    transform: rotate(180deg);
+}
+```
+
+### Debugging
+
+After applying the fix, if buttons still don't work:
+
+1. Open browser console
+2. Click an expand button
+3. Look for "GetCited:" warnings
+4. The warning message will indicate exactly which part of the selector is failing
+
+---
+
+## Summary of Changes for v1.0.4
+
+### Section 1: Expand Site Types (5 → 9)
+
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `includes/class-settings.php` | Modify | Add 4 new site types to validation array |
+| `includes/class-llms-txt.php` | Add | 4 new template generator methods (~200 lines) |
+| `includes/class-dashboard.php` | Modify | Update template type validation array |
+| `templates/wizard.php` | Modify | Add 4 new site type radio options |
+| `templates/settings.php` | Modify | Add 4 new site type select options |
+| `assets/css/admin.css` | Modify | Adjust wizard grid for 9 options (3x3) |
+
+### Section 2: Granular Settings by Site Type
+
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `includes/class-settings.php` | Add | New `get_schema_defaults_for_site_type()` method |
+| `includes/class-wizard.php` | Modify | Apply schema presets when site type selected |
+| `templates/settings.php` | Add | JavaScript to update schema on site type change |
+| `getcited.php` | Modify | Add localized string for confirmation dialog |
+
+### Section 3: Bug Fix — Wizard Steps
+
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `assets/js/admin.js` | Modify | Add `showStep(0)` call at end of `initWizard()` |
+| `assets/js/admin.js` | Add | Defensive `console.warn` in `showStep()` |
+
+### Section 4: Bug Fix — Health Check Expand Buttons
+
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `assets/js/admin.js` | Modify | Rewrite expand handler with error handling and fallback |
+| `assets/js/admin.js` | Add | New `toggleDetails()` helper function |
+| `assets/css/admin.css` | Add | Higher-specificity button styles with `appearance: none` |
+
+---
+
+## Files Changed Summary
+
+| File | Total Changes |
+|------|---------------|
+| `includes/class-settings.php` | 2 modifications |
+| `includes/class-llms-txt.php` | 1 addition (~200 lines for new templates) |
+| `includes/class-dashboard.php` | 1 modification |
+| `includes/class-wizard.php` | 1 modification |
+| `templates/wizard.php` | 1 modification |
+| `templates/settings.php` | 2 modifications |
+| `assets/css/admin.css` | 2 additions (wizard grid, health button) |
+| `assets/js/admin.js` | 3 modifications (wizard init, health expand, toggleDetails) |
+| `getcited.php` | 1 modification |
+
+**Estimated total new code:** ~400 lines
+
+---
+
+*End of document.*
+
+*See also: `CHANGES-v1.1.0.md` for the Site Scanner feature (next release)*

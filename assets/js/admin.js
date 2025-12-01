@@ -534,20 +534,61 @@
 
         // Expand/collapse health details
         healthSection.querySelectorAll('.getcited-health-expand').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
                 const item = this.closest('.getcited-health-item');
+                if (!item) {
+                    console.warn('GetCited: Could not find parent .getcited-health-item');
+                    return;
+                }
+
                 const checkKey = item.dataset.check;
-                const details = healthSection.querySelector(`.getcited-health-details[data-check="${checkKey}"]`);
+                if (!checkKey) {
+                    console.warn('GetCited: No data-check attribute on health item');
+                    return;
+                }
 
-                if (details) {
-                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
-                    this.setAttribute('aria-expanded', !isExpanded);
-                    details.style.display = isExpanded ? 'none' : 'block';
+                // Try to find details by data attribute first
+                let details = healthSection.querySelector('.getcited-health-details[data-check="' + checkKey + '"]');
 
-                    // Rotate arrow icon
-                    const icon = this.querySelector('.dashicons');
-                    icon.classList.toggle('dashicons-arrow-down-alt2', isExpanded);
-                    icon.classList.toggle('dashicons-arrow-up-alt2', !isExpanded);
+                // Fallback: look for details as child element
+                if (!details) {
+                    details = item.querySelector('.getcited-health-details');
+                }
+
+                // Fallback: look for next sibling
+                if (!details) {
+                    details = item.nextElementSibling;
+                    if (details && !details.classList.contains('getcited-health-details')) {
+                        details = null;
+                    }
+                }
+
+                if (!details) {
+                    console.warn('GetCited: Could not find details element for check:', checkKey);
+                    return;
+                }
+
+                // Toggle visibility
+                const isHidden = details.style.display === 'none' || !details.style.display;
+
+                if (isHidden) {
+                    details.style.display = 'block';
+                    this.classList.add('expanded');
+                    this.setAttribute('aria-expanded', 'true');
+                } else {
+                    details.style.display = 'none';
+                    this.classList.remove('expanded');
+                    this.setAttribute('aria-expanded', 'false');
+                }
+
+                // Rotate arrow icon
+                const icon = this.querySelector('.dashicons');
+                if (icon) {
+                    icon.classList.toggle('dashicons-arrow-down-alt2', !isHidden);
+                    icon.classList.toggle('dashicons-arrow-up-alt2', isHidden);
                 }
             });
         });
@@ -798,6 +839,8 @@
             const stepEl = wizard.querySelector(`[data-step="${steps[index]}"]`);
             if (stepEl) {
                 stepEl.style.display = 'block';
+            } else {
+                console.warn('GetCited: Wizard step element not found:', steps[index]);
             }
 
             // Update progress
@@ -880,6 +923,9 @@
                 this.closest('.getcited-radio-card').classList.add('selected');
             });
         });
+
+        // Initialize first step - ensure it's visible on page load
+        showStep(0);
     }
 
     function saveWizardStep(stepName) {

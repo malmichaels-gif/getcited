@@ -121,27 +121,47 @@ class GetCited_Wizard {
         return array(
             'blog' => array(
                 'label' => __( 'Blog', 'getcited' ),
-                'description' => __( 'Personal or professional blog with articles', 'getcited' ),
+                'description' => __( 'Personal or professional blog', 'getcited' ),
                 'icon' => 'dashicons-edit',
             ),
             'business' => array(
                 'label' => __( 'Business', 'getcited' ),
-                'description' => __( 'Company website, services, or local business', 'getcited' ),
+                'description' => __( 'Company or service provider', 'getcited' ),
                 'icon' => 'dashicons-building',
             ),
             'news' => array(
-                'label' => __( 'News / Media', 'getcited' ),
-                'description' => __( 'News publication, magazine, or media outlet', 'getcited' ),
+                'label' => __( 'News / Magazine', 'getcited' ),
+                'description' => __( 'Publication or editorial', 'getcited' ),
                 'icon' => 'dashicons-megaphone',
             ),
             'ecommerce' => array(
                 'label' => __( 'E-commerce', 'getcited' ),
-                'description' => __( 'Online store selling products', 'getcited' ),
+                'description' => __( 'Online store or products', 'getcited' ),
                 'icon' => 'dashicons-cart',
+            ),
+            'portfolio' => array(
+                'label' => __( 'Portfolio', 'getcited' ),
+                'description' => __( 'Creative work showcase', 'getcited' ),
+                'icon' => 'dashicons-portfolio',
+            ),
+            'nonprofit' => array(
+                'label' => __( 'Nonprofit', 'getcited' ),
+                'description' => __( 'Charity or cause', 'getcited' ),
+                'icon' => 'dashicons-heart',
+            ),
+            'education' => array(
+                'label' => __( 'Education', 'getcited' ),
+                'description' => __( 'Courses or tutorials', 'getcited' ),
+                'icon' => 'dashicons-welcome-learn-more',
+            ),
+            'community' => array(
+                'label' => __( 'Community', 'getcited' ),
+                'description' => __( 'Forum or membership', 'getcited' ),
+                'icon' => 'dashicons-groups',
             ),
             'other' => array(
                 'label' => __( 'Other', 'getcited' ),
-                'description' => __( 'Portfolio, community, or other type', 'getcited' ),
+                'description' => __( 'Something else', 'getcited' ),
                 'icon' => 'dashicons-admin-generic',
             ),
         );
@@ -184,34 +204,78 @@ class GetCited_Wizard {
         $content = $llms_txt->generate_template( $site_type );
         $settings->set( 'llms_txt_content', $content );
 
-        // Configure schema types based on site type
-        $schema_types = array(
-            'organization' => true,
-            'article' => true,
-            'author' => true,
-            'faq' => true,
-        );
-
-        switch ( $site_type ) {
-            case 'news':
-                // News sites need article and author schema
-                $schema_types['article'] = true;
-                $schema_types['author'] = true;
-                break;
-            case 'ecommerce':
-                // E-commerce: Organization and FAQ, skip article
-                $schema_types['article'] = false;
-                $schema_types['author'] = false;
-                break;
-            case 'business':
-                // Business: Organization is key
-                $schema_types['organization'] = true;
-                break;
-        }
-
+        // Get schema defaults for site type
+        $schema_types = $this->get_schema_defaults_for_site_type( $site_type );
         $settings->set( 'schema_types', $schema_types );
 
         return true;
+    }
+
+    /**
+     * Get schema defaults for a specific site type
+     *
+     * @param string $site_type The site type slug.
+     * @return array Schema type defaults.
+     */
+    public function get_schema_defaults_for_site_type( $site_type ) {
+        $defaults = array(
+            'blog' => array(
+                'organization' => true,
+                'article' => true,
+                'author' => true,
+                'faq' => true,
+            ),
+            'business' => array(
+                'organization' => true,
+                'article' => false,
+                'author' => false,
+                'faq' => true,
+            ),
+            'news' => array(
+                'organization' => true,
+                'article' => true,
+                'author' => true,
+                'faq' => false,
+            ),
+            'ecommerce' => array(
+                'organization' => true,
+                'article' => false,
+                'author' => false,
+                'faq' => true,
+            ),
+            'portfolio' => array(
+                'organization' => true,
+                'article' => false,
+                'author' => true,
+                'faq' => false,
+            ),
+            'nonprofit' => array(
+                'organization' => true,
+                'article' => true,
+                'author' => false,
+                'faq' => true,
+            ),
+            'education' => array(
+                'organization' => true,
+                'article' => true,
+                'author' => true,
+                'faq' => true,
+            ),
+            'community' => array(
+                'organization' => true,
+                'article' => false,
+                'author' => false,
+                'faq' => true,
+            ),
+            'other' => array(
+                'organization' => true,
+                'article' => true,
+                'author' => true,
+                'faq' => true,
+            ),
+        );
+
+        return isset( $defaults[ $site_type ] ) ? $defaults[ $site_type ] : $defaults['other'];
     }
 
     /**

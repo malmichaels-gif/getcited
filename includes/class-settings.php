@@ -298,7 +298,17 @@ class GetCited_Settings {
                 return $this->defaults['organization'];
 
             case 'site_type':
-                $valid_types = array( 'blog', 'business', 'news', 'ecommerce', 'other' );
+                $valid_types = array(
+                    'blog',
+                    'business',
+                    'news',
+                    'ecommerce',
+                    'portfolio',
+                    'nonprofit',
+                    'education',
+                    'community',
+                    'other'
+                );
                 return in_array( $value, $valid_types, true ) ? $value : 'blog';
 
             case 'license_key':

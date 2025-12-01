@@ -301,29 +301,47 @@
     position: relative;
 }
 
-.getcited-health-expand {
-    background: none;
-    border: none;
-    padding: 4px;
+/* Health Check Expand Buttons - Explicit Styling */
+.getcited-health-section .getcited-health-expand {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--getcited-gray-300);
+    border-radius: var(--getcited-radius-sm);
+    width: 28px;
+    height: 28px;
+    padding: 0;
     cursor: pointer;
-    color: var(--getcited-gray-400);
-    transition: color var(--getcited-transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
     flex-shrink: 0;
     margin-left: auto;
+    color: var(--getcited-gray-400);
 }
 
-.getcited-health-expand:hover {
+.getcited-health-section .getcited-health-expand:hover {
+    background: var(--getcited-gray-100);
+    border-color: var(--getcited-gray-400);
     color: var(--getcited-gray-600);
 }
 
-.getcited-health-expand .dashicons {
+.getcited-health-section .getcited-health-expand:focus {
+    outline: 2px solid var(--getcited-primary);
+    outline-offset: 2px;
+}
+
+.getcited-health-section .getcited-health-expand .dashicons {
     font-size: 16px;
     width: 16px;
     height: 16px;
-    transition: transform var(--getcited-transition);
+    transition: transform 0.2s ease;
 }
 
-.getcited-health-expand[aria-expanded="true"] .dashicons {
+.getcited-health-section .getcited-health-expand.expanded .dashicons,
+.getcited-health-section .getcited-health-expand[aria-expanded="true"] .dashicons {
     transform: rotate(180deg);
 }
 
@@ -1541,13 +1559,25 @@
     color: var(--getcited-gray-700);
 }
 
-/* Site Type Selection */
+/* Site Type Selection - 3x3 grid for 9 options */
 .getcited-site-types {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--getcited-space-md);
     text-align: left;
     margin-bottom: var(--getcited-space-lg);
+}
+
+@media (max-width: 782px) {
+    .getcited-site-types {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .getcited-site-types {
+        grid-template-columns: 1fr;
+    }
 }
 
 .getcited-site-type {

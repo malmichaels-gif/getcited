@@ -188,7 +188,7 @@ class GetCited_Dashboard {
         $type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : 'blog';
 
         // Validate type
-        $valid_types = array( 'blog', 'business', 'news', 'ecommerce', 'other' );
+        $valid_types = array( 'blog', 'business', 'news', 'ecommerce', 'portfolio', 'nonprofit', 'education', 'community', 'other' );
         if ( ! in_array( $type, $valid_types, true ) ) {
             $type = 'blog';
         }

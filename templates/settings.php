@@ -43,10 +43,22 @@ $wizard_completed = $settings->get( 'wizard_completed' );
                                 <?php esc_html_e( 'Business', 'getcited' ); ?>
                             </option>
                             <option value="news" <?php selected( $site_type, 'news' ); ?>>
-                                <?php esc_html_e( 'News / Media', 'getcited' ); ?>
+                                <?php esc_html_e( 'News / Magazine', 'getcited' ); ?>
                             </option>
                             <option value="ecommerce" <?php selected( $site_type, 'ecommerce' ); ?>>
                                 <?php esc_html_e( 'E-commerce', 'getcited' ); ?>
+                            </option>
+                            <option value="portfolio" <?php selected( $site_type, 'portfolio' ); ?>>
+                                <?php esc_html_e( 'Portfolio', 'getcited' ); ?>
+                            </option>
+                            <option value="nonprofit" <?php selected( $site_type, 'nonprofit' ); ?>>
+                                <?php esc_html_e( 'Nonprofit', 'getcited' ); ?>
+                            </option>
+                            <option value="education" <?php selected( $site_type, 'education' ); ?>>
+                                <?php esc_html_e( 'Education / Courses', 'getcited' ); ?>
+                            </option>
+                            <option value="community" <?php selected( $site_type, 'community' ); ?>>
+                                <?php esc_html_e( 'Community / Forum', 'getcited' ); ?>
                             </option>
                             <option value="other" <?php selected( $site_type, 'other' ); ?>>
                                 <?php esc_html_e( 'Other', 'getcited' ); ?>
