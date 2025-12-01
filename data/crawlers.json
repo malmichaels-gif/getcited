@@ -1,0 +1,214 @@
+{
+  "version": "1.0",
+  "updated": "2025-11-28",
+  "crawlers": [
+    {
+      "name": "GPTBot",
+      "company": "OpenAI",
+      "user_agent": "GPTBot",
+      "purpose": "ChatGPT training & web browsing",
+      "recommended": true,
+      "docs_url": "https://platform.openai.com/docs/gptbot"
+    },
+    {
+      "name": "ChatGPT-User",
+      "company": "OpenAI",
+      "user_agent": "ChatGPT-User",
+      "purpose": "ChatGPT browse mode (real-time)",
+      "recommended": true,
+      "docs_url": "https://platform.openai.com/docs/gptbot"
+    },
+    {
+      "name": "OAI-SearchBot",
+      "company": "OpenAI",
+      "user_agent": "OAI-SearchBot",
+      "purpose": "ChatGPT Search feature",
+      "recommended": true,
+      "docs_url": "https://platform.openai.com/docs/bots"
+    },
+    {
+      "name": "anthropic-ai",
+      "company": "Anthropic",
+      "user_agent": "anthropic-ai",
+      "purpose": "Claude training",
+      "recommended": true,
+      "docs_url": "https://www.anthropic.com/robots-txt"
+    },
+    {
+      "name": "ClaudeBot",
+      "company": "Anthropic",
+      "user_agent": "ClaudeBot",
+      "purpose": "Claude web access & citations",
+      "recommended": true,
+      "docs_url": "https://www.anthropic.com/robots-txt"
+    },
+    {
+      "name": "Claude-Web",
+      "company": "Anthropic",
+      "user_agent": "Claude-Web",
+      "purpose": "Claude web features",
+      "recommended": true,
+      "docs_url": "https://www.anthropic.com/robots-txt"
+    },
+    {
+      "name": "PerplexityBot",
+      "company": "Perplexity",
+      "user_agent": "PerplexityBot",
+      "purpose": "AI search engine indexing",
+      "recommended": true,
+      "docs_url": "https://docs.perplexity.ai/docs/perplexitybot"
+    },
+    {
+      "name": "Perplexity-User",
+      "company": "Perplexity",
+      "user_agent": "Perplexity-User",
+      "purpose": "User-triggered real-time fetches",
+      "recommended": true,
+      "docs_url": "https://docs.perplexity.ai/docs/perplexitybot"
+    },
+    {
+      "name": "Google-Extended",
+      "company": "Google",
+      "user_agent": "Google-Extended",
+      "purpose": "Gemini/Bard training",
+      "recommended": true,
+      "docs_url": "https://developers.google.com/search/docs/crawling-indexing/google-extended"
+    },
+    {
+      "name": "GoogleOther",
+      "company": "Google",
+      "user_agent": "GoogleOther",
+      "purpose": "Google AI research and development",
+      "recommended": false,
+      "docs_url": "https://developers.google.com/search/docs/crawling-indexing/googleother"
+    },
+    {
+      "name": "Google-CloudVertexBot",
+      "company": "Google",
+      "user_agent": "Google-CloudVertexBot",
+      "purpose": "Vertex AI platform",
+      "recommended": false,
+      "docs_url": "https://cloud.google.com/vertex-ai"
+    },
+    {
+      "name": "Applebot",
+      "company": "Apple",
+      "user_agent": "Applebot",
+      "purpose": "Siri and Spotlight search",
+      "recommended": true,
+      "docs_url": "https://support.apple.com/en-us/HT204683"
+    },
+    {
+      "name": "Applebot-Extended",
+      "company": "Apple",
+      "user_agent": "Applebot-Extended",
+      "purpose": "Apple Intelligence features",
+      "recommended": true,
+      "docs_url": "https://support.apple.com/en-us/HT204683"
+    },
+    {
+      "name": "Meta-ExternalAgent",
+      "company": "Meta",
+      "user_agent": "Meta-ExternalAgent",
+      "purpose": "Meta AI training",
+      "recommended": false,
+      "docs_url": "https://www.facebook.com/robots.txt"
+    },
+    {
+      "name": "FacebookBot",
+      "company": "Meta",
+      "user_agent": "FacebookBot",
+      "purpose": "Meta AI features",
+      "recommended": false,
+      "docs_url": "https://developers.facebook.com/docs/sharing/webmasters/crawler"
+    },
+    {
+      "name": "Amazonbot",
+      "company": "Amazon",
+      "user_agent": "Amazonbot",
+      "purpose": "Alexa and Amazon AI",
+      "recommended": true,
+      "docs_url": "https://developer.amazon.com/amazonbot"
+    },
+    {
+      "name": "Bytespider",
+      "company": "ByteDance",
+      "user_agent": "Bytespider",
+      "purpose": "TikTok/Doubao AI training",
+      "recommended": false,
+      "docs_url": null
+    },
+    {
+      "name": "CCBot",
+      "company": "Common Crawl",
+      "user_agent": "CCBot",
+      "purpose": "Open dataset (used by many LLMs)",
+      "recommended": true,
+      "docs_url": "https://commoncrawl.org/ccbot"
+    },
+    {
+      "name": "cohere-ai",
+      "company": "Cohere",
+      "user_agent": "cohere-ai",
+      "purpose": "Enterprise AI training",
+      "recommended": false,
+      "docs_url": "https://cohere.com"
+    },
+    {
+      "name": "DuckAssistBot",
+      "company": "DuckDuckGo",
+      "user_agent": "DuckAssistBot",
+      "purpose": "DuckDuckGo AI Assist",
+      "recommended": true,
+      "docs_url": "https://duckduckgo.com/duckduckbot"
+    },
+    {
+      "name": "Deepseek",
+      "company": "DeepSeek",
+      "user_agent": "Deepseek",
+      "purpose": "DeepSeek AI training",
+      "recommended": false,
+      "docs_url": "https://deepseek.com"
+    },
+    {
+      "name": "MistralAI-User",
+      "company": "Mistral",
+      "user_agent": "MistralAI-User",
+      "purpose": "Mistral AI (European)",
+      "recommended": false,
+      "docs_url": "https://mistral.ai"
+    },
+    {
+      "name": "xAI-Grok-Bot",
+      "company": "xAI",
+      "user_agent": "xAI-Grok-Bot",
+      "purpose": "Grok training",
+      "recommended": false,
+      "docs_url": "https://x.ai"
+    },
+    {
+      "name": "Diffbot",
+      "company": "Diffbot",
+      "user_agent": "Diffbot",
+      "purpose": "Knowledge graph construction",
+      "recommended": false,
+      "docs_url": "https://www.diffbot.com/company/crawling-policy"
+    },
+    {
+      "name": "YouBot",
+      "company": "You.com",
+      "user_agent": "YouBot",
+      "purpose": "AI search engine",
+      "recommended": true,
+      "docs_url": "https://about.you.com/youbot"
+    },
+    {
+      "name": "ImagesiftBot",
+      "company": "Imagesift",
+      "user_agent": "ImagesiftBot",
+      "purpose": "Image AI training",
+      "recommended": false,
+      "docs_url": null
+    }
+  ]
+}

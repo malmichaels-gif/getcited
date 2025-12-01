@@ -1,0 +1,1676 @@
+/**
+ * GetCited Admin Styles
+ * 
+ * Design inspired by modern dashboard UIs:
+ * - Card-based layouts with subtle shadows
+ * - Clean typography with clear hierarchy
+ * - Accent colors: teal/cyan for success, amber for warnings
+ * - Dark accents for Pro/locked features
+ */
+
+/* ==========================================================================
+   CSS Variables
+   ========================================================================== */
+
+:root {
+    /* Primary palette */
+    --getcited-primary: #0d9488;
+    --getcited-primary-dark: #0f766e;
+    --getcited-primary-light: #14b8a6;
+    
+    /* Accent colors */
+    --getcited-accent: #8b5cf6;
+    --getcited-accent-light: #a78bfa;
+    --getcited-warning: #f59e0b;
+    --getcited-error: #ef4444;
+    --getcited-success: #10b981;
+    
+    /* Neutrals */
+    --getcited-gray-50: #f9fafb;
+    --getcited-gray-100: #f3f4f6;
+    --getcited-gray-200: #e5e7eb;
+    --getcited-gray-300: #d1d5db;
+    --getcited-gray-400: #9ca3af;
+    --getcited-gray-500: #6b7280;
+    --getcited-gray-600: #4b5563;
+    --getcited-gray-700: #374151;
+    --getcited-gray-800: #1f2937;
+    --getcited-gray-900: #111827;
+    
+    /* Dark theme (for Pro sections) */
+    --getcited-dark-bg: #1e1e2e;
+    --getcited-dark-card: #2a2a3e;
+    --getcited-dark-border: #3a3a4e;
+    --getcited-dark-text: #e5e7eb;
+    --getcited-dark-muted: #9ca3af;
+    
+    /* Spacing */
+    --getcited-space-xs: 4px;
+    --getcited-space-sm: 8px;
+    --getcited-space-md: 16px;
+    --getcited-space-lg: 24px;
+    --getcited-space-xl: 32px;
+    --getcited-space-2xl: 48px;
+    
+    /* Border radius */
+    --getcited-radius-sm: 6px;
+    --getcited-radius-md: 10px;
+    --getcited-radius-lg: 16px;
+    --getcited-radius-full: 9999px;
+    
+    /* Shadows */
+    --getcited-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --getcited-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --getcited-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    /* Transitions */
+    --getcited-transition: 150ms ease;
+}
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
+
+.getcited-wrap {
+    max-width: 1400px;
+    margin: 20px 20px 20px 0;
+}
+
+.getcited-wrap h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--getcited-gray-900);
+    margin-bottom: 8px;
+}
+
+.getcited-wrap > p.description {
+    font-size: 14px;
+    color: var(--getcited-gray-500);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+/* ==========================================================================
+   Sections & Cards
+   ========================================================================== */
+
+.getcited-section {
+    background: #fff;
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-md);
+    padding: var(--getcited-space-lg);
+    margin-bottom: var(--getcited-space-lg);
+    box-shadow: var(--getcited-shadow-sm);
+}
+
+.getcited-section h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--getcited-gray-800);
+    margin: 0 0 var(--getcited-space-md) 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--getcited-space-md);
+}
+
+.getcited-section h2 .button {
+    font-size: 13px;
+}
+
+.getcited-section p.description {
+    color: var(--getcited-gray-500);
+    font-size: 13px;
+    margin: 0 0 var(--getcited-space-md) 0;
+}
+
+/* ==========================================================================
+   Dashboard - Status Cards
+   ========================================================================== */
+
+.getcited-status-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--getcited-space-md);
+}
+
+.getcited-card {
+    background: var(--getcited-gray-50);
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-md);
+    padding: var(--getcited-space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+    position: relative;
+    transition: border-color var(--getcited-transition), box-shadow var(--getcited-transition);
+}
+
+.getcited-card:hover {
+    border-color: var(--getcited-gray-300);
+    box-shadow: var(--getcited-shadow-md);
+}
+
+.getcited-card .card-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--getcited-primary);
+    border-radius: var(--getcited-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.getcited-card .card-icon .dashicons {
+    color: #fff;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.getcited-card .card-content h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--getcited-gray-500);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.getcited-card .card-stat {
+    font-size: 15px;
+    color: var(--getcited-gray-800);
+    margin: 4px 0 0 0;
+}
+
+.getcited-card .card-stat strong {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--getcited-gray-900);
+}
+
+.getcited-card .card-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--getcited-primary);
+    text-decoration: none;
+    margin-top: auto;
+    padding-top: var(--getcited-space-sm);
+}
+
+.getcited-card .card-link:hover {
+    color: var(--getcited-primary-dark);
+}
+
+/* ==========================================================================
+   Health Check
+   ========================================================================== */
+
+.getcited-health-results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-health-item {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-md);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    background: var(--getcited-gray-50);
+    border-radius: var(--getcited-radius-sm);
+    border-left: 3px solid var(--getcited-gray-300);
+}
+
+.getcited-health-item.getcited-status-ok {
+    border-left-color: var(--getcited-success);
+}
+
+.getcited-health-item.getcited-status-warning {
+    border-left-color: var(--getcited-warning);
+}
+
+.getcited-health-item.getcited-status-error {
+    border-left-color: var(--getcited-error);
+}
+
+.getcited-health-item .health-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.getcited-status-ok .health-icon {
+    background: var(--getcited-success);
+}
+
+.getcited-status-ok .health-icon::after {
+    content: '✓';
+    color: #fff;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.getcited-status-warning .health-icon {
+    background: var(--getcited-warning);
+}
+
+.getcited-status-warning .health-icon::after {
+    content: '!';
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.getcited-status-error .health-icon {
+    background: var(--getcited-error);
+}
+
+.getcited-status-error .health-icon::after {
+    content: '✕';
+    color: #fff;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.getcited-health-item .health-label {
+    font-weight: 500;
+    color: var(--getcited-gray-700);
+    min-width: 120px;
+}
+
+.getcited-health-item .health-message {
+    color: var(--getcited-gray-600);
+    font-size: 13px;
+}
+
+/* ==========================================================================
+   Quick Links
+   ========================================================================== */
+
+.getcited-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    background: var(--getcited-gray-100);
+    border-radius: var(--getcited-radius-sm);
+    color: var(--getcited-gray-700);
+    text-decoration: none;
+    font-size: 13px;
+    transition: background var(--getcited-transition), color var(--getcited-transition);
+}
+
+.getcited-link:hover {
+    background: var(--getcited-gray-200);
+    color: var(--getcited-gray-900);
+}
+
+.getcited-link .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ==========================================================================
+   Crawler Management
+   ========================================================================== */
+
+.getcited-bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-md);
+    flex-wrap: wrap;
+}
+
+.getcited-list-info {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-crawler-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-crawler-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--getcited-space-md);
+    align-items: center;
+    padding: var(--getcited-space-md);
+    background: var(--getcited-gray-50);
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-sm);
+    transition: border-color var(--getcited-transition);
+}
+
+.getcited-crawler-item:hover {
+    border-color: var(--getcited-gray-300);
+}
+
+.getcited-crawler-item .crawler-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--getcited-gray-800);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-crawler-item .crawler-purpose {
+    font-size: 13px;
+    color: var(--getcited-gray-600);
+    margin: 4px 0 0 0;
+}
+
+.getcited-crawler-item .crawler-ua {
+    font-size: 12px;
+    margin: 4px 0 0 0;
+}
+
+.getcited-crawler-item .crawler-ua code {
+    background: var(--getcited-gray-200);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+}
+
+.getcited-crawler-item .crawler-status .status-label {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: var(--getcited-radius-full);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.getcited-crawler-item .crawler-status .status-label.allowed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--getcited-success);
+}
+
+.getcited-crawler-item .crawler-status .status-label.blocked {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--getcited-error);
+}
+
+/* Toggle Switch */
+.getcited-toggle {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.getcited-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.getcited-toggle .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--getcited-gray-300);
+    transition: var(--getcited-transition);
+    border-radius: var(--getcited-radius-full);
+}
+
+.getcited-toggle .toggle-slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: var(--getcited-transition);
+    border-radius: 50%;
+    box-shadow: var(--getcited-shadow-sm);
+}
+
+.getcited-toggle input:checked + .toggle-slider {
+    background-color: var(--getcited-success);
+}
+
+.getcited-toggle input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+
+/* Badge */
+.getcited-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: var(--getcited-radius-full);
+}
+
+.getcited-badge.recommended {
+    background: var(--getcited-primary);
+    color: #fff;
+}
+
+/* ==========================================================================
+   llms.txt Editor
+   ========================================================================== */
+
+.getcited-llms-toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--getcited-space-md);
+}
+
+.getcited-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    cursor: pointer;
+}
+
+.getcited-llms-status {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-md);
+    padding: var(--getcited-space-md);
+    border-radius: var(--getcited-radius-sm);
+}
+
+.getcited-llms-status.getcited-status-ok {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.getcited-llms-status.getcited-status-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.getcited-llms-status.getcited-status-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.getcited-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-template-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-editor-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--getcited-space-lg);
+}
+
+@media (max-width: 1200px) {
+    .getcited-editor-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+
+.getcited-editor textarea {
+    width: 100%;
+    min-height: 400px;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: var(--getcited-space-md);
+    border: 1px solid var(--getcited-gray-300);
+    border-radius: var(--getcited-radius-sm);
+    resize: vertical;
+}
+
+.getcited-editor textarea:focus {
+    border-color: var(--getcited-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+.getcited-preview h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 var(--getcited-space-sm) 0;
+    color: var(--getcited-gray-700);
+}
+
+.getcited-preview-code {
+    background: var(--getcited-gray-800);
+    color: var(--getcited-gray-100);
+    padding: var(--getcited-space-md);
+    border-radius: var(--getcited-radius-sm);
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.getcited-validation-error,
+.getcited-validation-warning {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    border-radius: var(--getcited-radius-sm);
+    margin-top: var(--getcited-space-sm);
+    font-size: 13px;
+}
+
+.getcited-validation-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--getcited-error);
+}
+
+.getcited-validation-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #b45309;
+}
+
+/* ==========================================================================
+   Schema Settings
+   ========================================================================== */
+
+.getcited-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #92400e;
+}
+
+.getcited-warning p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-schema-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-md);
+}
+
+.getcited-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-md);
+    background: var(--getcited-gray-50);
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-sm);
+    cursor: pointer;
+    transition: border-color var(--getcited-transition);
+}
+
+.getcited-checkbox:hover {
+    border-color: var(--getcited-gray-300);
+}
+
+.getcited-checkbox input {
+    margin-top: 2px;
+}
+
+.getcited-checkbox strong {
+    display: block;
+    color: var(--getcited-gray-800);
+}
+
+.getcited-checkbox .description {
+    display: block;
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+    margin-top: 2px;
+}
+
+.getcited-social-urls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-social-urls input {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* ==========================================================================
+   Citability Scoring
+   ========================================================================== */
+
+.getcited-average-score {
+    text-align: center;
+    padding: var(--getcited-space-2xl) !important;
+}
+
+.getcited-score-display {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.getcited-score-display.large .score {
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--getcited-gray-900);
+    line-height: 1;
+}
+
+.getcited-score-display.large .max {
+    font-size: 24px;
+    color: var(--getcited-gray-400);
+}
+
+.getcited-posts-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.getcited-posts-table th,
+.getcited-posts-table td {
+    text-align: left;
+    padding: var(--getcited-space-md);
+    border-bottom: 1px solid var(--getcited-gray-200);
+}
+
+.getcited-posts-table th {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-posts-table td a {
+    color: var(--getcited-gray-800);
+    text-decoration: none;
+}
+
+.getcited-posts-table td a:hover {
+    color: var(--getcited-primary);
+}
+
+.getcited-score-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: var(--getcited-radius-full);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.getcited-score-badge.good {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--getcited-success);
+}
+
+.getcited-score-badge.ok {
+    background: rgba(245, 158, 11, 0.1);
+    color: #b45309;
+}
+
+.getcited-score-badge.low {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--getcited-error);
+}
+
+.getcited-score-badge.none {
+    background: var(--getcited-gray-100);
+    color: var(--getcited-gray-400);
+}
+
+.getcited-rubric-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.getcited-rubric-table th,
+.getcited-rubric-table td {
+    text-align: left;
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    border-bottom: 1px solid var(--getcited-gray-200);
+    font-size: 13px;
+}
+
+.getcited-rubric-table th {
+    font-weight: 600;
+    color: var(--getcited-gray-500);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+.getcited-rubric-table tfoot td {
+    font-weight: 600;
+    border-top: 2px solid var(--getcited-gray-300);
+}
+
+/* Locked Feature Teaser */
+.getcited-locked-feature {
+    background: linear-gradient(135deg, var(--getcited-dark-bg) 0%, var(--getcited-dark-card) 100%);
+    border: 1px solid var(--getcited-dark-border);
+    border-radius: var(--getcited-radius-md);
+    padding: var(--getcited-space-xl);
+    text-align: center;
+    color: var(--getcited-dark-text);
+}
+
+.getcited-locked-feature .dashicons-lock {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--getcited-accent);
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-locked-feature h3 {
+    font-size: 18px;
+    margin: 0 0 var(--getcited-space-sm) 0;
+    color: #fff;
+}
+
+.getcited-locked-feature p {
+    color: var(--getcited-dark-muted);
+    margin: 0 0 var(--getcited-space-lg) 0;
+}
+
+/* ==========================================================================
+   Pro Feature Teasers
+   ========================================================================== */
+
+.getcited-pro-teasers {
+    background: linear-gradient(135deg, var(--getcited-dark-bg) 0%, #252538 100%);
+    border: 1px solid var(--getcited-dark-border);
+    border-radius: var(--getcited-radius-lg);
+    padding: var(--getcited-space-xl);
+    color: var(--getcited-dark-text);
+}
+
+.getcited-pro-header {
+    text-align: center;
+    margin-bottom: var(--getcited-space-xl);
+}
+
+.getcited-pro-header h3 {
+    font-size: 20px;
+    color: #fff;
+    margin: 0 0 var(--getcited-space-sm) 0;
+}
+
+.getcited-pro-header p {
+    color: var(--getcited-dark-muted);
+    margin: 0;
+}
+
+.getcited-pro-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-xl);
+}
+
+.getcited-pro-feature {
+    display: flex;
+    gap: var(--getcited-space-md);
+    padding: var(--getcited-space-md);
+    background: var(--getcited-dark-card);
+    border: 1px solid var(--getcited-dark-border);
+    border-radius: var(--getcited-radius-md);
+    position: relative;
+}
+
+.getcited-pro-feature .feature-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--getcited-accent) 0%, var(--getcited-accent-light) 100%);
+    border-radius: var(--getcited-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.getcited-pro-feature .feature-icon .dashicons {
+    color: #fff;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.getcited-pro-feature .feature-content h4 {
+    font-size: 14px;
+    color: #fff;
+    margin: 0 0 4px 0;
+}
+
+.getcited-pro-feature .feature-content p {
+    font-size: 12px;
+    color: var(--getcited-dark-muted);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.getcited-pro-feature .feature-locked {
+    position: absolute;
+    top: var(--getcited-space-md);
+    right: var(--getcited-space-md);
+    color: var(--getcited-dark-muted);
+}
+
+.getcited-pro-feature .feature-locked .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Waitlist Form */
+.getcited-waitlist-form {
+    text-align: center;
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-waitlist-form p {
+    color: var(--getcited-dark-muted);
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-waitlist-form form {
+    display: flex;
+    justify-content: center;
+    gap: var(--getcited-space-sm);
+    max-width: 400px;
+    margin: 0 auto var(--getcited-space-md);
+}
+
+.getcited-waitlist-form input[type="email"] {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--getcited-dark-border);
+    border-radius: var(--getcited-radius-sm);
+    background: var(--getcited-dark-card);
+    color: var(--getcited-dark-text);
+    font-size: 14px;
+}
+
+.getcited-waitlist-form input[type="email"]::placeholder {
+    color: var(--getcited-dark-muted);
+}
+
+.getcited-waitlist-form input[type="email"]:focus {
+    outline: none;
+    border-color: var(--getcited-accent);
+}
+
+.getcited-waitlist-form .button-primary {
+    background: linear-gradient(135deg, var(--getcited-accent) 0%, var(--getcited-accent-light) 100%);
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+}
+
+.getcited-waitlist-form .button-primary:hover {
+    background: linear-gradient(135deg, var(--getcited-accent-light) 0%, var(--getcited-accent) 100%);
+}
+
+.getcited-waitlist-count {
+    font-size: 13px;
+    color: var(--getcited-dark-muted);
+}
+
+.getcited-waitlist-count .count {
+    color: var(--getcited-accent-light);
+    font-weight: 600;
+}
+
+.getcited-sample-report {
+    text-align: center;
+}
+
+/* ==========================================================================
+   Modal
+   ========================================================================== */
+
+.getcited-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    padding: var(--getcited-space-lg);
+}
+
+.getcited-modal-content {
+    background: var(--getcited-dark-bg);
+    border: 1px solid var(--getcited-dark-border);
+    border-radius: var(--getcited-radius-lg);
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    color: var(--getcited-dark-text);
+}
+
+.getcited-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--getcited-space-lg);
+    border-bottom: 1px solid var(--getcited-dark-border);
+}
+
+.getcited-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #fff;
+}
+
+.getcited-modal-close {
+    background: none;
+    border: none;
+    color: var(--getcited-dark-muted);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.getcited-modal-close:hover {
+    color: #fff;
+}
+
+.getcited-modal-body {
+    padding: var(--getcited-space-lg);
+}
+
+.getcited-sample-notice {
+    background: var(--getcited-dark-card);
+    border: 1px dashed var(--getcited-dark-border);
+    border-radius: var(--getcited-radius-sm);
+    padding: var(--getcited-space-md);
+    text-align: center;
+    color: var(--getcited-dark-muted);
+    font-size: 13px;
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-sample-section {
+    margin-bottom: var(--getcited-space-xl);
+}
+
+.getcited-sample-section h3 {
+    font-size: 14px;
+    color: var(--getcited-dark-muted);
+    margin: 0 0 var(--getcited-space-md) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.getcited-sample-stat {
+    display: flex;
+    align-items: baseline;
+    gap: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-sample-stat .stat-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.getcited-sample-stat .stat-label {
+    color: var(--getcited-dark-muted);
+}
+
+.getcited-sample-stat .stat-change {
+    padding: 4px 8px;
+    border-radius: var(--getcited-radius-full);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.getcited-sample-stat .stat-change.positive {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--getcited-success);
+}
+
+.getcited-sample-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+}
+
+.sample-bar {
+    display: grid;
+    grid-template-columns: 100px 1fr 60px;
+    align-items: center;
+    gap: var(--getcited-space-md);
+    font-size: 13px;
+}
+
+.sample-bar .bar-label {
+    color: var(--getcited-dark-muted);
+}
+
+.sample-bar .bar-track {
+    height: 8px;
+    background: var(--getcited-dark-card);
+    border-radius: var(--getcited-radius-full);
+    overflow: hidden;
+}
+
+.sample-bar .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--getcited-primary) 0%, var(--getcited-primary-light) 100%);
+    border-radius: var(--getcited-radius-full);
+}
+
+.sample-bar .bar-value {
+    text-align: right;
+    color: #fff;
+    font-weight: 500;
+}
+
+.getcited-citation-sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--getcited-space-sm);
+}
+
+.citation-source {
+    background: var(--getcited-dark-card);
+    padding: 4px 10px;
+    border-radius: var(--getcited-radius-full);
+    font-size: 12px;
+    color: var(--getcited-dark-muted);
+}
+
+.getcited-sample-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.getcited-sample-table th,
+.getcited-sample-table td {
+    text-align: left;
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    border-bottom: 1px solid var(--getcited-dark-border);
+}
+
+.getcited-sample-table th {
+    color: var(--getcited-dark-muted);
+    font-weight: 500;
+}
+
+.getcited-sample-table td {
+    color: var(--getcited-dark-text);
+}
+
+.getcited-modal-footer {
+    padding: var(--getcited-space-lg);
+    border-top: 1px solid var(--getcited-dark-border);
+    text-align: center;
+}
+
+.getcited-modal-footer p {
+    margin: 0 0 var(--getcited-space-md) 0;
+    color: var(--getcited-dark-muted);
+}
+
+/* ==========================================================================
+   Setup Wizard
+   ========================================================================== */
+
+.getcited-wizard-wrap {
+    background: var(--getcited-gray-100);
+    margin: -20px 0 0 -20px;
+    padding: var(--getcited-space-2xl);
+    min-height: calc(100vh - 32px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.getcited-wizard {
+    background: #fff;
+    border-radius: var(--getcited-radius-lg);
+    box-shadow: var(--getcited-shadow-lg);
+    max-width: 700px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.getcited-wizard-progress {
+    display: flex;
+    background: var(--getcited-gray-50);
+    border-bottom: 1px solid var(--getcited-gray-200);
+}
+
+.getcited-wizard-progress .progress-step {
+    flex: 1;
+    padding: var(--getcited-space-md);
+    text-align: center;
+    font-size: 12px;
+    color: var(--getcited-gray-400);
+    border-bottom: 2px solid transparent;
+    transition: all var(--getcited-transition);
+}
+
+.getcited-wizard-progress .progress-step.active {
+    color: var(--getcited-primary);
+    border-bottom-color: var(--getcited-primary);
+}
+
+.getcited-wizard-progress .progress-step.completed {
+    color: var(--getcited-success);
+}
+
+.getcited-wizard-progress .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--getcited-gray-200);
+    border-radius: 50%;
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.getcited-wizard-progress .progress-step.active .step-number {
+    background: var(--getcited-primary);
+    color: #fff;
+}
+
+.getcited-wizard-progress .progress-step.completed .step-number {
+    background: var(--getcited-success);
+    color: #fff;
+}
+
+.getcited-wizard-progress .step-title {
+    display: none;
+}
+
+@media (min-width: 600px) {
+    .getcited-wizard-progress .step-title {
+        display: inline;
+    }
+}
+
+.getcited-wizard-step {
+    padding: var(--getcited-space-2xl);
+}
+
+.wizard-content {
+    text-align: center;
+    margin-bottom: var(--getcited-space-xl);
+}
+
+.wizard-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--getcited-primary) 0%, var(--getcited-primary-light) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--getcited-space-lg);
+}
+
+.wizard-icon .dashicons {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+}
+
+.wizard-icon.success {
+    background: linear-gradient(135deg, var(--getcited-success) 0%, #34d399 100%);
+}
+
+.wizard-content h1 {
+    font-size: 24px;
+    color: var(--getcited-gray-900);
+    margin: 0 0 var(--getcited-space-sm) 0;
+}
+
+.wizard-subtitle {
+    font-size: 16px;
+    color: var(--getcited-gray-600);
+    margin: 0 0 var(--getcited-space-md) 0;
+}
+
+.wizard-content > p:last-child {
+    color: var(--getcited-gray-500);
+    margin: 0;
+}
+
+.wizard-actions {
+    text-align: center;
+}
+
+.wizard-actions .button-hero {
+    font-size: 16px;
+    padding: 12px 32px;
+    height: auto;
+}
+
+.wizard-actions > p {
+    margin-top: var(--getcited-space-md);
+}
+
+.wizard-actions a {
+    color: var(--getcited-gray-500);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.wizard-actions a:hover {
+    color: var(--getcited-gray-700);
+}
+
+/* Site Type Selection */
+.getcited-site-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--getcited-space-md);
+    text-align: left;
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-site-type {
+    cursor: pointer;
+}
+
+.getcited-site-type input {
+    display: none;
+}
+
+.site-type-card {
+    padding: var(--getcited-space-lg);
+    background: var(--getcited-gray-50);
+    border: 2px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-md);
+    text-align: center;
+    transition: all var(--getcited-transition);
+}
+
+.getcited-site-type:hover .site-type-card {
+    border-color: var(--getcited-gray-300);
+}
+
+.getcited-site-type input:checked + .site-type-card {
+    border-color: var(--getcited-primary);
+    background: rgba(13, 148, 136, 0.05);
+}
+
+.site-type-card .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--getcited-primary);
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.site-type-card strong {
+    display: block;
+    color: var(--getcited-gray-800);
+    margin-bottom: 4px;
+}
+
+.site-type-card .description {
+    font-size: 12px;
+    color: var(--getcited-gray-500);
+}
+
+/* Crawler Choice */
+.getcited-crawler-choice {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-md);
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.getcited-radio-card {
+    cursor: pointer;
+}
+
+.getcited-radio-card input {
+    display: none;
+}
+
+.radio-card-content {
+    padding: var(--getcited-space-lg);
+    background: var(--getcited-gray-50);
+    border: 2px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-md);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--getcited-space-sm);
+    align-items: center;
+    transition: all var(--getcited-transition);
+}
+
+.getcited-radio-card:hover .radio-card-content {
+    border-color: var(--getcited-gray-300);
+}
+
+.getcited-radio-card input:checked + .radio-card-content {
+    border-color: var(--getcited-primary);
+    background: rgba(13, 148, 136, 0.05);
+}
+
+.radio-card-content .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--getcited-primary);
+}
+
+.radio-card-content strong {
+    color: var(--getcited-gray-800);
+}
+
+.radio-card-content .recommended-badge {
+    background: var(--getcited-success);
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: var(--getcited-radius-full);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.radio-card-content p {
+    width: 100%;
+    margin: var(--getcited-space-sm) 0 0 0;
+    color: var(--getcited-gray-500);
+    font-size: 13px;
+    padding-left: 32px;
+}
+
+/* Organization Form */
+.getcited-org-form {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.getcited-org-form .form-field {
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-org-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--getcited-space-sm);
+    color: var(--getcited-gray-700);
+}
+
+.getcited-org-form label .optional {
+    font-weight: normal;
+    color: var(--getcited-gray-400);
+}
+
+.getcited-org-form input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--getcited-gray-300);
+    border-radius: var(--getcited-radius-sm);
+    font-size: 14px;
+}
+
+.getcited-org-form input:focus {
+    outline: none;
+    border-color: var(--getcited-primary);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* Setup Summary */
+.getcited-setup-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+    max-width: 300px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: var(--getcited-radius-sm);
+    color: var(--getcited-success);
+}
+
+.summary-item .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* ==========================================================================
+   Actions Bar
+   ========================================================================== */
+
+.getcited-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-md);
+}
+
+.getcited-save-status {
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-save-status.success {
+    color: var(--getcited-success);
+}
+
+.getcited-save-status.error {
+    color: var(--getcited-error);
+}
+
+/* ==========================================================================
+   Settings Page
+   ========================================================================== */
+
+.getcited-settings-page .form-table th {
+    width: 200px;
+    padding: var(--getcited-space-md) var(--getcited-space-md) var(--getcited-space-md) 0;
+}
+
+.getcited-settings-page .form-table td {
+    padding: var(--getcited-space-md) 0;
+}
+
+#getcited-system-info {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 12px;
+    background: var(--getcited-gray-800);
+    color: var(--getcited-gray-100);
+    border: none;
+    border-radius: var(--getcited-radius-sm);
+}
+
+/* ==========================================================================
+   Meta Box
+   ========================================================================== */
+
+.getcited-meta-box {
+    padding: var(--getcited-space-sm);
+}
+
+.getcited-meta-box .getcited-score-display {
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-meta-box .getcited-score-number {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.getcited-meta-box .getcited-score-number .score {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--getcited-gray-900);
+}
+
+.getcited-meta-box .getcited-score-number .max {
+    font-size: 14px;
+    color: var(--getcited-gray-400);
+}
+
+.getcited-meta-box .getcited-last-audit {
+    font-size: 12px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-meta-box .getcited-no-score {
+    color: var(--getcited-gray-400);
+    font-style: italic;
+}
+
+.getcited-meta-box .getcited-analyze-btn {
+    width: 100%;
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-meta-box hr {
+    border: none;
+    border-top: 1px solid var(--getcited-gray-200);
+    margin: var(--getcited-space-md) 0;
+}
+
+.getcited-meta-box p {
+    margin: var(--getcited-space-sm) 0;
+}
+
+.getcited-meta-box label {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   Help Section
+   ========================================================================== */
+
+.getcited-help-content {
+    background: var(--getcited-gray-50);
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-sm);
+    padding: var(--getcited-space-md);
+}
+
+.getcited-help-content ul {
+    margin: var(--getcited-space-sm) 0;
+    padding-left: var(--getcited-space-lg);
+}
+
+.getcited-help-content li {
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-help-content code {
+    background: var(--getcited-gray-200);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 782px) {
+    .getcited-wrap {
+        margin-right: 10px;
+    }
+    
+    .getcited-status-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .getcited-crawler-item {
+        grid-template-columns: auto 1fr;
+    }
+    
+    .getcited-crawler-item .crawler-status {
+        grid-column: 1 / -1;
+        margin-top: var(--getcited-space-sm);
+    }
+    
+    .getcited-pro-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .getcited-waitlist-form form {
+        flex-direction: column;
+    }
+    
+    .getcited-wizard-wrap {
+        padding: var(--getcited-space-md);
+    }
+    
+    .getcited-wizard-step {
+        padding: var(--getcited-space-lg);
+    }
+    
+    .getcited-site-types {
+        grid-template-columns: 1fr 1fr;
+    }
+}
