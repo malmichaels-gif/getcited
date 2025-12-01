@@ -117,7 +117,7 @@ $pro_teaser = GetCited_Pro_Teaser::instance();
                     <?php esc_html_e( 'Run Check', 'getcited' ); ?>
                 </button>
             </h2>
-            
+
             <div class="getcited-health-results">
                 <?php
                 $health_status = $stats['health'];
@@ -128,17 +128,76 @@ $pro_teaser = GetCited_Pro_Teaser::instance();
                     'rewrite_rules' => __( 'Rewrite Rules', 'getcited' ),
                     'crawler_list' => __( 'Crawler List', 'getcited' ),
                 );
-                
+
                 foreach ( $checks as $key => $label ) :
                     if ( ! isset( $health_status[ $key ] ) ) continue;
                     $check = $health_status[ $key ];
                     $status_class = $health->get_status_class( $check['status'] );
                 ?>
-                    <div class="getcited-health-item <?php echo esc_attr( $status_class ); ?>">
+                    <div class="getcited-health-item <?php echo esc_attr( $status_class ); ?>" data-check="<?php echo esc_attr( $key ); ?>">
                         <span class="health-icon"></span>
                         <span class="health-label"><?php echo esc_html( $label ); ?></span>
                         <span class="health-message"><?php echo esc_html( $check['message'] ); ?></span>
+
+                        <?php if ( ! empty( $check['details'] ) || ! empty( $check['action_type'] ) ) : ?>
+                            <button type="button" class="getcited-health-expand" aria-expanded="false">
+                                <span class="dashicons dashicons-arrow-down-alt2"></span>
+                            </button>
+                        <?php endif; ?>
                     </div>
+
+                    <?php if ( ! empty( $check['details'] ) || ! empty( $check['action_type'] ) ) : ?>
+                        <div class="getcited-health-details" data-check="<?php echo esc_attr( $key ); ?>" style="display: none;">
+                            <?php if ( ! empty( $check['details'] ) ) : ?>
+                                <p class="details-text"><?php echo esc_html( $check['details'] ); ?></p>
+                            <?php endif; ?>
+
+                            <?php if ( ! empty( $check['options'] ) ) : ?>
+                                <ul class="details-options">
+                                    <?php foreach ( $check['options'] as $option ) : ?>
+                                        <li><?php echo esc_html( $option ); ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+
+                            <?php if ( ! empty( $check['action_type'] ) ) : ?>
+                                <div class="details-actions">
+                                    <?php if ( $check['action_type'] === 'copy_rules' && ! empty( $check['rules'] ) ) : ?>
+                                        <div class="getcited-rules-preview">
+                                            <pre class="rules-code"><?php echo esc_html( $check['rules'] ); ?></pre>
+                                            <button type="button" class="button getcited-copy-rules" data-rules="<?php echo esc_attr( $check['rules'] ); ?>">
+                                                <span class="dashicons dashicons-clipboard"></span>
+                                                <?php esc_html_e( 'Copy Rules to Clipboard', 'getcited' ); ?>
+                                            </button>
+                                        </div>
+                                        <?php if ( ! empty( $check['file_path'] ) ) : ?>
+                                            <p class="file-path">
+                                                <?php esc_html_e( 'File location:', 'getcited' ); ?>
+                                                <code><?php echo esc_html( $check['file_path'] ); ?></code>
+                                            </p>
+                                        <?php endif; ?>
+                                    <?php elseif ( ! empty( $check['action_url'] ) && ! empty( $check['action_label'] ) ) : ?>
+                                        <a href="<?php echo esc_url( $check['action_url'] ); ?>" class="button">
+                                            <?php echo esc_html( $check['action_label'] ); ?>
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <?php if ( ! empty( $check['rules'] ) && $check['action_type'] !== 'copy_rules' ) : ?>
+                                        <button type="button" class="button getcited-show-rules">
+                                            <?php esc_html_e( 'Show Rules', 'getcited' ); ?>
+                                        </button>
+                                        <div class="getcited-rules-preview" style="display: none;">
+                                            <pre class="rules-code"><?php echo esc_html( $check['rules'] ); ?></pre>
+                                            <button type="button" class="button getcited-copy-rules" data-rules="<?php echo esc_attr( $check['rules'] ); ?>">
+                                                <span class="dashicons dashicons-clipboard"></span>
+                                                <?php esc_html_e( 'Copy Rules to Clipboard', 'getcited' ); ?>
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </div>
         </div>

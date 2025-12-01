@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,20 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.0.2 =
+* Fixed: Save Changes button now works correctly across all settings pages
+* Fixed: Analyze Citability button now works on post editor screens
+* Fixed: Setup wizard auto-redirect now triggers on fresh plugin activation
+* Added: llms.txt template loading from server (Blog, Business, News, etc.)
+* Added: Expandable Health Check details with robots.txt guidance
+* Added: Copy to clipboard functionality for robots.txt rules
+* Added: Meta description detection for SEOPress and The SEO Framework
+* Added: Filter hook `getcited_get_meta_description` for custom SEO plugin support
+* Added: HTML fallback detection for meta descriptions
+* Added: Content-type aware FAQ scoring (news/editorial exempt from FAQ penalty)
+* Added: Filter hook `getcited_faq_exempt` for custom FAQ exemptions
+* Changed: Crawler list health check now shows OK status when using bundled list
 
 = 1.0.1 =
 * Fixed WordPress Plugin Check issues

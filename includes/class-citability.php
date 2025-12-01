@@ -295,7 +295,7 @@ class GetCited_Citability {
         }
 
         // 3. FAQ Section (10 points)
-        $factor = $this->check_faq_section( $content );
+        $factor = $this->check_faq_section( $content, $post_id );
         $factors['faq_section'] = $factor;
         $total_score += $factor['score'];
         if ( ! empty( $factor['recommendation'] ) ) {
@@ -459,9 +459,16 @@ class GetCited_Citability {
 
     /**
      * Check for FAQ section
+     *
+     * @param string $content  The post content.
+     * @param int    $post_id  The post ID.
+     * @return array Factor result.
      */
-    private function check_faq_section( $content ) {
+    private function check_faq_section( $content, $post_id ) {
         $max = $this->rubric['faq_section']['max_points'];
+
+        // Check if this is a content type where FAQ is not expected
+        $faq_exempt = $this->is_faq_exempt_content( $post_id );
 
         // Check for Gutenberg FAQ blocks
         $has_faq_block = strpos( $content, 'wp:yoast/faq-block' ) !== false ||
@@ -493,6 +500,13 @@ class GetCited_Citability {
                 'message' => __( 'Q&A format detected but no FAQ heading', 'getcited' ),
                 'recommendation' => __( 'Add an "FAQ" or "Frequently Asked Questions" heading to your Q&A section', 'getcited' ),
             );
+        } elseif ( $faq_exempt ) {
+            // Content type where FAQ is not expected - give full points, no penalty
+            return array(
+                'score' => $max,
+                'passed' => true,
+                'message' => __( 'FAQ not required for this content type', 'getcited' ),
+            );
         } else {
             return array(
                 'score' => 0,
@@ -501,6 +515,64 @@ class GetCited_Citability {
                 'recommendation' => __( 'Add an FAQ section — AI systems heavily parse Q&A content for citations', 'getcited' ),
             );
         }
+    }
+
+    /**
+     * Check if post is a content type where FAQ is not expected
+     *
+     * @param int $post_id The post ID.
+     * @return bool True if FAQ is not expected for this content type.
+     */
+    private function is_faq_exempt_content( $post_id ) {
+        // Allow filtering for custom exemptions
+        $exempt = apply_filters( 'getcited_faq_exempt', false, $post_id );
+        if ( $exempt ) {
+            return true;
+        }
+
+        $post = get_post( $post_id );
+        if ( ! $post ) {
+            return false;
+        }
+
+        // Check site type setting
+        $settings = GetCited_Settings::instance();
+        $site_type = $settings->get( 'site_type' );
+
+        // News sites typically don't have FAQs on articles
+        if ( $site_type === 'news' ) {
+            return true;
+        }
+
+        // Check for news/editorial categories
+        $categories = wp_get_post_categories( $post_id, array( 'fields' => 'slugs' ) );
+        $news_categories = array( 'news', 'editorial', 'opinion', 'breaking', 'press-release', 'announcement', 'update', 'updates' );
+
+        foreach ( $categories as $cat_slug ) {
+            if ( in_array( $cat_slug, $news_categories, true ) ) {
+                return true;
+            }
+        }
+
+        // Check for news/editorial tags
+        $tags = wp_get_post_tags( $post_id, array( 'fields' => 'slugs' ) );
+        $news_tags = array( 'news', 'breaking-news', 'press-release', 'announcement', 'editorial' );
+
+        foreach ( $tags as $tag_slug ) {
+            if ( in_array( $tag_slug, $news_tags, true ) ) {
+                return true;
+            }
+        }
+
+        // Check post format
+        $post_format = get_post_format( $post_id );
+        $exempt_formats = array( 'aside', 'status', 'quote', 'link', 'gallery', 'image', 'video', 'audio' );
+
+        if ( $post_format && in_array( $post_format, $exempt_formats, true ) ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -802,6 +874,19 @@ class GetCited_Citability {
     private function check_meta_description( $post_id ) {
         $max = $this->rubric['meta_description']['max_points'];
 
+        // Allow SEO plugins to provide meta description via filter
+        // Hook: getcited_get_meta_description
+        // Params: $description (string), $post_id (int)
+        // Return: The meta description string or empty string
+        $custom_desc = apply_filters( 'getcited_get_meta_description', '', $post_id );
+        if ( ! empty( $custom_desc ) ) {
+            return array(
+                'score' => $max,
+                'passed' => true,
+                'message' => __( 'Meta description set (custom)', 'getcited' ),
+            );
+        }
+
         // Check Yoast
         $yoast_desc = get_post_meta( $post_id, '_yoast_wpseo_metadesc', true );
         if ( ! empty( $yoast_desc ) ) {
@@ -832,6 +917,26 @@ class GetCited_Citability {
             );
         }
 
+        // Check SEOPress
+        $seopress_desc = get_post_meta( $post_id, '_seopress_titles_desc', true );
+        if ( ! empty( $seopress_desc ) ) {
+            return array(
+                'score' => $max,
+                'passed' => true,
+                'message' => __( 'Meta description set (SEOPress)', 'getcited' ),
+            );
+        }
+
+        // Check The SEO Framework
+        $tsf_desc = get_post_meta( $post_id, '_genesis_description', true );
+        if ( ! empty( $tsf_desc ) ) {
+            return array(
+                'score' => $max,
+                'passed' => true,
+                'message' => __( 'Meta description set (TSF)', 'getcited' ),
+            );
+        }
+
         // Check excerpt as fallback
         $post = get_post( $post_id );
         if ( ! empty( $post->post_excerpt ) ) {
@@ -843,12 +948,61 @@ class GetCited_Citability {
             );
         }
 
+        // HTML fallback: fetch the page and check for meta description tag
+        $meta_desc = $this->get_meta_description_from_html( $post_id );
+        if ( ! empty( $meta_desc ) ) {
+            return array(
+                'score' => $max,
+                'passed' => true,
+                'message' => __( 'Meta description found in HTML', 'getcited' ),
+            );
+        }
+
         return array(
             'score' => 0,
             'passed' => false,
             'message' => __( 'No meta description', 'getcited' ),
             'recommendation' => __( 'Add a custom meta description using your SEO plugin', 'getcited' ),
         );
+    }
+
+    /**
+     * Get meta description from rendered HTML
+     *
+     * @param int $post_id The post ID.
+     * @return string The meta description or empty string.
+     */
+    private function get_meta_description_from_html( $post_id ) {
+        $url = get_permalink( $post_id );
+        if ( empty( $url ) ) {
+            return '';
+        }
+
+        $response = wp_remote_get( $url, array(
+            'timeout' => 5,
+            'sslverify' => false,
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            return '';
+        }
+
+        $body = wp_remote_retrieve_body( $response );
+        if ( empty( $body ) ) {
+            return '';
+        }
+
+        // Match <meta name="description" content="...">
+        if ( preg_match( '/<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']+)["\'][^>]*>/i', $body, $matches ) ) {
+            return trim( $matches[1] );
+        }
+
+        // Also try reversed attribute order: content before name
+        if ( preg_match( '/<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']description["\'][^>]*>/i', $body, $matches ) ) {
+            return trim( $matches[1] );
+        }
+
+        return '';
     }
 
     /**

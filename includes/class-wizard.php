@@ -225,8 +225,19 @@ class GetCited_Wizard {
         }
 
         $step = isset( $_POST['step'] ) ? sanitize_text_field( wp_unslash( $_POST['step'] ) ) : '';
+
+        // Handle JSON string from FormData (JS sends objects as JSON strings)
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Data is sanitized per-field below
-        $data = isset( $_POST['data'] ) ? map_deep( wp_unslash( $_POST['data'] ), 'sanitize_text_field' ) : array();
+        $raw_data = isset( $_POST['data'] ) ? wp_unslash( $_POST['data'] ) : array();
+        if ( is_string( $raw_data ) ) {
+            $decoded = json_decode( $raw_data, true );
+            if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+                $raw_data = $decoded;
+            }
+        }
+
+        // Sanitize the data array
+        $data = is_array( $raw_data ) ? map_deep( $raw_data, 'sanitize_text_field' ) : array();
 
         $settings = GetCited_Settings::instance();
 
@@ -246,13 +257,13 @@ class GetCited_Wizard {
                 break;
 
             case 'crawlers':
-                $allow_all = isset( $data['allow_all'] ) && $data['allow_all'] === 'true';
-                
+                $allow_all = isset( $data['allow_all'] ) && ( $data['allow_all'] === 'true' || $data['allow_all'] === true );
+
                 if ( $allow_all ) {
                     // Set all crawlers to allow
                     $crawler_list = GetCited_Crawler_List::instance();
                     $crawlers = $crawler_list->get_all();
-                    
+
                     $states = array();
                     foreach ( $crawlers as $crawler ) {
                         $states[ $crawler['name'] ] = 'allow';

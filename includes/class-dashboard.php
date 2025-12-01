@@ -36,6 +36,9 @@ class GetCited_Dashboard {
     private function __construct() {
         // Save settings handler
         add_action( 'wp_ajax_getcited_save_settings', array( $this, 'ajax_save_settings' ) );
+
+        // Template loading handler
+        add_action( 'wp_ajax_getcited_load_template', array( $this, 'ajax_load_template' ) );
     }
 
     /**
@@ -98,8 +101,19 @@ class GetCited_Dashboard {
         }
 
         $section = isset( $_POST['section'] ) ? sanitize_text_field( wp_unslash( $_POST['section'] ) ) : '';
+
+        // Handle JSON string from FormData (JS sends objects as JSON strings)
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Data is sanitized per-field below
-        $data = isset( $_POST['data'] ) ? map_deep( wp_unslash( $_POST['data'] ), 'sanitize_text_field' ) : array();
+        $raw_data = isset( $_POST['data'] ) ? wp_unslash( $_POST['data'] ) : array();
+        if ( is_string( $raw_data ) ) {
+            $decoded = json_decode( $raw_data, true );
+            if ( json_last_error() === JSON_ERROR_NONE && is_array( $decoded ) ) {
+                $raw_data = $decoded;
+            }
+        }
+
+        // Sanitize the data array
+        $data = is_array( $raw_data ) ? map_deep( $raw_data, 'sanitize_text_field' ) : array();
 
         $settings = GetCited_Settings::instance();
 
@@ -115,7 +129,7 @@ class GetCited_Dashboard {
 
             case 'llms_txt':
                 if ( isset( $data['llms_txt_enabled'] ) ) {
-                    $settings->set( 'llms_txt_enabled', (bool) $data['llms_txt_enabled'] );
+                    $settings->set( 'llms_txt_enabled', filter_var( $data['llms_txt_enabled'], FILTER_VALIDATE_BOOLEAN ) );
                 }
                 if ( isset( $data['llms_txt_content'] ) ) {
                     $settings->set( 'llms_txt_content', $data['llms_txt_content'] );
@@ -124,10 +138,15 @@ class GetCited_Dashboard {
 
             case 'schema':
                 if ( isset( $data['schema_enabled'] ) ) {
-                    $settings->set( 'schema_enabled', (bool) $data['schema_enabled'] );
+                    $settings->set( 'schema_enabled', filter_var( $data['schema_enabled'], FILTER_VALIDATE_BOOLEAN ) );
                 }
                 if ( isset( $data['schema_types'] ) && is_array( $data['schema_types'] ) ) {
-                    $settings->set( 'schema_types', $data['schema_types'] );
+                    // Convert string "true"/"false" to actual booleans
+                    $schema_types = array();
+                    foreach ( $data['schema_types'] as $key => $value ) {
+                        $schema_types[ $key ] = filter_var( $value, FILTER_VALIDATE_BOOLEAN );
+                    }
+                    $settings->set( 'schema_types', $schema_types );
                 }
                 if ( isset( $data['organization'] ) && is_array( $data['organization'] ) ) {
                     $settings->set( 'organization', $data['organization'] );
@@ -135,17 +154,48 @@ class GetCited_Dashboard {
                 break;
 
             case 'advanced':
+                if ( isset( $data['site_type'] ) ) {
+                    $settings->set( 'site_type', $data['site_type'] );
+                }
                 if ( isset( $data['debug_mode'] ) ) {
-                    $settings->set( 'debug_mode', (bool) $data['debug_mode'] );
+                    $settings->set( 'debug_mode', filter_var( $data['debug_mode'], FILTER_VALIDATE_BOOLEAN ) );
                 }
                 if ( isset( $data['keep_on_delete'] ) ) {
-                    $settings->set( 'keep_on_delete', (bool) $data['keep_on_delete'] );
+                    $settings->set( 'keep_on_delete', filter_var( $data['keep_on_delete'], FILTER_VALIDATE_BOOLEAN ) );
                 }
                 break;
         }
 
         wp_send_json_success( array(
             'message' => __( 'Settings saved', 'getcited' ),
+        ) );
+    }
+
+    /**
+     * AJAX: Load llms.txt template
+     */
+    public function ajax_load_template() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : 'blog';
+
+        // Validate type
+        $valid_types = array( 'blog', 'business', 'news', 'ecommerce', 'other' );
+        if ( ! in_array( $type, $valid_types, true ) ) {
+            $type = 'blog';
+        }
+
+        // Generate template content
+        $llms = GetCited_Llms_Txt::instance();
+        $content = $llms->generate_template( $type );
+
+        wp_send_json_success( array(
+            'content' => $content,
+            'type' => $type,
         ) );
     }
 

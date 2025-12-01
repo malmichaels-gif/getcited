@@ -293,6 +293,138 @@
 .getcited-health-item .health-message {
     color: var(--getcited-gray-600);
     font-size: 13px;
+    flex: 1;
+}
+
+/* Health Check - Expandable Details */
+.getcited-health-item {
+    position: relative;
+}
+
+.getcited-health-expand {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--getcited-gray-400);
+    transition: color var(--getcited-transition);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.getcited-health-expand:hover {
+    color: var(--getcited-gray-600);
+}
+
+.getcited-health-expand .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    transition: transform var(--getcited-transition);
+}
+
+.getcited-health-expand[aria-expanded="true"] .dashicons {
+    transform: rotate(180deg);
+}
+
+.getcited-health-details {
+    margin: 0 0 var(--getcited-space-sm) 0;
+    padding: var(--getcited-space-md);
+    padding-left: calc(20px + var(--getcited-space-md) + var(--getcited-space-md));
+    background: var(--getcited-gray-50);
+    border-left: 3px solid var(--getcited-gray-300);
+    border-radius: 0 0 var(--getcited-radius-sm) var(--getcited-radius-sm);
+}
+
+.getcited-status-warning + .getcited-health-details {
+    border-left-color: var(--getcited-warning);
+    background: rgba(245, 158, 11, 0.05);
+}
+
+.getcited-status-error + .getcited-health-details {
+    border-left-color: var(--getcited-error);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.getcited-health-details .details-text {
+    margin: 0 0 var(--getcited-space-md) 0;
+    color: var(--getcited-gray-600);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.getcited-health-details .details-options {
+    margin: 0 0 var(--getcited-space-md) 0;
+    padding-left: var(--getcited-space-lg);
+    color: var(--getcited-gray-600);
+    font-size: 13px;
+}
+
+.getcited-health-details .details-options li {
+    margin-bottom: var(--getcited-space-xs);
+}
+
+.getcited-health-details .details-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-md);
+}
+
+.getcited-rules-preview {
+    background: var(--getcited-gray-800);
+    border-radius: var(--getcited-radius-sm);
+    padding: var(--getcited-space-md);
+}
+
+.getcited-rules-preview .rules-code {
+    margin: 0 0 var(--getcited-space-md) 0;
+    padding: 0;
+    background: transparent;
+    color: var(--getcited-gray-100);
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.getcited-rules-preview .getcited-copy-rules {
+    background: var(--getcited-gray-700);
+    border-color: var(--getcited-gray-600);
+    color: var(--getcited-gray-100);
+}
+
+.getcited-rules-preview .getcited-copy-rules:hover {
+    background: var(--getcited-gray-600);
+    border-color: var(--getcited-gray-500);
+    color: #fff;
+}
+
+.getcited-rules-preview .getcited-copy-rules.copied {
+    background: var(--getcited-success);
+    border-color: var(--getcited-success);
+}
+
+.getcited-rules-preview .getcited-copy-rules .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.getcited-health-details .file-path {
+    margin: var(--getcited-space-sm) 0 0 0;
+    font-size: 12px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-health-details .file-path code {
+    background: var(--getcited-gray-200);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
 }
 
 /* ==========================================================================

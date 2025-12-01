@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Malcolm Michaels
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.0.1' );
+define( 'GETCITED_VERSION', '1.0.2' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -128,6 +128,11 @@ final class GetCited {
         // Flush rewrite rules
         $this->register_rewrites();
         flush_rewrite_rules();
+
+        // Set transient for wizard redirect (only on fresh install, not completed wizard)
+        if ( ! $settings->get( 'wizard_completed' ) ) {
+            set_transient( 'getcited_activation_redirect', true, 60 );
+        }
 
         // Fire activation hook
         do_action( 'getcited_activated' );
@@ -263,8 +268,12 @@ final class GetCited {
      * Enqueue admin assets
      */
     public function enqueue_admin_assets( $hook ) {
-        // Only load on GetCited pages
-        if ( strpos( $hook, 'getcited' ) === false ) {
+        // Determine if we should load assets
+        $is_getcited_page = strpos( $hook, 'getcited' ) !== false;
+        $is_post_edit = in_array( $hook, array( 'post.php', 'post-new.php' ), true );
+
+        // Only load on GetCited pages and post edit screens
+        if ( ! $is_getcited_page && ! $is_post_edit ) {
             return;
         }
 
@@ -294,6 +303,7 @@ final class GetCited {
                 'error' => __( 'Error saving', 'getcited' ),
                 'checking' => __( 'Checking...', 'getcited' ),
                 'analyzing' => __( 'Analyzing...', 'getcited' ),
+                'copied' => __( 'Copied!', 'getcited' ),
             ),
         ) );
     }

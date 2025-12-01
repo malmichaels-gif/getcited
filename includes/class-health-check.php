@@ -163,8 +163,40 @@ class GetCited_Health_Check {
      * Check robots.txt for our rules
      */
     private function check_robots_txt() {
+        $robots = GetCited_Robots::instance();
+
+        // Check if site discourages search engines
+        $is_public = get_option( 'blog_public' );
+        if ( ! $is_public ) {
+            return array(
+                'status' => 'error',
+                'message' => __( 'Site is set to discourage search engines', 'getcited' ),
+                'details' => __( 'WordPress is blocking all crawlers. Go to Settings → Reading and uncheck "Discourage search engines from indexing this site" to allow AI crawlers.', 'getcited' ),
+                'action_type' => 'settings_link',
+                'action_url' => admin_url( 'options-reading.php' ),
+                'action_label' => __( 'Go to Reading Settings', 'getcited' ),
+            );
+        }
+
+        // Check for physical robots.txt file
+        if ( $robots->physical_file_exists() ) {
+            return array(
+                'status' => 'warning',
+                'message' => __( 'Physical robots.txt file exists', 'getcited' ),
+                'details' => __( 'A robots.txt file exists in your site root. WordPress cannot add GetCited rules dynamically. You have two options:', 'getcited' ),
+                'options' => array(
+                    __( 'Copy the rules below and paste them into your robots.txt file', 'getcited' ),
+                    __( 'Delete the physical robots.txt file to let WordPress manage it automatically', 'getcited' ),
+                ),
+                'action_type' => 'copy_rules',
+                'rules' => $robots->generate_rules(),
+                'file_path' => ABSPATH . 'robots.txt',
+            );
+        }
+
+        // Fetch and check robots.txt content
         $url = home_url( '/robots.txt' );
-        
+
         $response = wp_remote_get( $url, array(
             'timeout' => 5,
             'sslverify' => false,
@@ -173,7 +205,8 @@ class GetCited_Health_Check {
         if ( is_wp_error( $response ) ) {
             return array(
                 'status' => 'error',
-                'message' => $response->get_error_message(),
+                'message' => __( 'Could not fetch robots.txt', 'getcited' ),
+                'details' => $response->get_error_message(),
             );
         }
 
@@ -184,24 +217,21 @@ class GetCited_Health_Check {
             return array(
                 'status' => 'error',
                 /* translators: %d: HTTP response code */
-                'message' => sprintf( __( 'HTTP %d response', 'getcited' ), $code ),
+                'message' => sprintf( __( 'robots.txt returned HTTP %d', 'getcited' ), $code ),
+                'details' => __( 'The robots.txt file could not be loaded. Check your server configuration.', 'getcited' ),
             );
         }
 
         // Check for our marker
         if ( strpos( $body, '# === GetCited AI Crawler Rules ===' ) === false ) {
-            // Check if physical file exists
-            $robots = GetCited_Robots::instance();
-            if ( $robots->physical_file_exists() ) {
-                return array(
-                    'status' => 'warning',
-                    'message' => __( 'A physical robots.txt file exists. GetCited rules may not be included.', 'getcited' ),
-                );
-            }
-
             return array(
                 'status' => 'warning',
                 'message' => __( 'GetCited rules not found in robots.txt', 'getcited' ),
+                'details' => __( 'The rules should be added automatically. Try deactivating and reactivating GetCited, or flush your permalinks by visiting Settings → Permalinks and clicking Save.', 'getcited' ),
+                'action_type' => 'permalinks_link',
+                'action_url' => admin_url( 'options-permalink.php' ),
+                'action_label' => __( 'Go to Permalinks', 'getcited' ),
+                'rules' => $robots->generate_rules(),
             );
         }
 
@@ -287,17 +317,23 @@ class GetCited_Health_Check {
      */
     private function check_crawler_list() {
         $crawler_list = GetCited_Crawler_List::instance();
-        
+
         $is_remote = $crawler_list->is_remote_cached();
         $version = $crawler_list->get_version();
         $updated = $crawler_list->get_last_updated();
 
+        // If using bundled list, show OK status (bundled list is valid and usable)
         if ( ! $is_remote ) {
             return array(
-                'status' => 'warning',
-                'message' => __( 'Using bundled crawler list. Remote sync may have failed.', 'getcited' ),
+                'status' => 'ok',
+                'message' => sprintf(
+                    /* translators: %s: version number */
+                    __( 'Using bundled crawler list v%s', 'getcited' ),
+                    $version
+                ),
                 'version' => $version,
                 'updated' => $updated,
+                'details' => __( 'Remote sync will be attempted automatically. The bundled list is fully functional.', 'getcited' ),
             );
         }
 

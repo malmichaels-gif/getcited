@@ -278,21 +278,40 @@
         templateBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const type = btn.dataset.type;
-                
+
+                // Confirm if textarea has content
                 if (textarea.value.trim() && !confirm('This will replace your current content. Continue?')) {
                     return;
                 }
 
-                // For now, just indicate loading - actual template would come from server
+                // Show loading state
                 btn.disabled = true;
+                const originalText = btn.textContent;
                 btn.textContent = 'Loading...';
 
-                // Simulate loading template (would be AJAX call to get template)
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-                    // Template content would be loaded here
-                }, 500);
+                // Fetch template from server
+                ajax('getcited_load_template', { type: type })
+                    .then(response => {
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+
+                        if (response.success && response.data.content) {
+                            // Populate textarea
+                            textarea.value = response.data.content;
+
+                            // Update live preview if exists
+                            if (preview) {
+                                preview.textContent = response.data.content;
+                            }
+                        } else {
+                            console.error('Failed to load template:', response);
+                        }
+                    })
+                    .catch(error => {
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+                        console.error('Template load error:', error);
+                    });
             });
         });
     }
@@ -485,27 +504,96 @@
     // ==========================================================================
 
     function initHealthCheck() {
-        const btn = document.querySelector('.getcited-run-health-check');
-        if (!btn) return;
+        const healthSection = document.querySelector('.getcited-health-section');
+        if (!healthSection) return;
 
-        btn.addEventListener('click', () => {
-            btn.disabled = true;
-            btn.textContent = getcitedAdmin.strings.checking;
+        // Run health check button
+        const runBtn = healthSection.querySelector('.getcited-run-health-check');
+        if (runBtn) {
+            runBtn.addEventListener('click', () => {
+                runBtn.disabled = true;
+                runBtn.textContent = getcitedAdmin.strings.checking;
 
-            ajax('getcited_health_check')
-                .then(response => {
-                    btn.disabled = false;
-                    btn.textContent = 'Run Check';
+                ajax('getcited_health_check')
+                    .then(response => {
+                        runBtn.disabled = false;
+                        runBtn.textContent = 'Run Check';
 
-                    if (response.success) {
-                        // Reload the page to show updated results
-                        window.location.reload();
-                    }
-                })
-                .catch(() => {
-                    btn.disabled = false;
-                    btn.textContent = 'Run Check';
+                        if (response.success) {
+                            // Reload page to show updated results
+                            window.location.reload();
+                        }
+                    })
+                    .catch(() => {
+                        runBtn.disabled = false;
+                        runBtn.textContent = 'Run Check';
+                    });
+            });
+        }
+
+        // Expand/collapse health details
+        healthSection.querySelectorAll('.getcited-health-expand').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const item = this.closest('.getcited-health-item');
+                const checkKey = item.dataset.check;
+                const details = healthSection.querySelector(`.getcited-health-details[data-check="${checkKey}"]`);
+
+                if (details) {
+                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', !isExpanded);
+                    details.style.display = isExpanded ? 'none' : 'block';
+
+                    // Rotate arrow icon
+                    const icon = this.querySelector('.dashicons');
+                    icon.classList.toggle('dashicons-arrow-down-alt2', isExpanded);
+                    icon.classList.toggle('dashicons-arrow-up-alt2', !isExpanded);
+                }
+            });
+        });
+
+        // Copy rules to clipboard
+        healthSection.querySelectorAll('.getcited-copy-rules').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const rules = this.dataset.rules;
+
+                navigator.clipboard.writeText(rules).then(() => {
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<span class="dashicons dashicons-yes"></span> ' + getcitedAdmin.strings.copied;
+                    this.classList.add('copied');
+
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                        this.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = rules;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<span class="dashicons dashicons-yes"></span> ' + getcitedAdmin.strings.copied;
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                    }, 2000);
                 });
+            });
+        });
+
+        // Show/hide rules toggle
+        healthSection.querySelectorAll('.getcited-show-rules').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const preview = this.nextElementSibling;
+                if (preview && preview.classList.contains('getcited-rules-preview')) {
+                    const isHidden = preview.style.display === 'none';
+                    preview.style.display = isHidden ? 'block' : 'none';
+                    this.textContent = isHidden ? 'Hide Rules' : 'Show Rules';
+                }
+            });
         });
     }
 
