@@ -43,8 +43,8 @@ $status = $health->get_status();
             </label>
             <p class="description">
                 <?php
-                /* translators: %s: URL to the llms.txt file */
                 printf(
+                    /* translators: %s: URL to the llms.txt file */
                     esc_html__( 'When enabled, your llms.txt will be available at %s', 'getcited' ),
                     '<a href="' . esc_url( $llms_txt->get_url() ) . '" target="_blank">' . esc_html( $llms_txt->get_url() ) . '</a>'
                 ); ?>

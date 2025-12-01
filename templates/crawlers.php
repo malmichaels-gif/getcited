@@ -41,8 +41,8 @@ $list_updated = $crawler_list->get_last_updated();
             </button>
             <span class="getcited-list-info">
                 <?php
-                /* translators: %1$s: version number, %2$s: last updated date */
                 printf(
+                    /* translators: %1$s: version number, %2$s: last updated date */
                     esc_html__( 'Crawler list v%1$s (updated %2$s)', 'getcited' ),
                     esc_html( $list_version ),
                     esc_html( $list_updated )

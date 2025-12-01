@@ -34,8 +34,8 @@ $detected_plugins = $schema->get_detected_plugins();
                 <p>
                     <span class="dashicons dashicons-warning"></span>
                     <?php
-                    /* translators: %s: comma-separated list of detected schema plugin names */
                     printf(
+                        /* translators: %s: comma-separated list of detected schema plugin names */
                         esc_html__( 'Detected schema plugins: %s. Enabling GetCited schema may cause duplicate output.', 'getcited' ),
                         '<strong>' . esc_html( implode( ', ', array_column( $detected_plugins, 'name' ) ) ) . '</strong>'
                     ); ?>

@@ -343,8 +343,8 @@ class GetCited_Pro_Teaser {
             <span class="dashicons dashicons-lock"></span>
             <p>
                 <?php
-                /* translators: %s: feature name */
                 printf(
+                    /* translators: %s: feature name */
                     esc_html__( '%s requires GetCited Pro.', 'getcited' ),
                     esc_html( $feature_name )
                 ); ?>

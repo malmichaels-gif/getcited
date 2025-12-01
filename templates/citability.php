@@ -101,8 +101,8 @@ $average_score = $citability->get_average_score();
                 <h3><?php esc_html_e( 'Full Site Audit', 'getcited' ); ?></h3>
                 <p>
                     <?php
-                    /* translators: %d: number of published posts */
                     printf(
+                        /* translators: %d: number of published posts */
                         esc_html__( 'Free users can analyze their 5 most recent posts. Upgrade to Pro to audit all %d posts with detailed recommendations.', 'getcited' ),
                         absint( wp_count_posts( 'post' )->publish )
                     ); ?>

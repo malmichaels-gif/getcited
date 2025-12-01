@@ -190,8 +190,8 @@ class GetCited_Citability {
                     <?php if ( $last_audit ) : ?>
                         <div class="getcited-last-audit">
                             <?php
-                            /* translators: %s: human-readable time difference (e.g., "2 hours ago") */
                             printf(
+                                /* translators: %s: human-readable time difference (e.g., "2 hours ago") */
                                 esc_html__( 'Last analyzed: %s', 'getcited' ),
                                 esc_html( human_time_diff( strtotime( $last_audit ) ) . ' ' . __( 'ago', 'getcited' ) )
                             ); ?>

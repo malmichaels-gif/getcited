@@ -232,8 +232,8 @@ class GetCited_Health_Check {
             $names = array_map( function( $p ) { return $p['name']; }, $conflicts );
             return array(
                 'status' => 'warning',
-                /* translators: %s: comma-separated list of detected schema plugin names */
                 'message' => sprintf(
+                    /* translators: %s: comma-separated list of detected schema plugin names */
                     __( 'Schema plugins detected: %s. This may cause duplicate schema.', 'getcited' ),
                     implode( ', ', $names )
                 ),
@@ -253,8 +253,8 @@ class GetCited_Health_Check {
 
         return array(
             'status' => 'ok',
-            /* translators: %s: comma-separated list of enabled schema types */
             'message' => sprintf(
+                /* translators: %s: comma-separated list of enabled schema types */
                 __( 'Schema enabled for: %s', 'getcited' ),
                 implode( ', ', array_keys( $enabled ) )
             ),
@@ -303,8 +303,8 @@ class GetCited_Health_Check {
 
         return array(
             'status' => 'ok',
-            /* translators: %1$s: version number, %2$s: last updated date */
             'message' => sprintf(
+                /* translators: %1$s: version number, %2$s: last updated date */
                 __( 'Crawler list v%1$s (updated %2$s)', 'getcited' ),
                 $version,
                 $updated
