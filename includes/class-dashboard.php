@@ -39,6 +39,10 @@ class GetCited_Dashboard {
 
         // Template loading handler
         add_action( 'wp_ajax_getcited_load_template', array( $this, 'ajax_load_template' ) );
+
+        // Robots.txt rule management handlers
+        add_action( 'wp_ajax_getcited_add_robots_rules', array( $this, 'ajax_add_robots_rules' ) );
+        add_action( 'wp_ajax_getcited_remove_robots_rules', array( $this, 'ajax_remove_robots_rules' ) );
     }
 
     /**
@@ -197,6 +201,46 @@ class GetCited_Dashboard {
             'content' => $content,
             'type' => $type,
         ) );
+    }
+
+    /**
+     * AJAX: Add rules to physical robots.txt
+     */
+    public function ajax_add_robots_rules() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $robots = GetCited_Robots::instance();
+        $result = $robots->add_rules_to_physical_file();
+
+        if ( $result['success'] ) {
+            wp_send_json_success( $result );
+        } else {
+            wp_send_json_error( $result );
+        }
+    }
+
+    /**
+     * AJAX: Remove rules from physical robots.txt
+     */
+    public function ajax_remove_robots_rules() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $robots = GetCited_Robots::instance();
+        $result = $robots->remove_rules_from_physical_file();
+
+        if ( $result['success'] ) {
+            wp_send_json_success( $result );
+        } else {
+            wp_send_json_error( $result );
+        }
     }
 
     /**

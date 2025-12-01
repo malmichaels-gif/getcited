@@ -34,8 +34,8 @@ class GetCited_Robots {
      * Constructor
      */
     private function __construct() {
-        // Hook into robots.txt generation
-        add_filter( 'robots_txt', array( $this, 'append_rules' ), 10, 2 );
+        // Hook into robots.txt generation with priority 99 to run after most SEO plugins
+        add_filter( 'robots_txt', array( $this, 'append_rules' ), 99, 2 );
     }
 
     /**
@@ -167,10 +167,10 @@ class GetCited_Robots {
     public function get_status() {
         $settings = GetCited_Settings::instance();
         $crawler_states = $settings->get( 'crawlers' );
-        
+
         $allowed = 0;
         $blocked = 0;
-        
+
         foreach ( $crawler_states as $status ) {
             if ( $status === 'allow' ) {
                 $allowed++;
@@ -185,5 +185,203 @@ class GetCited_Robots {
             'total' => count( $crawler_states ),
             'physical_file_exists' => $this->physical_file_exists(),
         );
+    }
+
+    /**
+     * Check if we can write to robots.txt
+     *
+     * @return bool
+     */
+    public function can_write_physical_file() {
+        $file_path = ABSPATH . 'robots.txt';
+
+        // If file exists, check if writable
+        if ( file_exists( $file_path ) ) {
+            return is_writable( $file_path );
+        }
+
+        // If file doesn't exist, check if directory is writable
+        return is_writable( ABSPATH );
+    }
+
+    /**
+     * Add GetCited rules to physical robots.txt file
+     *
+     * @return array Result with success status and message
+     */
+    public function add_rules_to_physical_file() {
+        $file_path = ABSPATH . 'robots.txt';
+
+        // Check write permissions
+        if ( ! $this->can_write_physical_file() ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Cannot write to robots.txt. Check file permissions.', 'getcited' ),
+                'details' => __( 'Your hosting may require FTP credentials for file operations. Try adding rules manually, or contact your host about direct file write permissions.', 'getcited' ),
+                'show_manual_fallback' => true,
+            );
+        }
+
+        // Initialize WP_Filesystem
+        global $wp_filesystem;
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        if ( ! WP_Filesystem() ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Could not initialize filesystem.', 'getcited' ),
+                'details' => __( 'Your hosting may require FTP credentials for file operations. Try adding rules manually, or contact your host about direct file write permissions.', 'getcited' ),
+                'show_manual_fallback' => true,
+            );
+        }
+
+        // Get current content or empty string
+        $content = '';
+        if ( $wp_filesystem->exists( $file_path ) ) {
+            $content = $wp_filesystem->get_contents( $file_path );
+            if ( $content === false ) {
+                return array(
+                    'success' => false,
+                    'message' => __( 'Could not read existing robots.txt file.', 'getcited' ),
+                );
+            }
+        }
+
+        // Generate our rules
+        $rules = $this->generate_rules();
+        $marker_start = '# === GetCited AI Crawler Rules ===';
+        $marker_end = '# === End GetCited Rules ===';
+
+        // Check if our rules already exist
+        if ( strpos( $content, $marker_start ) !== false ) {
+            // Replace existing rules
+            $pattern = '/' . preg_quote( $marker_start, '/' ) . '.*?' . preg_quote( $marker_end, '/' ) . '/s';
+            $new_content = preg_replace( $pattern, $rules, $content );
+            $action = 'updated';
+        } else {
+            // Append rules (with spacing)
+            $new_content = rtrim( $content );
+            if ( ! empty( $new_content ) ) {
+                $new_content .= "\n\n";
+            }
+            $new_content .= $rules;
+            $action = 'added';
+        }
+
+        // Write file
+        $result = $wp_filesystem->put_contents( $file_path, $new_content, FS_CHMOD_FILE );
+
+        if ( ! $result ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Failed to write robots.txt file.', 'getcited' ),
+            );
+        }
+
+        // Clear health check cache so it re-evaluates
+        GetCited_Health_Check::instance()->invalidate_cache();
+
+        return array(
+            'success' => true,
+            'action' => $action,
+            'message' => $action === 'updated'
+                ? __( 'GetCited rules updated in robots.txt', 'getcited' )
+                : __( 'GetCited rules added to robots.txt', 'getcited' ),
+        );
+    }
+
+    /**
+     * Remove GetCited rules from physical robots.txt file
+     *
+     * @return array Result with success status and message
+     */
+    public function remove_rules_from_physical_file() {
+        $file_path = ABSPATH . 'robots.txt';
+
+        // Check if file exists
+        if ( ! file_exists( $file_path ) ) {
+            return array(
+                'success' => true,
+                'message' => __( 'No robots.txt file exists.', 'getcited' ),
+            );
+        }
+
+        // Check write permissions
+        if ( ! is_writable( $file_path ) ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Cannot write to robots.txt. Check file permissions.', 'getcited' ),
+            );
+        }
+
+        // Initialize WP_Filesystem
+        global $wp_filesystem;
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        if ( ! WP_Filesystem() ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Could not initialize filesystem.', 'getcited' ),
+            );
+        }
+
+        $content = $wp_filesystem->get_contents( $file_path );
+        if ( $content === false ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Could not read robots.txt file.', 'getcited' ),
+            );
+        }
+
+        $marker_start = '# === GetCited AI Crawler Rules ===';
+        $marker_end = '# === End GetCited Rules ===';
+
+        // Check if our rules exist
+        if ( strpos( $content, $marker_start ) === false ) {
+            return array(
+                'success' => true,
+                'message' => __( 'No GetCited rules found in robots.txt.', 'getcited' ),
+            );
+        }
+
+        // Remove our rules section (including surrounding whitespace)
+        $pattern = '/\n*' . preg_quote( $marker_start, '/' ) . '.*?' . preg_quote( $marker_end, '/' ) . '\n*/s';
+        $new_content = preg_replace( $pattern, "\n", $content );
+        $new_content = trim( $new_content ) . "\n";
+
+        // Write file
+        $result = $wp_filesystem->put_contents( $file_path, $new_content, FS_CHMOD_FILE );
+
+        if ( ! $result ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Failed to update robots.txt file.', 'getcited' ),
+            );
+        }
+
+        return array(
+            'success' => true,
+            'message' => __( 'GetCited rules removed from robots.txt', 'getcited' ),
+        );
+    }
+
+    /**
+     * Check if GetCited rules exist in physical robots.txt
+     *
+     * @return bool
+     */
+    public function rules_exist_in_physical_file() {
+        $file_path = ABSPATH . 'robots.txt';
+
+        if ( ! file_exists( $file_path ) ) {
+            return false;
+        }
+
+        $content = file_get_contents( $file_path );
+        return strpos( $content, '# === GetCited AI Crawler Rules ===' ) !== false;
     }
 }

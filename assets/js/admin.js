@@ -21,6 +21,7 @@
         initSchemaSettings();
         initCitabilityAnalysis();
         initHealthCheck();
+        initRobotsRulesActions();
         initWaitlistForm();
         initSampleModal();
         initWizard();
@@ -591,7 +592,98 @@
                 if (preview && preview.classList.contains('getcited-rules-preview')) {
                     const isHidden = preview.style.display === 'none';
                     preview.style.display = isHidden ? 'block' : 'none';
-                    this.textContent = isHidden ? 'Hide Rules' : 'Show Rules';
+                    this.textContent = isHidden ? getcitedAdmin.strings.hide_rules : getcitedAdmin.strings.show_rules;
+                }
+            });
+        });
+    }
+
+    // ==========================================================================
+    // Robots.txt Rules Actions
+    // ==========================================================================
+
+    function initRobotsRulesActions() {
+        // Add rules button
+        document.querySelectorAll('.getcited-add-robots-rules').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const statusEl = this.nextElementSibling;
+                const originalText = this.innerHTML;
+
+                this.disabled = true;
+                this.innerHTML = '<span class="dashicons dashicons-update spin"></span> ' + getcitedAdmin.strings.adding;
+
+                ajax('getcited_add_robots_rules')
+                    .then(response => {
+                        if (response.success) {
+                            showStatus(statusEl, response.data.message, 'success');
+                            // Reload after short delay to show updated health check
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            this.disabled = false;
+                            this.innerHTML = originalText;
+                            showStatus(statusEl, response.data.message || getcitedAdmin.strings.error, 'error');
+
+                            // If manual fallback needed, show the preview
+                            if (response.data.show_manual_fallback) {
+                                const preview = this.closest('.details-actions').querySelector('.getcited-rules-preview');
+                                if (preview) {
+                                    preview.style.display = 'block';
+                                }
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                        showStatus(statusEl, getcitedAdmin.strings.error, 'error');
+                    });
+            });
+        });
+
+        // Remove rules button (if we add one in the future)
+        document.querySelectorAll('.getcited-remove-robots-rules').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!confirm(getcitedAdmin.strings.confirm_remove_rules)) {
+                    return;
+                }
+
+                const statusEl = this.nextElementSibling;
+                const originalText = this.innerHTML;
+
+                this.disabled = true;
+                this.innerHTML = '<span class="dashicons dashicons-update spin"></span> ' + getcitedAdmin.strings.removing;
+
+                ajax('getcited_remove_robots_rules')
+                    .then(response => {
+                        if (response.success) {
+                            showStatus(statusEl, response.data.message, 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            this.disabled = false;
+                            this.innerHTML = originalText;
+                            showStatus(statusEl, response.data.message || getcitedAdmin.strings.error, 'error');
+                        }
+                    })
+                    .catch(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                        showStatus(statusEl, getcitedAdmin.strings.error, 'error');
+                    });
+            });
+        });
+
+        // Toggle rules preview button
+        document.querySelectorAll('.getcited-toggle-rules').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const preview = this.nextElementSibling;
+                if (preview && preview.classList.contains('getcited-rules-preview')) {
+                    const isHidden = preview.style.display === 'none';
+                    preview.style.display = isHidden ? 'block' : 'none';
+                    this.textContent = isHidden ? getcitedAdmin.strings.hide_rules : getcitedAdmin.strings.preview_rules;
                 }
             });
         });

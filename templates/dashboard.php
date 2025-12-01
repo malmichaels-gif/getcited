@@ -162,7 +162,46 @@ $pro_teaser = GetCited_Pro_Teaser::instance();
 
                             <?php if ( ! empty( $check['action_type'] ) ) : ?>
                                 <div class="details-actions">
-                                    <?php if ( $check['action_type'] === 'copy_rules' && ! empty( $check['rules'] ) ) : ?>
+
+                                    <?php if ( $check['action_type'] === 'auto_add' ) : ?>
+                                        <!-- One-click add button -->
+                                        <button type="button" class="button button-primary getcited-add-robots-rules">
+                                            <span class="dashicons dashicons-plus-alt2"></span>
+                                            <?php echo esc_html( $check['action_label'] ); ?>
+                                        </button>
+                                        <span class="getcited-action-status"></span>
+
+                                        <?php if ( ! empty( $check['seo_plugin'] ) ) : ?>
+                                            <p class="alternative-action">
+                                                <?php esc_html_e( 'Or add manually via:', 'getcited' ); ?>
+                                                <a href="<?php echo esc_url( admin_url( $check['seo_plugin']['robots_editor']['url'] ) ); ?>">
+                                                    <?php echo esc_html( $check['seo_plugin']['robots_editor']['path'] ); ?>
+                                                </a>
+                                            </p>
+                                        <?php endif; ?>
+
+                                        <?php if ( ! empty( $check['detected_plugins'] ) ) : ?>
+                                            <p class="detected-plugins">
+                                                <?php
+                                                printf(
+                                                    /* translators: %s: comma-separated list of plugin names */
+                                                    esc_html__( 'Detected plugins modifying robots.txt: %s', 'getcited' ),
+                                                    esc_html( implode( ', ', $check['detected_plugins'] ) )
+                                                );
+                                                ?>
+                                            </p>
+                                        <?php endif; ?>
+
+                                        <!-- Expandable rules preview -->
+                                        <button type="button" class="button getcited-toggle-rules">
+                                            <?php esc_html_e( 'Preview Rules', 'getcited' ); ?>
+                                        </button>
+                                        <div class="getcited-rules-preview" style="display: none;">
+                                            <pre class="rules-code"><?php echo esc_html( $check['rules'] ); ?></pre>
+                                        </div>
+
+                                    <?php elseif ( $check['action_type'] === 'copy_rules' && ! empty( $check['rules'] ) ) : ?>
+                                        <!-- Copy rules (fallback when can't write) -->
                                         <div class="getcited-rules-preview">
                                             <pre class="rules-code"><?php echo esc_html( $check['rules'] ); ?></pre>
                                             <button type="button" class="button getcited-copy-rules" data-rules="<?php echo esc_attr( $check['rules'] ); ?>">
@@ -170,19 +209,45 @@ $pro_teaser = GetCited_Pro_Teaser::instance();
                                                 <?php esc_html_e( 'Copy Rules to Clipboard', 'getcited' ); ?>
                                             </button>
                                         </div>
+
+                                        <?php if ( ! empty( $check['seo_plugin'] ) ) : ?>
+                                            <p class="paste-location">
+                                                <?php esc_html_e( 'Paste into:', 'getcited' ); ?>
+                                                <a href="<?php echo esc_url( admin_url( $check['seo_plugin']['robots_editor']['url'] ) ); ?>">
+                                                    <?php echo esc_html( $check['seo_plugin']['robots_editor']['path'] ); ?>
+                                                </a>
+                                            </p>
+                                        <?php endif; ?>
+
                                         <?php if ( ! empty( $check['file_path'] ) ) : ?>
                                             <p class="file-path">
                                                 <?php esc_html_e( 'File location:', 'getcited' ); ?>
                                                 <code><?php echo esc_html( $check['file_path'] ); ?></code>
                                             </p>
                                         <?php endif; ?>
+
+                                    <?php elseif ( $check['action_type'] === 'copy_content' && ! empty( $check['content'] ) ) : ?>
+                                        <!-- Copy llms.txt content -->
+                                        <p class="current-content-label"><?php esc_html_e( 'Current file content (first 500 chars):', 'getcited' ); ?></p>
+                                        <pre class="content-preview"><?php echo esc_html( $check['current_content_preview'] ); ?></pre>
+
+                                        <p class="getcited-content-label"><?php esc_html_e( 'GetCited content to use:', 'getcited' ); ?></p>
+                                        <div class="getcited-rules-preview">
+                                            <pre class="rules-code"><?php echo esc_html( $check['content'] ); ?></pre>
+                                            <button type="button" class="button getcited-copy-rules" data-rules="<?php echo esc_attr( $check['content'] ); ?>">
+                                                <span class="dashicons dashicons-clipboard"></span>
+                                                <?php esc_html_e( 'Copy Content to Clipboard', 'getcited' ); ?>
+                                            </button>
+                                        </div>
+
                                     <?php elseif ( ! empty( $check['action_url'] ) && ! empty( $check['action_label'] ) ) : ?>
+                                        <!-- Link to settings -->
                                         <a href="<?php echo esc_url( $check['action_url'] ); ?>" class="button">
                                             <?php echo esc_html( $check['action_label'] ); ?>
                                         </a>
                                     <?php endif; ?>
 
-                                    <?php if ( ! empty( $check['rules'] ) && $check['action_type'] !== 'copy_rules' ) : ?>
+                                    <?php if ( ! empty( $check['rules'] ) && ! in_array( $check['action_type'], array( 'copy_rules', 'auto_add' ), true ) ) : ?>
                                         <button type="button" class="button getcited-show-rules">
                                             <?php esc_html_e( 'Show Rules', 'getcited' ); ?>
                                         </button>
@@ -194,6 +259,14 @@ $pro_teaser = GetCited_Pro_Teaser::instance();
                                             </button>
                                         </div>
                                     <?php endif; ?>
+
+                                    <?php if ( ! empty( $check['content_preview'] ) && $check['action_type'] !== 'copy_content' ) : ?>
+                                        <div class="conflict-preview">
+                                            <p class="preview-label"><?php esc_html_e( 'Current content preview:', 'getcited' ); ?></p>
+                                            <pre class="content-preview"><?php echo esc_html( $check['content_preview'] ); ?></pre>
+                                        </div>
+                                    <?php endif; ?>
+
                                 </div>
                             <?php endif; ?>
                         </div>

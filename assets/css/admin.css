@@ -427,6 +427,102 @@
     font-size: 11px;
 }
 
+/* Auto-add button styles */
+.getcited-add-robots-rules {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.getcited-add-robots-rules .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.getcited-action-status {
+    margin-left: var(--getcited-space-md);
+    font-size: 13px;
+}
+
+.getcited-action-status.success {
+    color: var(--getcited-success);
+}
+
+.getcited-action-status.error {
+    color: var(--getcited-error);
+}
+
+.alternative-action,
+.paste-location,
+.detected-plugins {
+    margin: var(--getcited-space-sm) 0 0 0;
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+}
+
+.alternative-action a,
+.paste-location a {
+    color: var(--getcited-primary);
+    text-decoration: none;
+}
+
+.alternative-action a:hover,
+.paste-location a:hover {
+    text-decoration: underline;
+}
+
+.detected-plugins {
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    background: var(--getcited-gray-100);
+    border-radius: var(--getcited-radius-sm);
+    margin-top: var(--getcited-space-md);
+}
+
+.getcited-toggle-rules {
+    margin-top: var(--getcited-space-md);
+}
+
+/* Content preview for llms.txt conflicts */
+.current-content-label,
+.getcited-content-label,
+.preview-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--getcited-gray-600);
+    margin: var(--getcited-space-md) 0 var(--getcited-space-sm) 0;
+}
+
+.content-preview {
+    background: var(--getcited-gray-100);
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-sm);
+    padding: var(--getcited-space-md);
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    max-height: 150px;
+    overflow-y: auto;
+    color: var(--getcited-gray-600);
+}
+
+.conflict-preview {
+    margin-top: var(--getcited-space-md);
+    padding-top: var(--getcited-space-md);
+    border-top: 1px solid var(--getcited-gray-200);
+}
+
+/* Spinning icon for loading states */
+@keyframes getcited-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.dashicons.spin {
+    animation: getcited-spin 1s linear infinite;
+}
+
 /* ==========================================================================
    Quick Links
    ========================================================================== */

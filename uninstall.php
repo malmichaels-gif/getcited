@@ -76,8 +76,51 @@ function getcited_uninstall() {
     // 5. Remove cron jobs
     wp_clear_scheduled_hook( 'getcited_daily_cron' );
 
-    // 6. Flush rewrite rules (removes /llms.txt route)
+    // 6. Remove GetCited rules from physical robots.txt if present
+    getcited_cleanup_robots_txt();
+
+    // 7. Flush rewrite rules (removes /llms.txt route)
     flush_rewrite_rules();
+}
+
+/**
+ * Remove GetCited rules from physical robots.txt file
+ */
+function getcited_cleanup_robots_txt() {
+    $file_path = ABSPATH . 'robots.txt';
+
+    // Check if file exists
+    if ( ! file_exists( $file_path ) ) {
+        return;
+    }
+
+    // Check if writable
+    if ( ! is_writable( $file_path ) ) {
+        return;
+    }
+
+    // Read current content
+    $content = file_get_contents( $file_path );
+    if ( $content === false ) {
+        return;
+    }
+
+    $marker_start = '# === GetCited AI Crawler Rules ===';
+    $marker_end = '# === End GetCited Rules ===';
+
+    // Check if our rules exist
+    if ( strpos( $content, $marker_start ) === false ) {
+        return;
+    }
+
+    // Remove our rules section (including surrounding whitespace)
+    $pattern = '/\n*' . preg_quote( $marker_start, '/' ) . '.*?' . preg_quote( $marker_end, '/' ) . '\n*/s';
+    $new_content = preg_replace( $pattern, "\n", $content );
+    $new_content = trim( $new_content ) . "\n";
+
+    // Write file
+    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Uninstall runs outside normal WP context
+    file_put_contents( $file_path, $new_content );
 }
 
 // Run uninstall
