@@ -315,6 +315,127 @@
                     });
             });
         });
+
+        // Site scanner button
+        const scanBtn = document.querySelector('.getcited-scan-site');
+        if (scanBtn) {
+            scanBtn.addEventListener('click', function() {
+                const statusEl = document.querySelector('.getcited-scan-status');
+                const originalHTML = this.innerHTML;
+
+                // Confirm if textarea has content
+                if (textarea.value.trim() && !confirm('This will replace your current content with scanned data. Continue?')) {
+                    return;
+                }
+
+                this.disabled = true;
+                this.innerHTML = '<span class="dashicons dashicons-update getcited-spinning"></span> ' + (getcitedAdmin.strings.scanning || 'Scanning...');
+                if (statusEl) {
+                    statusEl.textContent = '';
+                    statusEl.className = 'getcited-scan-status';
+                }
+
+                ajax('getcited_scan_site')
+                    .then(response => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+
+                        if (response.success) {
+                            // Update the editor with generated content
+                            textarea.value = response.data.llms_txt;
+
+                            // Update live preview if exists
+                            if (preview) {
+                                preview.textContent = response.data.llms_txt;
+                            }
+
+                            // Mark as having unsaved changes
+                            markUnsaved();
+
+                            if (statusEl) {
+                                statusEl.textContent = getcitedAdmin.strings.scan_success || 'Site scanned successfully!';
+                                statusEl.className = 'getcited-scan-status success';
+                            }
+
+                            // Show scan summary
+                            showScanSummary(response.data.scan_data);
+                        } else {
+                            if (statusEl) {
+                                statusEl.textContent = getcitedAdmin.strings.scan_failed || 'Scan failed. Please try again.';
+                                statusEl.className = 'getcited-scan-status error';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+                        if (statusEl) {
+                            statusEl.textContent = getcitedAdmin.strings.scan_failed || 'Scan failed. Please try again.';
+                            statusEl.className = 'getcited-scan-status error';
+                        }
+                        console.error('GetCited: Scan failed', error);
+                    });
+            });
+        }
+    }
+
+    /**
+     * Mark the editor as having unsaved changes
+     */
+    function markUnsaved() {
+        const saveBtn = document.querySelector('.getcited-save-llms-txt');
+        if (saveBtn && !saveBtn.classList.contains('has-changes')) {
+            saveBtn.classList.add('has-changes');
+            // Add visual indicator
+            const statusEl = saveBtn.nextElementSibling;
+            if (statusEl) {
+                statusEl.textContent = getcitedAdmin.strings.unsaved || 'Unsaved changes';
+                statusEl.className = 'getcited-save-status warning';
+            }
+        }
+    }
+
+    /**
+     * Display scan results summary
+     */
+    function showScanSummary(data) {
+        // Remove existing summary
+        const existingSummary = document.querySelector('.getcited-scan-summary');
+        if (existingSummary) {
+            existingSummary.remove();
+        }
+
+        const stats = [
+            { label: getcitedAdmin.strings.pages || 'pages', count: Object.keys(data.pages || {}).length },
+            { label: getcitedAdmin.strings.posts || 'posts', count: (data.posts || []).length },
+            { label: getcitedAdmin.strings.categories || 'categories', count: (data.categories || []).length },
+            { label: getcitedAdmin.strings.menu_items || 'menu items', count: (data.menu || []).length },
+            { label: getcitedAdmin.strings.social_links || 'social links', count: Object.keys(data.social || {}).length },
+        ];
+
+        const statsHtml = stats
+            .filter(s => s.count > 0)
+            .map(s => `<span class="stat"><strong>${s.count}</strong> ${s.label}</span>`)
+            .join(' · ');
+
+        if (!statsHtml) return; // No stats to show
+
+        const summaryHtml = `
+            <div class="getcited-scan-summary">
+                <div class="summary-header">
+                    <span class="dashicons dashicons-yes-alt"></span>
+                    <strong>${getcitedAdmin.strings.scan_complete || 'Scan Complete'}</strong>
+                </div>
+                <div class="summary-stats">${statsHtml}</div>
+                <p class="description">${getcitedAdmin.strings.scan_review || 'Review the generated content and save when ready.'}</p>
+            </div>
+        `;
+
+        // Insert after scan description
+        const scanDesc = document.querySelector('.getcited-scan-description');
+        if (scanDesc) {
+            scanDesc.insertAdjacentHTML('afterend', summaryHtml);
+        }
     }
 
     // ==========================================================================

@@ -1931,4 +1931,196 @@
     .getcited-site-types {
         grid-template-columns: 1fr 1fr;
     }
+
+    .getcited-llms-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .getcited-scan-section {
+        justify-content: center;
+    }
+
+    .getcited-scan-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .getcited-scan-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================
+   Site Scanner Styles
+   ============================================ */
+
+/* llms.txt Editor Actions */
+.getcited-llms-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-scan-section {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-scan-site {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+}
+
+.getcited-scan-site .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.getcited-spinning {
+    animation: getcited-spin 1s linear infinite;
+}
+
+@keyframes getcited-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.getcited-scan-status {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.getcited-scan-status.success {
+    color: var(--getcited-success);
+}
+
+.getcited-scan-status.error {
+    color: var(--getcited-error);
+}
+
+.getcited-scan-description {
+    color: var(--getcited-gray-500);
+    font-style: italic;
+    margin-bottom: var(--getcited-space-md);
+}
+
+/* Scan Summary */
+.getcited-scan-summary {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 1px solid var(--getcited-success);
+    border-radius: var(--getcited-radius-md);
+    padding: var(--getcited-space-md);
+    margin: var(--getcited-space-md) 0;
+}
+
+.getcited-scan-summary .summary-header {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+    color: var(--getcited-success);
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-scan-summary .summary-header .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.getcited-scan-summary .summary-stats {
+    color: var(--getcited-gray-700);
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-scan-summary .summary-stats .stat {
+    white-space: nowrap;
+}
+
+/* Save button unsaved state */
+.getcited-save-llms-txt.has-changes {
+    animation: getcited-pulse 2s ease-in-out infinite;
+}
+
+@keyframes getcited-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+    50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0); }
+}
+
+.getcited-save-status.warning {
+    color: var(--getcited-warning);
+}
+
+/* ============================================
+   Wizard Scan Results (Step 5)
+   ============================================ */
+
+.getcited-wizard-preview {
+    background: var(--getcited-gray-900);
+    border-radius: var(--getcited-radius-md);
+    overflow: hidden;
+    margin-bottom: var(--getcited-space-lg);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.getcited-wizard-preview .preview-header {
+    background: var(--getcited-gray-800);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+    color: var(--getcited-gray-300);
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+}
+
+.getcited-wizard-preview .preview-content {
+    padding: var(--getcited-space-md);
+    margin: 0;
+    color: var(--getcited-gray-100);
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Scan Stats Grid */
+.getcited-scan-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-scan-stats .stat-item {
+    text-align: center;
+    padding: var(--getcited-space-md);
+    background: var(--getcited-gray-50);
+    border-radius: var(--getcited-radius-md);
+}
+
+.getcited-scan-stats .stat-number {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--getcited-primary);
+    line-height: 1;
+    margin-bottom: var(--getcited-space-xs);
+}
+
+.getcited-scan-stats .stat-label {
+    font-size: 12px;
+    color: var(--getcited-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }

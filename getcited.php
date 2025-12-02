@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.0.4
+ * Version: 1.1.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Malcolm Michaels
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.0.4' );
+define( 'GETCITED_VERSION', '1.1.0' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -73,6 +73,7 @@ final class GetCited {
         require_once GETCITED_PLUGIN_DIR . 'includes/class-wizard.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-dashboard.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-pro-teaser.php';
+        require_once GETCITED_PLUGIN_DIR . 'includes/class-site-scanner.php';
 
         // WP-CLI commands
         if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -173,6 +174,7 @@ final class GetCited {
         GetCited_Wizard::instance();
         GetCited_Dashboard::instance();
         GetCited_Pro_Teaser::instance();
+        GetCited_Site_Scanner::instance();
 
         // Maybe run migrations
         $this->maybe_migrate();
@@ -313,6 +315,18 @@ final class GetCited {
                 'preview_rules' => __( 'Preview Rules', 'getcited' ),
                 'confirm_remove_rules' => __( 'Are you sure you want to remove GetCited rules from robots.txt?', 'getcited' ),
                 'apply_schema_preset' => __( 'Apply recommended schema settings for this site type?', 'getcited' ),
+                // Site scanner strings
+                'scanning' => __( 'Scanning...', 'getcited' ),
+                'scan_success' => __( 'Site scanned successfully!', 'getcited' ),
+                'scan_failed' => __( 'Scan failed. Please try again.', 'getcited' ),
+                'scan_complete' => __( 'Scan Complete', 'getcited' ),
+                'scan_review' => __( 'Review the generated content and save when ready.', 'getcited' ),
+                'unsaved' => __( 'Unsaved changes', 'getcited' ),
+                'pages' => __( 'pages', 'getcited' ),
+                'posts' => __( 'posts', 'getcited' ),
+                'categories' => __( 'categories', 'getcited' ),
+                'menu_items' => __( 'menu items', 'getcited' ),
+                'social_links' => __( 'social links', 'getcited' ),
             ),
         ) );
     }

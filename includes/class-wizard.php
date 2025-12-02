@@ -309,6 +309,9 @@ class GetCited_Wizard {
             case 'site_type':
                 $site_type = sanitize_text_field( $data['site_type'] ?? 'blog' );
                 $this->apply_preset( $site_type );
+
+                // Run site scan after site type selection for the "wow" moment
+                $this->run_site_scan();
                 break;
 
             case 'organization':
@@ -341,6 +344,47 @@ class GetCited_Wizard {
     }
 
     /**
+     * Run site scan and store results for wizard completion
+     *
+     * Called after site type selection to generate personalized llms.txt content.
+     * Results are stored in a transient for display in the completion step.
+     */
+    private function run_site_scan() {
+        $scanner       = GetCited_Site_Scanner::instance();
+        $scan_data     = $scanner->scan_site();
+        $generated_llms = $scanner->generate_llms_txt( $scan_data );
+
+        // Store for step 5 (complete) display
+        set_transient(
+            'getcited_wizard_scan',
+            array(
+                'scan_data'  => $scan_data,
+                'llms_txt'   => $generated_llms,
+                'scanned_at' => current_time( 'mysql' ),
+            ),
+            HOUR_IN_SECONDS
+        );
+
+        // Pre-fill organization info from scan if not already set
+        $settings = GetCited_Settings::instance();
+        $org      = $settings->get( 'organization' );
+
+        if ( empty( $org['name'] ) && ! empty( $scan_data['site']['name'] ) ) {
+            $org['name'] = $scan_data['site']['name'];
+            $settings->set( 'organization', $org );
+        }
+    }
+
+    /**
+     * Get wizard scan data if available
+     *
+     * @return array|false Scan data or false if not available.
+     */
+    public function get_scan_data() {
+        return get_transient( 'getcited_wizard_scan' );
+    }
+
+    /**
      * AJAX: Skip wizard
      */
     public function ajax_skip_wizard() {
@@ -367,6 +411,16 @@ class GetCited_Wizard {
         }
 
         $settings = GetCited_Settings::instance();
+
+        // Save the generated llms.txt content from the scan
+        $wizard_scan = get_transient( 'getcited_wizard_scan' );
+        if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
+            $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
+
+            // Clean up the transient
+            delete_transient( 'getcited_wizard_scan' );
+        }
+
         $settings->set( 'wizard_completed', true );
 
         // Flush rewrite rules to ensure llms.txt works

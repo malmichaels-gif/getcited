@@ -173,31 +173,84 @@ if ( empty( $org['name'] ) ) {
 
         <!-- Step 5: Complete -->
         <div class="getcited-wizard-step" data-step="complete" style="display: none;">
+            <?php
+            $wizard_scan = $wizard->get_scan_data();
+            $has_scan    = $wizard_scan && ! empty( $wizard_scan['llms_txt'] );
+            $scan_data   = $has_scan ? $wizard_scan['scan_data'] : array();
+            ?>
             <div class="wizard-content">
                 <div class="wizard-icon success">
                     <span class="dashicons dashicons-yes"></span>
                 </div>
                 <h1><?php esc_html_e( 'All Set!', 'getcited' ); ?></h1>
-                <p class="wizard-subtitle">
-                    <?php esc_html_e( 'Your site is now optimized for AI visibility.', 'getcited' ); ?>
-                </p>
-                
-                <div class="getcited-setup-summary">
-                    <div class="summary-item">
-                        <span class="dashicons dashicons-yes"></span>
-                        <span><?php esc_html_e( 'AI crawlers configured', 'getcited' ); ?></span>
+
+                <?php if ( $has_scan ) : ?>
+                    <p class="wizard-subtitle">
+                        <?php esc_html_e( "We scanned your site and created your llms.txt. Here's what AI systems will see:", 'getcited' ); ?>
+                    </p>
+
+                    <div class="getcited-wizard-preview">
+                        <div class="preview-header">
+                            <span class="dashicons dashicons-media-text"></span>
+                            <span><?php esc_html_e( 'Your llms.txt', 'getcited' ); ?></span>
+                        </div>
+                        <pre class="preview-content"><?php echo esc_html( $wizard_scan['llms_txt'] ); ?></pre>
                     </div>
-                    <div class="summary-item">
-                        <span class="dashicons dashicons-yes"></span>
-                        <span><?php esc_html_e( 'llms.txt generated', 'getcited' ); ?></span>
+
+                    <div class="getcited-scan-stats">
+                        <div class="stat-item">
+                            <span class="stat-number"><?php echo count( $scan_data['pages'] ?? array() ); ?></span>
+                            <span class="stat-label"><?php esc_html_e( 'Pages', 'getcited' ); ?></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?php echo count( $scan_data['categories'] ?? array() ); ?></span>
+                            <span class="stat-label"><?php esc_html_e( 'Categories', 'getcited' ); ?></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?php echo count( $scan_data['posts'] ?? array() ); ?></span>
+                            <span class="stat-label"><?php esc_html_e( 'Posts', 'getcited' ); ?></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?php echo count( $scan_data['menu'] ?? array() ); ?></span>
+                            <span class="stat-label"><?php esc_html_e( 'Menu Items', 'getcited' ); ?></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?php echo count( $scan_data['social'] ?? array() ); ?></span>
+                            <span class="stat-label"><?php esc_html_e( 'Social Links', 'getcited' ); ?></span>
+                        </div>
                     </div>
-                    <div class="summary-item">
-                        <span class="dashicons dashicons-yes"></span>
-                        <span><?php esc_html_e( 'Schema markup enabled', 'getcited' ); ?></span>
+
+                    <p class="description" style="text-align: center;">
+                        <?php esc_html_e( 'You can edit this anytime from the llms.txt Editor page.', 'getcited' ); ?>
+                    </p>
+
+                <?php else : ?>
+                    <p class="wizard-subtitle">
+                        <?php esc_html_e( 'Your site is now optimized for AI visibility.', 'getcited' ); ?>
+                    </p>
+
+                    <div class="getcited-setup-summary">
+                        <div class="summary-item">
+                            <span class="dashicons dashicons-yes"></span>
+                            <span><?php esc_html_e( 'AI crawlers configured', 'getcited' ); ?></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="dashicons dashicons-yes"></span>
+                            <span><?php esc_html_e( 'llms.txt ready to customize', 'getcited' ); ?></span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="dashicons dashicons-yes"></span>
+                            <span><?php esc_html_e( 'Schema markup enabled', 'getcited' ); ?></span>
+                        </div>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
             <div class="wizard-actions">
+                <?php if ( $has_scan ) : ?>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>" class="button">
+                        <?php esc_html_e( 'Edit llms.txt', 'getcited' ); ?>
+                    </a>
+                <?php endif; ?>
                 <button type="button" class="button button-primary button-hero getcited-wizard-complete">
                     <?php esc_html_e( 'Go to Dashboard', 'getcited' ); ?> →
                 </button>

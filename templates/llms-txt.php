@@ -72,22 +72,34 @@ $status = $health->get_status();
         <div class="getcited-section getcited-llms-editor-section">
             <div class="getcited-editor-header">
                 <h2><?php esc_html_e( 'Content', 'getcited' ); ?></h2>
-                <div class="getcited-template-buttons">
-                    <span><?php esc_html_e( 'Load template:', 'getcited' ); ?></span>
-                    <button type="button" class="button getcited-load-template" data-type="blog">
-                        <?php esc_html_e( 'Blog', 'getcited' ); ?>
-                    </button>
-                    <button type="button" class="button getcited-load-template" data-type="business">
-                        <?php esc_html_e( 'Business', 'getcited' ); ?>
-                    </button>
-                    <button type="button" class="button getcited-load-template" data-type="news">
-                        <?php esc_html_e( 'News', 'getcited' ); ?>
-                    </button>
-                    <button type="button" class="button getcited-load-template" data-type="ecommerce">
-                        <?php esc_html_e( 'E-commerce', 'getcited' ); ?>
-                    </button>
+                <div class="getcited-llms-actions">
+                    <div class="getcited-template-buttons">
+                        <span><?php esc_html_e( 'Load template:', 'getcited' ); ?></span>
+                        <button type="button" class="button getcited-load-template" data-type="blog">
+                            <?php esc_html_e( 'Blog', 'getcited' ); ?>
+                        </button>
+                        <button type="button" class="button getcited-load-template" data-type="business">
+                            <?php esc_html_e( 'Business', 'getcited' ); ?>
+                        </button>
+                        <button type="button" class="button getcited-load-template" data-type="news">
+                            <?php esc_html_e( 'News', 'getcited' ); ?>
+                        </button>
+                        <button type="button" class="button getcited-load-template" data-type="ecommerce">
+                            <?php esc_html_e( 'E-commerce', 'getcited' ); ?>
+                        </button>
+                    </div>
+                    <div class="getcited-scan-section">
+                        <button type="button" class="button button-primary getcited-scan-site">
+                            <span class="dashicons dashicons-search"></span>
+                            <?php esc_html_e( 'Scan My Site', 'getcited' ); ?>
+                        </button>
+                        <span class="getcited-scan-status"></span>
+                    </div>
                 </div>
             </div>
+            <p class="description getcited-scan-description">
+                <?php esc_html_e( 'Scan your site to auto-generate llms.txt content based on your actual pages, posts, categories, and more.', 'getcited' ); ?>
+            </p>
 
             <div class="getcited-editor-wrapper">
                 <div class="getcited-editor">

@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,29 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.1.0 =
+* New: Intelligent Site Scanner for llms.txt generation
+* New: Wizard now scans your site and generates personalized llms.txt during setup
+* New: "Scan My Site" button in llms.txt editor for re-scanning
+* New: Scan results preview with stats (pages, posts, categories, menu items, social links)
+* New: Support for Rank Math and SEOPress social link detection
+* New: Support for modern social platforms (X/Twitter, Threads, Mastodon, Bluesky)
+* New: Filter hook `getcited_scanner_generated_content` for customizing generated llms.txt
+* Added: Markdown escaping to prevent broken links from special characters
+* Added: 5-minute scan cache to prevent excessive database queries
+* Changed: Twitter social links now normalized to X branding
+
+= 1.0.4 =
+* New: Expanded site types from 5 to 9 (added Portfolio, Nonprofit, Education, Community)
+* New: Granular schema settings by site type
+* New: llms.txt templates for all 9 site types
+* Fixed: Wizard initialization now properly shows first step on page load
+* Fixed: Health check expand buttons now work correctly with improved fallback logic
+
+= 1.0.3 =
+* Enhanced robots.txt and llms.txt handling
+* Improved conflict detection
 
 = 1.0.2 =
 * Fixed: Save Changes button now works correctly across all settings pages
