@@ -93,13 +93,19 @@ class GetCited_Robots {
             );
         }
 
-        // Read existing content (if any)
+        // Read existing content from physical file (if any)
         $existing = '';
         if ( $wp_filesystem->exists( $file_path ) ) {
             $existing = $wp_filesystem->get_contents( $file_path );
             if ( $existing === false ) {
                 $existing = '';
             }
+        }
+
+        // If no physical file exists, get WordPress dynamic robots.txt content
+        // This preserves sitemap rules from SEO plugins (Yoast, etc.)
+        if ( empty( $existing ) ) {
+            $existing = $this->get_wordpress_robots_content();
         }
 
         // Remove any existing GetCited section
@@ -139,6 +145,33 @@ class GetCited_Robots {
             'success' => true,
             'message' => __( 'robots.txt updated successfully', 'getcited' ),
         );
+    }
+
+    /**
+     * Get WordPress dynamic robots.txt content (without GetCited rules)
+     *
+     * This fetches what WordPress would generate dynamically, including
+     * sitemap rules from SEO plugins like Yoast.
+     *
+     * @return string The robots.txt content
+     */
+    private function get_wordpress_robots_content() {
+        // Temporarily remove our filter to get base content
+        remove_filter( 'robots_txt', array( $this, 'append_rules' ), 99 );
+
+        // Capture WordPress robots.txt output
+        $public = get_option( 'blog_public' );
+
+        ob_start();
+        // Trigger the robots_txt filter without our rules
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
+        $output = apply_filters( 'robots_txt', "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n", $public );
+        ob_end_clean();
+
+        // Re-add our filter
+        add_filter( 'robots_txt', array( $this, 'append_rules' ), 99, 2 );
+
+        return $output;
     }
 
     /**
@@ -351,7 +384,7 @@ class GetCited_Robots {
             );
         }
 
-        // Get current content or empty string
+        // Get current content from physical file or WordPress dynamic output
         $content = '';
         if ( $wp_filesystem->exists( $file_path ) ) {
             $content = $wp_filesystem->get_contents( $file_path );
@@ -361,6 +394,12 @@ class GetCited_Robots {
                     'message' => __( 'Could not read existing robots.txt file.', 'getcited' ),
                 );
             }
+        }
+
+        // If no physical file exists, get WordPress dynamic robots.txt content
+        // This preserves sitemap rules from SEO plugins (Yoast, etc.)
+        if ( empty( $content ) ) {
+            $content = $this->get_wordpress_robots_content();
         }
 
         // Generate our rules
@@ -375,12 +414,16 @@ class GetCited_Robots {
             $new_content = preg_replace( $pattern, $rules, $content );
             $action = 'updated';
         } else {
-            // Append rules (with spacing)
-            $new_content = rtrim( $content );
-            if ( ! empty( $new_content ) ) {
-                $new_content .= "\n\n";
+            // Remove our section first (in case it exists without markers)
+            $content = preg_replace( '/' . preg_quote( $marker_start, '/' ) . '.*?' . preg_quote( $marker_end, '/' ) . '\s*/s', '', $content );
+            $content = trim( $content );
+
+            // Prepend GetCited rules, then existing content
+            if ( ! empty( $content ) ) {
+                $new_content = $rules . "\n\n" . $content;
+            } else {
+                $new_content = $rules;
             }
-            $new_content .= $rules;
             $action = 'added';
         }
 
