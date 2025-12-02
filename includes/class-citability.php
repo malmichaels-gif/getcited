@@ -235,14 +235,15 @@ class GetCited_Citability {
     public function ajax_analyze_post() {
         check_ajax_referer( 'getcited_admin', 'nonce' );
 
-        if ( ! current_user_can( 'edit_posts' ) ) {
-            wp_send_json_error( 'Permission denied' );
-        }
-
         $post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 
         if ( ! $post_id ) {
             wp_send_json_error( 'Invalid post ID' );
+        }
+
+        // Check if user can edit this specific post
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( 'Permission denied' );
         }
 
         $result = $this->analyze_post( $post_id );
@@ -679,8 +680,8 @@ class GetCited_Citability {
         }
 
         $schema_types = $settings->get( 'schema_types' );
-        
-        if ( $schema_types['article'] ) {
+
+        if ( ! empty( $schema_types['article'] ) ) {
             return array(
                 'score' => $max,
                 'passed' => true,

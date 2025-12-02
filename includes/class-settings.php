@@ -134,33 +134,37 @@ class GetCited_Settings {
 
     /**
      * Initialize default settings on activation
+     *
+     * Uses add_option() which is atomic - if the option already exists,
+     * this does nothing, preventing race conditions.
      */
     public function init_defaults() {
-        // Get current settings
-        $current = get_option( self::OPTION_NAME, array() );
+        // Set default crawler states (all allowed)
+        $crawler_list = GetCited_Crawler_List::instance();
+        $crawlers = $crawler_list->get_all();
 
-        // Only init if empty
-        if ( empty( $current ) ) {
-            // Set default crawler states (all allowed)
-            $crawler_list = GetCited_Crawler_List::instance();
-            $crawlers = $crawler_list->get_all();
-            
-            $crawler_states = array();
-            foreach ( $crawlers as $crawler ) {
-                $crawler_states[ $crawler['name'] ] = 'allow';
-            }
-            
-            $this->defaults['crawlers'] = $crawler_states;
+        $crawler_states = array();
+        foreach ( $crawlers as $crawler ) {
+            $crawler_states[ $crawler['name'] ] = 'allow';
+        }
 
-            // Set organization name from site
-            $this->defaults['organization']['name'] = get_bloginfo( 'name' );
+        $this->defaults['crawlers'] = $crawler_states;
 
-            // Generate default llms.txt
-            $this->defaults['llms_txt_content'] = $this->generate_default_llms_txt();
+        // Set organization name from site
+        $this->defaults['organization']['name'] = get_bloginfo( 'name' );
 
-            // Save defaults
-            update_option( self::OPTION_NAME, $this->defaults, true );
+        // Generate default llms.txt
+        $this->defaults['llms_txt_content'] = $this->generate_default_llms_txt();
+
+        // Use add_option which is atomic - only adds if option doesn't exist
+        // This prevents race conditions with concurrent requests
+        $added = add_option( self::OPTION_NAME, $this->defaults );
+
+        if ( $added ) {
             $this->settings = $this->defaults;
+        } else {
+            // Option already existed, reload settings
+            $this->load();
         }
     }
 
@@ -246,7 +250,10 @@ class GetCited_Settings {
      * Save settings to database
      */
     private function save() {
-        update_option( self::OPTION_NAME, $this->settings, true );
+        update_option( self::OPTION_NAME, $this->settings );
+
+        // Clear object cache to ensure other processes get fresh data
+        wp_cache_delete( self::OPTION_NAME, 'options' );
     }
 
     /**

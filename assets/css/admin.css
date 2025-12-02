@@ -2148,11 +2148,6 @@
     animation: getcited-spin 1s linear infinite;
 }
 
-@keyframes getcited-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
 .getcited-scan-status {
     font-size: 13px;
     font-weight: 500;

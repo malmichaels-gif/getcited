@@ -134,19 +134,19 @@ class GetCited_Dashboard {
                     $settings->set( 'custom_crawlers', $data['custom_crawlers'] );
                 }
                 if ( isset( $data['robots_write_physical'] ) ) {
-                    $settings->set( 'robots_write_physical', filter_var( $data['robots_write_physical'], FILTER_VALIDATE_BOOLEAN ) );
+                    $settings->set( 'robots_write_physical', filter_var( $data['robots_write_physical'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
                 break;
 
             case 'llms_txt':
                 if ( isset( $data['llms_txt_enabled'] ) ) {
-                    $settings->set( 'llms_txt_enabled', filter_var( $data['llms_txt_enabled'], FILTER_VALIDATE_BOOLEAN ) );
+                    $settings->set( 'llms_txt_enabled', filter_var( $data['llms_txt_enabled'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
                 if ( isset( $data['llms_txt_content'] ) ) {
                     $settings->set( 'llms_txt_content', $data['llms_txt_content'] );
                 }
                 if ( isset( $data['llms_write_physical'] ) ) {
-                    $settings->set( 'llms_write_physical', filter_var( $data['llms_write_physical'], FILTER_VALIDATE_BOOLEAN ) );
+                    $settings->set( 'llms_write_physical', filter_var( $data['llms_write_physical'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
                 if ( isset( $data['llms_founder_name'] ) ) {
                     $settings->set( 'llms_founder_name', $data['llms_founder_name'] );
@@ -167,13 +167,13 @@ class GetCited_Dashboard {
 
             case 'schema':
                 if ( isset( $data['schema_enabled'] ) ) {
-                    $settings->set( 'schema_enabled', filter_var( $data['schema_enabled'], FILTER_VALIDATE_BOOLEAN ) );
+                    $settings->set( 'schema_enabled', filter_var( $data['schema_enabled'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
                 if ( isset( $data['schema_types'] ) && is_array( $data['schema_types'] ) ) {
                     // Convert string "true"/"false" to actual booleans
                     $schema_types = array();
                     foreach ( $data['schema_types'] as $key => $value ) {
-                        $schema_types[ $key ] = filter_var( $value, FILTER_VALIDATE_BOOLEAN );
+                        $schema_types[ $key ] = filter_var( $value, FILTER_VALIDATE_BOOLEAN ) ?? false;
                     }
                     $settings->set( 'schema_types', $schema_types );
                 }
@@ -187,10 +187,10 @@ class GetCited_Dashboard {
                     $settings->set( 'site_type', $data['site_type'] );
                 }
                 if ( isset( $data['debug_mode'] ) ) {
-                    $settings->set( 'debug_mode', filter_var( $data['debug_mode'], FILTER_VALIDATE_BOOLEAN ) );
+                    $settings->set( 'debug_mode', filter_var( $data['debug_mode'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
                 if ( isset( $data['keep_on_delete'] ) ) {
-                    $settings->set( 'keep_on_delete', filter_var( $data['keep_on_delete'], FILTER_VALIDATE_BOOLEAN ) );
+                    $settings->set( 'keep_on_delete', filter_var( $data['keep_on_delete'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
                 break;
         }
@@ -357,11 +357,13 @@ class GetCited_Dashboard {
         $crawler_list = GetCited_Crawler_List::instance();
 
         // Get active plugins
-        $active_plugins = get_option( 'active_plugins' );
+        $active_plugins = get_option( 'active_plugins', array() );
         $plugin_names = array();
         foreach ( $active_plugins as $plugin ) {
             $plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin );
-            $plugin_names[] = $plugin_data['Name'] . ' ' . $plugin_data['Version'];
+            if ( ! empty( $plugin_data['Name'] ) ) {
+                $plugin_names[] = $plugin_data['Name'] . ' ' . ( $plugin_data['Version'] ?? 'unknown' );
+            }
         }
 
         $info = array(

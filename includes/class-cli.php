@@ -355,7 +355,7 @@ class GetCited_CLI {
 
         $items = array();
         foreach ( $result['factors'] as $key => $factor ) {
-            $icon = $factor['passed'] ?? $factor['score'] > 0 ? '✓' : '✗';
+            $icon = ( $factor['passed'] ?? ( $factor['score'] > 0 ) ) ? '✓' : '✗';
             $items[] = array(
                 'factor' => $result['rubric'][ $key ]['label'] ?? $key,
                 'score' => $factor['score'] . '/' . ( $result['rubric'][ $key ]['max_points'] ?? '?' ),

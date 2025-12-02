@@ -159,19 +159,21 @@ class GetCited_Robots {
         // Temporarily remove our filter to get base content
         remove_filter( 'robots_txt', array( $this, 'append_rules' ), 99 );
 
-        // Capture WordPress robots.txt output
-        $public = get_option( 'blog_public' );
+        try {
+            // Capture WordPress robots.txt output
+            $public = get_option( 'blog_public' );
 
-        ob_start();
-        // Trigger the robots_txt filter without our rules
-        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
-        $output = apply_filters( 'robots_txt', "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n", $public );
-        ob_end_clean();
+            ob_start();
+            // Trigger the robots_txt filter without our rules
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
+            $output = apply_filters( 'robots_txt', "User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n", $public );
+            ob_end_clean();
 
-        // Re-add our filter
-        add_filter( 'robots_txt', array( $this, 'append_rules' ), 99, 2 );
-
-        return $output;
+            return $output;
+        } finally {
+            // Always re-add our filter, even if an exception occurs
+            add_filter( 'robots_txt', array( $this, 'append_rules' ), 99, 2 );
+        }
     }
 
     /**

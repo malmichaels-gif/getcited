@@ -185,7 +185,7 @@ class GetCited_Health_Check {
 
             // Still fetch to see what's actually served
             $url = home_url( '/llms.txt' );
-            $response = wp_remote_get( $url, array( 'timeout' => 5, 'sslverify' => false ) );
+            $response = wp_remote_get( $url, array( 'timeout' => 5 ) );
 
             if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
                 $body = wp_remote_retrieve_body( $response );
@@ -227,10 +227,7 @@ class GetCited_Health_Check {
         // Standard fetch check
         $url = home_url( '/llms.txt' );
 
-        $response = wp_remote_get( $url, array(
-            'timeout' => 5,
-            'sslverify' => false,
-        ) );
+        $response = wp_remote_get( $url, array( 'timeout' => 5 ) );
 
         if ( is_wp_error( $response ) ) {
             return array(
@@ -427,10 +424,7 @@ class GetCited_Health_Check {
         // Fetch and check robots.txt content
         $url = home_url( '/robots.txt' );
 
-        $response = wp_remote_get( $url, array(
-            'timeout' => 5,
-            'sslverify' => false,
-        ) );
+        $response = wp_remote_get( $url, array( 'timeout' => 5 ) );
 
         if ( is_wp_error( $response ) ) {
             return array(

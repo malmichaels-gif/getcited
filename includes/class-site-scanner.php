@@ -26,9 +26,12 @@ class GetCited_Site_Scanner {
 	const CACHE_KEY = 'getcited_scan_cache';
 
 	/**
-	 * Cache TTL in seconds (5 minutes)
+	 * Cache TTL in seconds (1 hour)
+	 *
+	 * Site content doesn't change frequently enough to warrant 5-minute caching.
+	 * 1 hour is a good balance between freshness and performance.
 	 */
-	const CACHE_TTL = 300;
+	const CACHE_TTL = HOUR_IN_SECONDS;
 
 	/**
 	 * Get instance

@@ -130,10 +130,13 @@ class GetCited_Schema {
         }
 
         $schema_types = $settings->get( 'schema_types' );
+        if ( ! is_array( $schema_types ) ) {
+            $schema_types = array();
+        }
         $schemas = array();
 
         // Organization schema (front page only)
-        if ( $schema_types['organization'] && is_front_page() ) {
+        if ( ! empty( $schema_types['organization'] ) && is_front_page() ) {
             $org_schema = $this->get_organization_schema();
             if ( $org_schema ) {
                 $schemas[] = $org_schema;
@@ -141,7 +144,7 @@ class GetCited_Schema {
         }
 
         // Article schema (single posts)
-        if ( $schema_types['article'] && is_singular( 'post' ) ) {
+        if ( ! empty( $schema_types['article'] ) && is_singular( 'post' ) ) {
             $article_schema = $this->get_article_schema();
             if ( $article_schema ) {
                 $schemas[] = $article_schema;
@@ -149,7 +152,7 @@ class GetCited_Schema {
         }
 
         // Author schema (with articles)
-        if ( $schema_types['author'] && is_singular( 'post' ) ) {
+        if ( ! empty( $schema_types['author'] ) && is_singular( 'post' ) ) {
             $author_schema = $this->get_author_schema();
             if ( $author_schema ) {
                 $schemas[] = $author_schema;
@@ -157,7 +160,7 @@ class GetCited_Schema {
         }
 
         // FAQ schema (posts with FAQ blocks)
-        if ( $schema_types['faq'] && is_singular() ) {
+        if ( ! empty( $schema_types['faq'] ) && is_singular() ) {
             $faq_schema = $this->get_faq_schema();
             if ( $faq_schema ) {
                 $schemas[] = $faq_schema;
