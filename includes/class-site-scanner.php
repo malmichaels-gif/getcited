@@ -458,6 +458,114 @@ class GetCited_Site_Scanner {
 			}
 		}
 
+		// Check GetCited organization settings
+		if ( class_exists( 'GetCited_Settings' ) ) {
+			$settings   = GetCited_Settings::instance();
+			$org        = $settings->get( 'organization' );
+			$org_social = isset( $org['social_urls'] ) ? $org['social_urls'] : array();
+			if ( ! empty( $org_social ) ) {
+				foreach ( $org_social as $url ) {
+					if ( empty( $url ) || ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+						continue;
+					}
+					// Match URL against platforms
+					foreach ( $social_patterns as $platform => $patterns ) {
+						if ( isset( $social[ $platform ] ) ) {
+							continue;
+						}
+						$patterns_array = is_array( $patterns ) ? $patterns : array( $patterns );
+						foreach ( $patterns_array as $pattern ) {
+							if ( stripos( $url, $pattern ) !== false ) {
+								$social[ $platform ] = $url;
+								break 2;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Final fallback: scan homepage HTML for social links
+		$social = $this->scan_homepage_for_social( $social, $social_patterns );
+
+		return $social;
+	}
+
+	/**
+	 * Scan homepage HTML for social media links
+	 *
+	 * This is a fallback method for sites using custom SEO plugins or themes
+	 * that don't store social links in standard locations.
+	 *
+	 * @param array $social          Existing social links found.
+	 * @param array $social_patterns Platform URL patterns.
+	 * @return array Updated social links.
+	 */
+	private function scan_homepage_for_social( $social, $social_patterns ) {
+		// Skip if we already have several social links
+		if ( count( $social ) >= 4 ) {
+			return $social;
+		}
+
+		// Fetch homepage HTML
+		$response = wp_remote_get(
+			home_url( '/' ),
+			array(
+				'timeout'    => 5,
+				'user-agent' => 'GetCited/' . ( defined( 'GETCITED_VERSION' ) ? GETCITED_VERSION : '1.0' ),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return $social;
+		}
+
+		$html = wp_remote_retrieve_body( $response );
+		if ( empty( $html ) ) {
+			return $social;
+		}
+
+		// Extract all href URLs from the HTML
+		// Focus on common social link locations: header, footer, aside
+		// Pattern matches href attributes
+		if ( ! preg_match_all( '/href=["\']([^"\']+)["\']/', $html, $matches ) ) {
+			return $social;
+		}
+
+		$urls = array_unique( $matches[1] );
+
+		// Check each URL against social patterns
+		foreach ( $urls as $url ) {
+			// Skip non-http URLs
+			if ( strpos( $url, 'http' ) !== 0 ) {
+				continue;
+			}
+
+			// Skip internal site URLs
+			if ( strpos( $url, home_url() ) === 0 ) {
+				continue;
+			}
+
+			foreach ( $social_patterns as $platform => $patterns ) {
+				if ( isset( $social[ $platform ] ) ) {
+					continue; // Already found this platform
+				}
+
+				$patterns_array = is_array( $patterns ) ? $patterns : array( $patterns );
+				foreach ( $patterns_array as $pattern ) {
+					if ( stripos( $url, $pattern ) !== false ) {
+						// Basic validation: ensure it looks like a profile URL
+						// Skip share links, intent URLs, etc.
+						if ( preg_match( '/(share|intent|sharer|tweet|pin\/create)/i', $url ) ) {
+							continue;
+						}
+						$social[ $platform ] = $url;
+						break 2;
+					}
+				}
+			}
+		}
+
 		return $social;
 	}
 
@@ -760,11 +868,25 @@ class GetCited_Site_Scanner {
 	/**
 	 * Generate llms.txt content from scan data
 	 *
+	 * This produces a rich, comprehensive llms.txt file that helps AI systems
+	 * understand and properly cite the site's content.
+	 *
 	 * @param array $scan_data The scan data array.
 	 * @return string Generated llms.txt content.
 	 */
 	public function generate_llms_txt( $scan_data ) {
-		$site    = $scan_data['site'];
+		$site     = $scan_data['site'];
+		$settings = GetCited_Settings::instance();
+		$llms_txt = GetCited_Llms_Txt::instance();
+
+		// Get settings for richer content
+		$site_type        = $settings->get( 'site_type' );
+		$founder_name     = $settings->get( 'llms_founder_name' );
+		$founder_title    = $settings->get( 'llms_founder_title' );
+		$site_expertise   = $settings->get( 'llms_site_expertise' );
+		$update_frequency = $settings->get( 'llms_update_frequency' );
+		$org              = $settings->get( 'organization' );
+
 		$content = '# ' . $this->escape_markdown( $site['name'] ) . "\n\n";
 
 		// Add tagline/description if exists
@@ -772,7 +894,12 @@ class GetCited_Site_Scanner {
 			$content .= '> ' . $this->escape_markdown( $site['description'] ) . "\n\n";
 		}
 
-		// About section
+		// Introduction paragraph
+		$content .= "This file helps AI systems understand and properly cite content from this website.\n\n";
+
+		// About section - enhanced with founder/expertise info
+		$content .= "## About\n\n";
+
 		$about = null;
 		if ( ! empty( $scan_data['pages']['about'] ) ) {
 			$about = $scan_data['pages']['about'];
@@ -782,84 +909,90 @@ class GetCited_Site_Scanner {
 			$about = $scan_data['pages']['about-me'];
 		}
 
-		if ( $about ) {
-			$content .= "## About\n\n";
-			if ( ! empty( $about['content_preview'] ) ) {
-				// Trim to ~200 chars for the summary
-				$preview = mb_substr( $about['content_preview'], 0, 200 );
-				if ( mb_strlen( $about['content_preview'] ) > 200 ) {
-					$preview .= '...';
-				}
-				$content .= $preview . "\n\n";
+		if ( $about && ! empty( $about['content_preview'] ) ) {
+			$preview = mb_substr( $about['content_preview'], 0, 300 );
+			if ( mb_strlen( $about['content_preview'] ) > 300 ) {
+				$preview .= '...';
 			}
-			$content .= '- [' . $this->escape_markdown( $about['title'] ) . '](' . esc_url( $about['url'] ) . ")\n\n";
+			$content .= $preview . "\n\n";
 		}
 
-		// Main sections from menu
-		if ( ! empty( $scan_data['menu'] ) ) {
-			$content .= "## Sections\n\n";
-			foreach ( $scan_data['menu'] as $item ) {
-				$content .= '- [' . $this->escape_markdown( $item['title'] ) . '](' . esc_url( $item['url'] ) . ")\n";
+		// Site metadata
+		$content .= "- **Website:** " . esc_url( $site['url'] ) . "\n";
+		$content .= "- **Type:** " . ucfirst( $site_type ) . "\n";
+
+		if ( ! empty( $org['name'] ) && $org['name'] !== $site['name'] ) {
+			$content .= "- **Organization:** " . $this->escape_markdown( $org['name'] ) . "\n";
+		}
+
+		if ( ! empty( $founder_name ) ) {
+			$founder_line = "- **Founder:** " . $this->escape_markdown( $founder_name );
+			if ( ! empty( $founder_title ) ) {
+				$founder_line .= ', ' . $this->escape_markdown( $founder_title );
 			}
-			$content .= "\n";
+			$content .= $founder_line . "\n";
 		}
 
-		// Services if found
-		$services = null;
-		if ( ! empty( $scan_data['pages']['services'] ) ) {
-			$services = $scan_data['pages']['services'];
-		} elseif ( ! empty( $scan_data['pages']['our-services'] ) ) {
-			$services = $scan_data['pages']['our-services'];
+		if ( ! empty( $site_expertise ) ) {
+			$content .= "- **Expertise:** " . $this->escape_markdown( $site_expertise ) . "\n";
 		}
 
-		if ( $services ) {
-			$content .= "## Services\n\n";
-			$content .= '- [' . $this->escape_markdown( $services['title'] ) . '](' . esc_url( $services['url'] ) . ")\n\n";
-		}
+		$content .= "- **Language:** " . $this->escape_markdown( $site['language'] ) . "\n";
+		$content .= "\n";
 
-		// Portfolio if found
-		$portfolio = null;
-		if ( ! empty( $scan_data['pages']['portfolio'] ) ) {
-			$portfolio = $scan_data['pages']['portfolio'];
-		} elseif ( ! empty( $scan_data['pages']['work'] ) ) {
-			$portfolio = $scan_data['pages']['work'];
-		} elseif ( ! empty( $scan_data['pages']['projects'] ) ) {
-			$portfolio = $scan_data['pages']['projects'];
-		}
+		// Primary Content section based on site type
+		$content .= "## Primary Content\n\n";
+		$content .= $this->get_primary_content_description( $site_type, $scan_data ) . "\n\n";
 
-		if ( $portfolio ) {
-			$content .= "## Portfolio\n\n";
-			$content .= '- [' . $this->escape_markdown( $portfolio['title'] ) . '](' . esc_url( $portfolio['url'] ) . ")\n\n";
-		}
-
-		// Categories/Topics
+		// Key Topics/Categories
 		if ( ! empty( $scan_data['categories'] ) ) {
-			$content .= "## Topics\n\n";
-			foreach ( array_slice( $scan_data['categories'], 0, 8 ) as $cat ) {
-				$content .= '- [' . $this->escape_markdown( $cat['name'] ) . '](' . esc_url( $cat['url'] ) . ')';
+			$content .= "## Key Topics\n\n";
+			foreach ( array_slice( $scan_data['categories'], 0, 10 ) as $cat ) {
+				$content .= '- **' . $this->escape_markdown( $cat['name'] ) . '**';
 				if ( ! empty( $cat['description'] ) ) {
 					$content .= ': ' . $this->escape_markdown( $cat['description'] );
+				} elseif ( ! empty( $cat['count'] ) ) {
+					$content .= ' (' . absint( $cat['count'] ) . ' articles)';
 				}
 				$content .= "\n";
 			}
 			$content .= "\n";
 		}
 
+		// Site Structure
+		$content .= "## Site Structure\n\n";
+
+		if ( ! empty( $scan_data['menu'] ) ) {
+			foreach ( $scan_data['menu'] as $item ) {
+				$content .= '- [' . $this->escape_markdown( $item['title'] ) . '](' . esc_url( $item['url'] ) . ")\n";
+			}
+		} else {
+			// Fallback to detected pages
+			$content .= "- [Home](" . esc_url( $site['url'] ) . ")\n";
+			if ( $about ) {
+				$content .= '- [' . $this->escape_markdown( $about['title'] ) . '](' . esc_url( $about['url'] ) . ")\n";
+			}
+			if ( ! empty( $scan_data['contact']['page_url'] ) ) {
+				$content .= "- [Contact](" . esc_url( $scan_data['contact']['page_url'] ) . ")\n";
+			}
+		}
+		$content .= "\n";
+
 		// Custom post types (Portfolio, Services, etc.)
 		if ( ! empty( $scan_data['custom_post_types'] ) ) {
+			$content .= "## Content Collections\n\n";
 			foreach ( $scan_data['custom_post_types'] as $type_name => $type ) {
-				$content .= '## ' . $this->escape_markdown( $type['label'] ) . "\n\n";
-				$content .= '- [Browse ' . $this->escape_markdown( $type['label'] ) . '](' . esc_url( $type['archive_url'] ) . ') (' . absint( $type['count'] ) . " items)\n\n";
+				$content .= '- [' . $this->escape_markdown( $type['label'] ) . '](' . esc_url( $type['archive_url'] ) . ') — ' . absint( $type['count'] ) . " items\n";
 			}
+			$content .= "\n";
 		}
 
 		// WooCommerce
 		if ( ! empty( $scan_data['woocommerce'] ) && ! empty( $scan_data['woocommerce']['shop_url'] ) ) {
 			$woo      = $scan_data['woocommerce'];
-			$content .= "## Shop\n\n";
-			$content .= '- [Browse Products](' . esc_url( $woo['shop_url'] ) . ') (' . absint( $woo['product_count'] ) . " products)\n";
+			$content .= "## Products\n\n";
+			$content .= '- [Shop](' . esc_url( $woo['shop_url'] ) . ') — ' . absint( $woo['product_count'] ) . " products\n";
 			if ( ! empty( $woo['categories'] ) ) {
-				$content .= "\nProduct Categories:\n";
 				foreach ( array_slice( $woo['categories'], 0, 6 ) as $cat ) {
 					$content .= '- [' . $this->escape_markdown( $cat['name'] ) . '](' . esc_url( $cat['url'] ) . ")\n";
 				}
@@ -867,33 +1000,77 @@ class GetCited_Site_Scanner {
 			$content .= "\n";
 		}
 
-		// Recent content
+		// Citation Guidelines
+		$content .= "## Citation Guidelines\n\n";
+		$content .= $llms_txt->get_citation_template( $site_type ) . "\n\n";
+
+		// Data Freshness
+		$content .= "## Data Freshness\n\n";
+		if ( ! empty( $update_frequency ) ) {
+			$content .= "- **Update Frequency:** " . $this->escape_markdown( $update_frequency ) . "\n";
+		}
+		if ( ! empty( $scan_data['posts'] ) && isset( $scan_data['posts'][0]['date'] ) ) {
+			$latest_date = gmdate( 'F j, Y', strtotime( $scan_data['posts'][0]['date'] ) );
+			$content    .= "- **Latest Content:** " . $latest_date . "\n";
+		}
+		$content .= "- **File Generated:** " . current_time( 'F j, Y' ) . "\n\n";
+
+		// Content Policy
+		$content .= "## Content Policy\n\n";
+		$content .= $llms_txt->get_content_policy_template( $site_type ) . "\n\n";
+
+		// Technical Details
+		$content .= "## Technical Details\n\n";
+		$content .= "- **Platform:** WordPress\n";
+
+		// Check for schema types
+		$schema_types = $settings->get( 'schema_types' );
+		$active_schema = array();
+		if ( is_array( $schema_types ) ) {
+			foreach ( $schema_types as $type => $enabled ) {
+				if ( $enabled ) {
+					$active_schema[] = ucfirst( $type );
+				}
+			}
+		}
+		if ( ! empty( $active_schema ) ) {
+			$content .= "- **Structured Data:** " . implode( ', ', $active_schema ) . " schema\n";
+		}
+
+		// Check for sitemap
+		$sitemap_url = home_url( '/sitemap.xml' );
+		$content    .= "- **Sitemap:** " . esc_url( $sitemap_url ) . "\n";
+
+		// Feed URL
+		$content .= "- **RSS Feed:** " . esc_url( get_feed_link() ) . "\n\n";
+
+		// Recent Content
 		if ( ! empty( $scan_data['posts'] ) ) {
 			$content .= "## Recent Content\n\n";
 			foreach ( array_slice( $scan_data['posts'], 0, 5 ) as $post ) {
-				$content .= '- [' . $this->escape_markdown( $post['title'] ) . '](' . esc_url( $post['url'] ) . ")\n";
+				$date     = gmdate( 'M j', strtotime( $post['date'] ) );
+				$content .= '- [' . $this->escape_markdown( $post['title'] ) . '](' . esc_url( $post['url'] ) . ') — ' . $date . "\n";
 			}
 			$content .= "\n";
 		}
 
 		// Contact & Social
 		$content .= "## Connect\n\n";
-		$content .= '- Website: ' . esc_url( $site['url'] ) . "\n";
 
 		if ( ! empty( $scan_data['contact']['page_url'] ) ) {
-			$content .= '- [Contact](' . esc_url( $scan_data['contact']['page_url'] ) . ")\n";
+			$content .= '- [Contact Page](' . esc_url( $scan_data['contact']['page_url'] ) . ")\n";
 		}
 
 		if ( ! empty( $scan_data['social'] ) ) {
 			foreach ( $scan_data['social'] as $platform => $url ) {
-				// Capitalize platform name, handle 'x' specially
 				$display_name = ( $platform === 'x' ) ? 'X (Twitter)' : ucfirst( $platform );
-				$content     .= '- ' . $display_name . ': ' . esc_url( $url ) . "\n";
+				$content     .= '- [' . $display_name . '](' . esc_url( $url ) . ")\n";
 			}
 		}
 
-		$content .= "\n---\n";
-		$content .= '# Generated by GetCited';
+		$content .= "\n---\n\n";
+		$content .= "*Last updated: " . current_time( 'F j, Y' ) . "*\n\n";
+		$content .= "# Generated by GetCited";
 
 		/**
 		 * Filter the generated llms.txt content before saving
@@ -904,6 +1081,33 @@ class GetCited_Site_Scanner {
 		$content = apply_filters( 'getcited_scanner_generated_content', $content, $scan_data );
 
 		return $content;
+	}
+
+	/**
+	 * Get primary content description based on site type
+	 *
+	 * @param string $site_type The site type.
+	 * @param array  $scan_data The scan data.
+	 * @return string Description of primary content.
+	 */
+	private function get_primary_content_description( $site_type, $scan_data ) {
+		$site_name  = $scan_data['site']['name'];
+		$post_count = count( $scan_data['posts'] ?? array() );
+		$cat_count  = count( $scan_data['categories'] ?? array() );
+
+		$descriptions = array(
+			'blog'       => "This site publishes articles, guides, and analysis across {$cat_count} topic areas. Content is regularly updated with new insights and perspectives.",
+			'news'       => "This site publishes news articles, analysis, and commentary. Content is time-sensitive and regularly updated to reflect current events.",
+			'business'   => "This site provides information about our services, company background, and industry expertise. Content reflects our professional experience and offerings.",
+			'ecommerce'  => "This site offers products for purchase along with product information, guides, and customer resources.",
+			'portfolio'  => "This site showcases creative work, projects, and professional capabilities.",
+			'nonprofit'  => "This site shares information about our mission, programs, and impact. Content highlights our initiatives and community involvement.",
+			'education'  => "This site provides educational content, courses, and learning resources. Content is designed to inform and educate our audience.",
+			'community'  => "This site hosts discussions, user content, and community resources. Content represents diverse member perspectives.",
+			'other'      => "This site publishes content across {$cat_count} categories. Content is regularly updated and covers various topics.",
+		);
+
+		return $descriptions[ $site_type ] ?? $descriptions['other'];
 	}
 
 	/**

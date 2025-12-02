@@ -81,11 +81,11 @@ class GetCited_Crawler_List {
      */
     private function load_bundled() {
         $bundled_file = GETCITED_PLUGIN_DIR . 'data/crawlers.json';
-        
+
         if ( file_exists( $bundled_file ) ) {
-            $json = file_get_contents( $bundled_file );
-            $data = json_decode( $json, true );
-            
+            // Use wp_json_file_decode for consistent JSON parsing (WP 5.9+)
+            $data = wp_json_file_decode( $bundled_file, array( 'associative' => true ) );
+
             if ( $data && isset( $data['crawlers'] ) ) {
                 $this->crawlers = $data['crawlers'];
                 $this->version = $data['version'] ?? '1.0';

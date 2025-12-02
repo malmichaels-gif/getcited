@@ -36,6 +36,109 @@ class GetCited_Robots {
     private function __construct() {
         // Hook into robots.txt generation with priority 99 to run after most SEO plugins
         add_filter( 'robots_txt', array( $this, 'append_rules' ), 99, 2 );
+
+        // Auto-write physical file when crawler settings change
+        add_action( 'getcited_setting_updated', array( $this, 'maybe_auto_write' ), 10, 2 );
+    }
+
+    /**
+     * Maybe auto-write robots.txt when settings change
+     *
+     * @param string $key   The setting key that was updated.
+     * @param mixed  $value The new value.
+     */
+    public function maybe_auto_write( $key, $value ) {
+        // Only trigger on crawler-related settings
+        if ( ! in_array( $key, array( 'crawlers', 'custom_crawlers', 'robots_write_physical' ), true ) ) {
+            return;
+        }
+
+        $settings = GetCited_Settings::instance();
+
+        // Check if auto-write is enabled
+        if ( ! $settings->get( 'robots_write_physical' ) ) {
+            return;
+        }
+
+        // Auto-write the file
+        $this->auto_write_physical_file();
+    }
+
+    /**
+     * Auto-write robots.txt with GetCited rules, preserving existing content
+     *
+     * @return array Result with success status and message
+     */
+    public function auto_write_physical_file() {
+        $file_path = ABSPATH . 'robots.txt';
+
+        // Check write permissions
+        if ( ! $this->can_write_physical_file() ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Cannot write to robots.txt. Check file permissions.', 'getcited' ),
+            );
+        }
+
+        // Initialize WP_Filesystem
+        global $wp_filesystem;
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        if ( ! WP_Filesystem() ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Could not initialize filesystem.', 'getcited' ),
+            );
+        }
+
+        // Read existing content (if any)
+        $existing = '';
+        if ( $wp_filesystem->exists( $file_path ) ) {
+            $existing = $wp_filesystem->get_contents( $file_path );
+            if ( $existing === false ) {
+                $existing = '';
+            }
+        }
+
+        // Remove any existing GetCited section
+        $marker_start = '# === GetCited AI Crawler Rules ===';
+        $marker_end = '# === End GetCited Rules ===';
+        $pattern = '/' . preg_quote( $marker_start, '/' ) . '.*?' . preg_quote( $marker_end, '/' ) . '\s*/s';
+        $existing = preg_replace( $pattern, '', $existing );
+        $existing = trim( $existing );
+
+        // Generate new GetCited rules
+        $getcited_rules = $this->generate_rules();
+
+        // Combine: GetCited rules FIRST, then existing content
+        // AI crawlers should be at top for visibility
+        if ( ! empty( $existing ) ) {
+            $new_content = $getcited_rules . "\n\n" . $existing . "\n";
+        } else {
+            $new_content = $getcited_rules . "\n";
+        }
+
+        // Write file
+        $result = $wp_filesystem->put_contents( $file_path, $new_content, FS_CHMOD_FILE );
+
+        if ( ! $result ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Failed to write robots.txt file.', 'getcited' ),
+            );
+        }
+
+        // Clear health check cache
+        if ( class_exists( 'GetCited_Health_Check' ) ) {
+            GetCited_Health_Check::instance()->invalidate_cache();
+        }
+
+        return array(
+            'success' => true,
+            'message' => __( 'robots.txt updated successfully', 'getcited' ),
+        );
     }
 
     /**
@@ -392,7 +495,14 @@ class GetCited_Robots {
             return false;
         }
 
-        $content = file_get_contents( $file_path );
-        return strpos( $content, '# === GetCited AI Crawler Rules ===' ) !== false;
+        // Use WP_Filesystem for consistent file operations
+        global $wp_filesystem;
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+        WP_Filesystem();
+
+        $content = $wp_filesystem->get_contents( $file_path );
+        return $content && strpos( $content, '# === GetCited AI Crawler Rules ===' ) !== false;
     }
 }

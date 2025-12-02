@@ -43,6 +43,15 @@ class GetCited_Settings {
         // llms.txt
         'llms_txt_content' => '',
         'llms_txt_enabled' => true,
+        'llms_write_physical' => true,
+        'llms_founder_name' => '',
+        'llms_founder_title' => '',
+        'llms_site_expertise' => '',
+        'llms_update_frequency' => '',
+        'llms_citation_format' => '',
+
+        // robots.txt
+        'robots_write_physical' => true,
 
         // Schema
         'schema_enabled' => true,
@@ -269,12 +278,24 @@ class GetCited_Settings {
                 return wp_kses_post( $value );
 
             case 'llms_txt_enabled':
+            case 'llms_write_physical':
+            case 'robots_write_physical':
             case 'schema_enabled':
             case 'wizard_completed':
             case 'debug_mode':
             case 'keep_on_delete':
             case 'ga4_connected':
                 return (bool) $value;
+
+            case 'llms_founder_name':
+            case 'llms_founder_title':
+            case 'llms_site_expertise':
+            case 'llms_update_frequency':
+                return sanitize_text_field( $value );
+
+            case 'llms_citation_format':
+                // Allow markdown-safe content for custom citation format
+                return wp_kses_post( $value );
 
             case 'schema_types':
                 if ( is_array( $value ) ) {

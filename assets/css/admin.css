@@ -844,6 +844,42 @@
     color: var(--getcited-gray-700);
 }
 
+.getcited-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-preview-header h3,
+.getcited-preview-header h2 {
+    margin: 0;
+}
+
+.getcited-copy-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.getcited-copy-content .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.getcited-copy-content.copied {
+    color: var(--getcited-success);
+    border-color: var(--getcited-success);
+}
+
+.getcited-copy-hint {
+    margin-top: var(--getcited-space-sm);
+    font-size: 12px;
+    color: var(--getcited-gray-500);
+    font-style: italic;
+}
+
 .getcited-preview-code {
     background: var(--getcited-gray-800);
     color: var(--getcited-gray-100);

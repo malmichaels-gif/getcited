@@ -27,6 +27,7 @@
         initWizard();
         initSettingsPage();
         initExportImport();
+        initCopyButtons();
     }
 
     // ==========================================================================
@@ -105,6 +106,52 @@
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
+    }
+
+    // ==========================================================================
+    // Copy to Clipboard
+    // ==========================================================================
+
+    function initCopyButtons() {
+        document.querySelectorAll('.getcited-copy-content').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.dataset.target;
+                const targetEl = document.getElementById(targetId);
+
+                if (!targetEl) return;
+
+                const text = targetEl.textContent;
+                const originalHTML = this.innerHTML;
+
+                navigator.clipboard.writeText(text).then(() => {
+                    this.innerHTML = '<span class="dashicons dashicons-yes"></span> ' + (getcitedAdmin.strings?.copied || 'Copied!');
+                    this.classList.add('copied');
+
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                        this.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+
+                    this.innerHTML = '<span class="dashicons dashicons-yes"></span> ' + (getcitedAdmin.strings?.copied || 'Copied!');
+                    this.classList.add('copied');
+
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                        this.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+        });
     }
 
     // ==========================================================================
@@ -262,11 +309,15 @@
                     }
                 });
 
+                // Get the auto-write toggle
+                const robotsWritePhysical = document.getElementById('robots_write_physical');
+
                 ajax('getcited_save_settings', {
                     section: 'crawlers',
                     data: {
                         crawlers: crawlers,
-                        custom_crawlers: customCrawlers
+                        custom_crawlers: customCrawlers,
+                        robots_write_physical: robotsWritePhysical ? robotsWritePhysical.checked : false
                     }
                 }).then(response => {
                     saveBtn.disabled = false;
@@ -310,6 +361,7 @@
         const preview = document.getElementById('llms_txt_preview');
         const saveBtn = document.querySelector('.getcited-save-llms-txt');
         const enabledToggle = document.getElementById('llms_txt_enabled');
+        const writePhysicalToggle = document.getElementById('llms_write_physical');
         const templateBtns = document.querySelectorAll('.getcited-load-template');
 
         if (!textarea) return;
@@ -321,23 +373,32 @@
             }, 300));
         }
 
-        // Save button
+        // Save button - collects all llms.txt settings
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
                 const statusEl = saveBtn.nextElementSibling;
                 saveBtn.disabled = true;
                 saveBtn.textContent = getcitedAdmin.strings.saving;
 
+                // Collect all llms.txt related settings
+                const data = {
+                    llms_txt_enabled: enabledToggle ? enabledToggle.checked : true,
+                    llms_txt_content: textarea.value,
+                    llms_write_physical: writePhysicalToggle ? writePhysicalToggle.checked : false,
+                    llms_founder_name: document.getElementById('llms_founder_name')?.value || '',
+                    llms_founder_title: document.getElementById('llms_founder_title')?.value || '',
+                    llms_site_expertise: document.getElementById('llms_site_expertise')?.value || '',
+                    llms_update_frequency: document.getElementById('llms_update_frequency')?.value || '',
+                    llms_citation_format: document.getElementById('llms_citation_format')?.value || ''
+                };
+
                 ajax('getcited_save_settings', {
                     section: 'llms_txt',
-                    data: {
-                        llms_txt_enabled: enabledToggle ? enabledToggle.checked : true,
-                        llms_txt_content: textarea.value
-                    }
+                    data: data
                 }).then(response => {
                     saveBtn.disabled = false;
                     saveBtn.textContent = 'Save Changes';
-                    
+
                     if (response.success) {
                         showStatus(statusEl, getcitedAdmin.strings.saved, 'success');
                     } else {
@@ -348,6 +409,71 @@
                     saveBtn.textContent = 'Save Changes';
                     showStatus(statusEl, getcitedAdmin.strings.error, 'error');
                 });
+            });
+        }
+
+        // Write llms.txt file button (manual trigger)
+        const writeFileBtn = document.querySelector('.getcited-write-llms-file');
+        if (writeFileBtn) {
+            writeFileBtn.addEventListener('click', function() {
+                const statusEl = this.nextElementSibling;
+                const originalHTML = this.innerHTML;
+
+                this.disabled = true;
+                this.innerHTML = '<span class="dashicons dashicons-update getcited-spinning"></span> Writing...';
+
+                ajax('getcited_write_llms_file')
+                    .then(response => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+
+                        if (response.success) {
+                            showStatus(statusEl, response.data.message || 'File written successfully!', 'success');
+                            // Update file status display if present
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showStatus(statusEl, response.data?.message || 'Failed to write file', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+                        showStatus(statusEl, 'Failed to write file', 'error');
+                    });
+            });
+        }
+
+        // Delete llms.txt file button
+        const deleteFileBtn = document.querySelector('.getcited-delete-llms-file');
+        if (deleteFileBtn) {
+            deleteFileBtn.addEventListener('click', function() {
+                if (!confirm('Delete the physical llms.txt file? The dynamic version will still work.')) {
+                    return;
+                }
+
+                const statusEl = this.nextElementSibling;
+                const originalHTML = this.innerHTML;
+
+                this.disabled = true;
+                this.innerHTML = '<span class="dashicons dashicons-update getcited-spinning"></span> Deleting...';
+
+                ajax('getcited_delete_llms_file')
+                    .then(response => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+
+                        if (response.success) {
+                            showStatus(statusEl, response.data.message || 'File deleted!', 'success');
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showStatus(statusEl, response.data?.message || 'Failed to delete file', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+                        showStatus(statusEl, 'Failed to delete file', 'error');
+                    });
             });
         }
 
@@ -823,14 +949,42 @@
     // ==========================================================================
 
     function initRobotsRulesActions() {
-        // Add rules button
+        // Write robots.txt file button (on crawlers page)
+        document.querySelectorAll('.getcited-write-robots-file').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const statusEl = document.querySelector('.getcited-robots-status');
+                const originalHTML = this.innerHTML;
+
+                this.disabled = true;
+                this.innerHTML = '<span class="dashicons dashicons-update getcited-spinning"></span> Writing...';
+
+                ajax('getcited_add_robots_rules')
+                    .then(response => {
+                        if (response.success) {
+                            if (statusEl) showStatus(statusEl, response.data.message || 'Rules written!', 'success');
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            this.disabled = false;
+                            this.innerHTML = originalHTML;
+                            if (statusEl) showStatus(statusEl, response.data?.message || 'Failed to write rules', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+                        if (statusEl) showStatus(statusEl, 'Failed to write rules', 'error');
+                    });
+            });
+        });
+
+        // Add rules button (on health check page)
         document.querySelectorAll('.getcited-add-robots-rules').forEach(btn => {
             btn.addEventListener('click', function() {
                 const statusEl = this.nextElementSibling;
                 const originalText = this.innerHTML;
 
                 this.disabled = true;
-                this.innerHTML = '<span class="dashicons dashicons-update spin"></span> ' + getcitedAdmin.strings.adding;
+                this.innerHTML = '<span class="dashicons dashicons-update spin"></span> ' + (getcitedAdmin.strings?.adding || 'Adding...');
 
                 ajax('getcited_add_robots_rules')
                     .then(response => {

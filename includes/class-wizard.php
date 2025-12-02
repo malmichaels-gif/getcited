@@ -200,14 +200,20 @@ class GetCited_Wizard {
         // Set site type
         $settings->set( 'site_type', $site_type );
 
-        // Generate appropriate llms.txt
-        $llms_txt = GetCited_Llms_Txt::instance();
-        $content = $llms_txt->generate_template( $site_type );
-        $settings->set( 'llms_txt_content', $content );
+        // Generate appropriate llms.txt only if not already customized
+        $existing_content = $settings->get( 'llms_txt_content' );
+        if ( empty( $existing_content ) ) {
+            $llms_txt = GetCited_Llms_Txt::instance();
+            $content = $llms_txt->generate_template( $site_type );
+            $settings->set( 'llms_txt_content', $content );
+        }
 
-        // Get schema defaults for site type
-        $schema_types = $this->get_schema_defaults_for_site_type( $site_type );
-        $settings->set( 'schema_types', $schema_types );
+        // Only set schema defaults if not already configured
+        $existing_schema = $settings->get( 'schema_types' );
+        if ( empty( $existing_schema ) || ! array_filter( $existing_schema ) ) {
+            $schema_types = $this->get_schema_defaults_for_site_type( $site_type );
+            $settings->set( 'schema_types', $schema_types );
+        }
 
         return true;
     }
@@ -314,10 +320,14 @@ class GetCited_Wizard {
                 break;
 
             case 'organization':
+                // Merge with existing settings to preserve social_urls if not provided
+                $existing_org = $settings->get( 'organization' );
                 $org = array(
-                    'name' => sanitize_text_field( $data['name'] ?? '' ),
-                    'logo_url' => esc_url_raw( $data['logo_url'] ?? '' ),
-                    'social_urls' => array_map( 'esc_url_raw', (array) ( $data['social_urls'] ?? array() ) ),
+                    'name' => sanitize_text_field( $data['name'] ?? $existing_org['name'] ?? '' ),
+                    'logo_url' => esc_url_raw( $data['logo_url'] ?? $existing_org['logo_url'] ?? '' ),
+                    'social_urls' => ! empty( $data['social_urls'] )
+                        ? array_map( 'esc_url_raw', (array) $data['social_urls'] )
+                        : ( $existing_org['social_urls'] ?? array() ),
                 );
                 $settings->set( 'organization', $org );
                 break;

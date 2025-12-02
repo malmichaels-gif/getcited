@@ -43,6 +43,10 @@ class GetCited_Dashboard {
         // Robots.txt rule management handlers
         add_action( 'wp_ajax_getcited_add_robots_rules', array( $this, 'ajax_add_robots_rules' ) );
         add_action( 'wp_ajax_getcited_remove_robots_rules', array( $this, 'ajax_remove_robots_rules' ) );
+
+        // llms.txt file management handlers
+        add_action( 'wp_ajax_getcited_write_llms_file', array( $this, 'ajax_write_llms_file' ) );
+        add_action( 'wp_ajax_getcited_delete_llms_file', array( $this, 'ajax_delete_llms_file' ) );
     }
 
     /**
@@ -129,6 +133,9 @@ class GetCited_Dashboard {
                 if ( isset( $data['custom_crawlers'] ) && is_array( $data['custom_crawlers'] ) ) {
                     $settings->set( 'custom_crawlers', $data['custom_crawlers'] );
                 }
+                if ( isset( $data['robots_write_physical'] ) ) {
+                    $settings->set( 'robots_write_physical', filter_var( $data['robots_write_physical'], FILTER_VALIDATE_BOOLEAN ) );
+                }
                 break;
 
             case 'llms_txt':
@@ -137,6 +144,24 @@ class GetCited_Dashboard {
                 }
                 if ( isset( $data['llms_txt_content'] ) ) {
                     $settings->set( 'llms_txt_content', $data['llms_txt_content'] );
+                }
+                if ( isset( $data['llms_write_physical'] ) ) {
+                    $settings->set( 'llms_write_physical', filter_var( $data['llms_write_physical'], FILTER_VALIDATE_BOOLEAN ) );
+                }
+                if ( isset( $data['llms_founder_name'] ) ) {
+                    $settings->set( 'llms_founder_name', $data['llms_founder_name'] );
+                }
+                if ( isset( $data['llms_founder_title'] ) ) {
+                    $settings->set( 'llms_founder_title', $data['llms_founder_title'] );
+                }
+                if ( isset( $data['llms_site_expertise'] ) ) {
+                    $settings->set( 'llms_site_expertise', $data['llms_site_expertise'] );
+                }
+                if ( isset( $data['llms_update_frequency'] ) ) {
+                    $settings->set( 'llms_update_frequency', $data['llms_update_frequency'] );
+                }
+                if ( isset( $data['llms_citation_format'] ) ) {
+                    $settings->set( 'llms_citation_format', $data['llms_citation_format'] );
                 }
                 break;
 
@@ -235,6 +260,46 @@ class GetCited_Dashboard {
 
         $robots = GetCited_Robots::instance();
         $result = $robots->remove_rules_from_physical_file();
+
+        if ( $result['success'] ) {
+            wp_send_json_success( $result );
+        } else {
+            wp_send_json_error( $result );
+        }
+    }
+
+    /**
+     * AJAX: Write llms.txt physical file
+     */
+    public function ajax_write_llms_file() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $llms = GetCited_Llms_Txt::instance();
+        $result = $llms->write_physical_file();
+
+        if ( $result['success'] ) {
+            wp_send_json_success( $result );
+        } else {
+            wp_send_json_error( $result );
+        }
+    }
+
+    /**
+     * AJAX: Delete llms.txt physical file
+     */
+    public function ajax_delete_llms_file() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $llms = GetCited_Llms_Txt::instance();
+        $result = $llms->delete_physical_file();
 
         if ( $result['success'] ) {
             wp_send_json_success( $result );
