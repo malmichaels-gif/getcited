@@ -13,11 +13,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 ( function() {
 $settings = GetCited_Settings::instance();
 $schema = GetCited_Schema::instance();
+$pro_teaser = GetCited_Pro_Teaser::instance();
 
 $enabled = $settings->get( 'schema_enabled' );
 $schema_types = $settings->get( 'schema_types' );
 $organization = $settings->get( 'organization' );
 $detected_plugins = $schema->get_detected_plugins();
+
+// Count active types
+$active_count = 0;
+foreach ( $schema_types as $type => $active ) {
+    if ( $active ) {
+        $active_count++;
+    }
+}
 ?>
 
 <div class="wrap getcited-wrap">
@@ -27,7 +36,10 @@ $detected_plugins = $schema->get_detected_plugins();
     </p>
 
     <div class="getcited-schema-page">
-        
+
+        <!-- Pro Teaser Banner -->
+        <?php $pro_teaser->render_page_teaser( 'schema' ); ?>
+
         <!-- Conflict Warning -->
         <?php if ( ! empty( $detected_plugins ) ) : ?>
             <div class="getcited-section getcited-warning">
@@ -43,111 +55,135 @@ $detected_plugins = $schema->get_detected_plugins();
             </div>
         <?php endif; ?>
 
-        <!-- Enable/Disable -->
-        <div class="getcited-section">
-            <label class="getcited-toggle-label">
-                <input type="checkbox" 
-                       name="schema_enabled" 
-                       id="schema_enabled"
-                       value="1"
-                       <?php checked( $enabled ); ?>>
-                <strong><?php esc_html_e( 'Enable Schema Output', 'getcited' ); ?></strong>
-            </label>
-            <p class="description">
-                <?php esc_html_e( 'Output JSON-LD structured data in page headers.', 'getcited' ); ?>
-            </p>
-        </div>
-
-        <!-- Schema Types -->
-        <div class="getcited-section getcited-schema-types">
-            <h2><?php esc_html_e( 'Schema Types', 'getcited' ); ?></h2>
-            
-            <div class="getcited-schema-options">
-                <label class="getcited-checkbox">
-                    <input type="checkbox" 
-                           name="schema_types[organization]" 
+        <!-- Two-Column Settings Grid -->
+        <div class="getcited-settings-grid">
+            <!-- Left Column: Enable + Status -->
+            <div class="getcited-section getcited-schema-toggle">
+                <h2><?php esc_html_e( 'Schema Output', 'getcited' ); ?></h2>
+                <label class="getcited-toggle-label">
+                    <input type="checkbox"
+                           name="schema_enabled"
+                           id="schema_enabled"
                            value="1"
-                           <?php checked( $schema_types['organization'] ); ?>>
-                    <strong><?php esc_html_e( 'Organization', 'getcited' ); ?></strong>
-                    <span class="description"><?php esc_html_e( 'Your site/company identity. Appears on front page.', 'getcited' ); ?></span>
+                           <?php checked( $enabled ); ?>>
+                    <strong><?php esc_html_e( 'Enable JSON-LD', 'getcited' ); ?></strong>
                 </label>
+                <p class="description">
+                    <?php esc_html_e( 'Output structured data in page headers.', 'getcited' ); ?>
+                </p>
 
-                <label class="getcited-checkbox">
-                    <input type="checkbox" 
-                           name="schema_types[article]" 
-                           value="1"
-                           <?php checked( $schema_types['article'] ); ?>>
-                    <strong><?php esc_html_e( 'Article', 'getcited' ); ?></strong>
-                    <span class="description"><?php esc_html_e( 'Blog posts and articles. Includes headline, date, author.', 'getcited' ); ?></span>
-                </label>
+                <?php if ( $enabled && $active_count > 0 ) : ?>
+                    <p class="getcited-file-status">
+                        <span class="dashicons dashicons-yes-alt" style="color: #46b450;"></span>
+                        <?php
+                        printf(
+                            /* translators: %d: number of active schema types */
+                            esc_html( _n( '%d type active', '%d types active', $active_count, 'getcited' ) ),
+                            $active_count
+                        );
+                        ?>
+                    </p>
+                <?php endif; ?>
 
-                <label class="getcited-checkbox">
-                    <input type="checkbox" 
-                           name="schema_types[author]" 
-                           value="1"
-                           <?php checked( $schema_types['author'] ); ?>>
-                    <strong><?php esc_html_e( 'Author (Person)', 'getcited' ); ?></strong>
-                    <span class="description"><?php esc_html_e( 'Author information on posts. Helps AI attribute quotes.', 'getcited' ); ?></span>
-                </label>
+                <div class="getcited-schema-test">
+                    <a href="https://search.google.com/test/rich-results?url=<?php echo urlencode( home_url() ); ?>"
+                       target="_blank"
+                       class="button">
+                        <span class="dashicons dashicons-external"></span>
+                        <?php esc_html_e( 'Test with Google', 'getcited' ); ?>
+                    </a>
+                </div>
+            </div>
 
-                <label class="getcited-checkbox">
-                    <input type="checkbox" 
-                           name="schema_types[faq]" 
-                           value="1"
-                           <?php checked( $schema_types['faq'] ); ?>>
-                    <strong><?php esc_html_e( 'FAQ', 'getcited' ); ?></strong>
-                    <span class="description"><?php esc_html_e( 'Extracted from FAQ blocks in content. AI systems love Q&A format.', 'getcited' ); ?></span>
-                </label>
+            <!-- Right Column: Schema Types -->
+            <div class="getcited-section getcited-schema-types">
+                <h2><?php esc_html_e( 'Schema Types', 'getcited' ); ?></h2>
+
+                <div class="getcited-schema-options-compact">
+                    <label class="getcited-checkbox-compact">
+                        <input type="checkbox"
+                               name="schema_types[organization]"
+                               value="1"
+                               <?php checked( $schema_types['organization'] ); ?>>
+                        <span class="checkbox-label">
+                            <strong><?php esc_html_e( 'Organization', 'getcited' ); ?></strong>
+                            <span class="description"><?php esc_html_e( 'Site/company identity', 'getcited' ); ?></span>
+                        </span>
+                    </label>
+
+                    <label class="getcited-checkbox-compact">
+                        <input type="checkbox"
+                               name="schema_types[article]"
+                               value="1"
+                               <?php checked( $schema_types['article'] ); ?>>
+                        <span class="checkbox-label">
+                            <strong><?php esc_html_e( 'Article', 'getcited' ); ?></strong>
+                            <span class="description"><?php esc_html_e( 'Posts & articles', 'getcited' ); ?></span>
+                        </span>
+                    </label>
+
+                    <label class="getcited-checkbox-compact">
+                        <input type="checkbox"
+                               name="schema_types[author]"
+                               value="1"
+                               <?php checked( $schema_types['author'] ); ?>>
+                        <span class="checkbox-label">
+                            <strong><?php esc_html_e( 'Author', 'getcited' ); ?></strong>
+                            <span class="description"><?php esc_html_e( 'Author attribution', 'getcited' ); ?></span>
+                        </span>
+                    </label>
+
+                    <label class="getcited-checkbox-compact">
+                        <input type="checkbox"
+                               name="schema_types[faq]"
+                               value="1"
+                               <?php checked( $schema_types['faq'] ); ?>>
+                        <span class="checkbox-label">
+                            <strong><?php esc_html_e( 'FAQ', 'getcited' ); ?></strong>
+                            <span class="description"><?php esc_html_e( 'Q&A format', 'getcited' ); ?></span>
+                        </span>
+                    </label>
+                </div>
             </div>
         </div>
 
-        <!-- Organization Details -->
-        <div class="getcited-section getcited-organization">
-            <h2><?php esc_html_e( 'Organization Details', 'getcited' ); ?></h2>
-            <p class="description">
-                <?php esc_html_e( 'This information appears in your Organization schema.', 'getcited' ); ?>
-            </p>
+        <!-- Organization Details (Collapsible) -->
+        <div class="getcited-section getcited-organization getcited-collapsible" data-collapsed="true">
+            <h2 class="getcited-collapsible-header">
+                <?php esc_html_e( 'Organization Details', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
+            </h2>
+            <div class="getcited-collapsible-content" style="display: none;">
+                <p class="description">
+                    <?php esc_html_e( 'This information appears in your Organization schema.', 'getcited' ); ?>
+                </p>
 
-            <table class="form-table">
-                <tr>
-                    <th scope="row">
+                <div class="getcited-compact-form">
+                    <div class="form-row">
                         <label for="org_name"><?php esc_html_e( 'Organization Name', 'getcited' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text" 
-                               name="organization[name]" 
+                        <input type="text"
+                               name="organization[name]"
                                id="org_name"
                                value="<?php echo esc_attr( $organization['name'] ); ?>"
-                               class="regular-text"
                                placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
+                    </div>
+                    <div class="form-row">
                         <label for="org_logo"><?php esc_html_e( 'Logo URL', 'getcited' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="url" 
-                               name="organization[logo_url]" 
-                               id="org_logo"
-                               value="<?php echo esc_url( $organization['logo_url'] ); ?>"
-                               class="regular-text"
-                               placeholder="https://example.com/logo.png">
-                        <button type="button" class="button getcited-upload-logo">
-                            <?php esc_html_e( 'Upload', 'getcited' ); ?>
-                        </button>
-                        <p class="description">
-                            <?php esc_html_e( 'Recommended: At least 112x112 pixels, square or rectangular.', 'getcited' ); ?>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
+                        <div class="input-with-button">
+                            <input type="url"
+                                   name="organization[logo_url]"
+                                   id="org_logo"
+                                   value="<?php echo esc_url( $organization['logo_url'] ); ?>"
+                                   placeholder="https://example.com/logo.png">
+                            <button type="button" class="button getcited-upload-logo">
+                                <?php esc_html_e( 'Upload', 'getcited' ); ?>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-row form-row-full">
                         <label><?php esc_html_e( 'Social Profiles', 'getcited' ); ?></label>
-                    </th>
-                    <td>
                         <div class="getcited-social-urls">
-                            <?php 
+                            <?php
                             $social_urls = $organization['social_urls'] ?? array();
                             $placeholders = array(
                                 'https://twitter.com/yourhandle',
@@ -158,38 +194,35 @@ $detected_plugins = $schema->get_detected_plugins();
                                 $value = $social_urls[ $i ] ?? '';
                                 $placeholder = $placeholders[ $i ] ?? 'https://...';
                             ?>
-                                <input type="url" 
-                                       name="organization[social_urls][]" 
+                                <input type="url"
+                                       name="organization[social_urls][]"
                                        value="<?php echo esc_url( $value ); ?>"
-                                       class="regular-text"
                                        placeholder="<?php echo esc_attr( $placeholder ); ?>">
                             <?php endfor; ?>
                         </div>
                         <button type="button" class="button getcited-add-social">
                             <?php esc_html_e( '+ Add Another', 'getcited' ); ?>
                         </button>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Schema Preview -->
-        <div class="getcited-section getcited-schema-preview">
-            <h2>
+        <!-- Schema Preview (Collapsible) -->
+        <div class="getcited-section getcited-schema-preview getcited-collapsible" data-collapsed="true">
+            <h2 class="getcited-collapsible-header">
                 <?php esc_html_e( 'Schema Preview', 'getcited' ); ?>
-                <a href="https://search.google.com/test/rich-results?url=<?php echo urlencode( home_url() ); ?>" 
-                   target="_blank" 
-                   class="button">
-                    <?php esc_html_e( 'Test with Google', 'getcited' ); ?>
-                </a>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
             </h2>
-            <p class="description">
-                <?php esc_html_e( 'Organization schema as it will appear on your front page:', 'getcited' ); ?>
-            </p>
-            <pre class="getcited-preview-code"><?php 
-                $org_schema = $schema->get_preview( 'organization' );
-                echo esc_html( wp_json_encode( $org_schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) );
-            ?></pre>
+            <div class="getcited-collapsible-content" style="display: none;">
+                <p class="description">
+                    <?php esc_html_e( 'Organization schema as it will appear on your front page:', 'getcited' ); ?>
+                </p>
+                <pre class="getcited-preview-code"><?php
+                    $org_schema = $schema->get_preview( 'organization' );
+                    echo esc_html( wp_json_encode( $org_schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) );
+                ?></pre>
+            </div>
         </div>
 
         <!-- Save Button -->

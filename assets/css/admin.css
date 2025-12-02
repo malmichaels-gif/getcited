@@ -1094,7 +1094,7 @@
 
 /* Locked Feature Teaser */
 .getcited-locked-feature {
-    background: linear-gradient(135deg, var(--getcited-dark-bg) 0%, var(--getcited-dark-card) 100%);
+    background: var(--getcited-dark-bg);
     border: 1px solid var(--getcited-dark-border);
     border-radius: var(--getcited-radius-md);
     padding: var(--getcited-space-xl);
@@ -1126,7 +1126,7 @@
    ========================================================================== */
 
 .getcited-pro-teasers {
-    background: linear-gradient(135deg, var(--getcited-dark-bg) 0%, #252538 100%);
+    background: var(--getcited-dark-bg);
     border: 1px solid var(--getcited-dark-border);
     border-radius: var(--getcited-radius-lg);
     padding: var(--getcited-space-xl);
@@ -1169,7 +1169,7 @@
 .getcited-pro-feature .feature-icon {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, var(--getcited-accent) 0%, var(--getcited-accent-light) 100%);
+    background: var(--getcited-accent);
     border-radius: var(--getcited-radius-sm);
     display: flex;
     align-items: center;
@@ -1249,14 +1249,14 @@
 }
 
 .getcited-waitlist-form .button-primary {
-    background: linear-gradient(135deg, var(--getcited-accent) 0%, var(--getcited-accent-light) 100%);
+    background: var(--getcited-accent);
     border: none;
     padding: 10px 20px;
     font-weight: 500;
 }
 
 .getcited-waitlist-form .button-primary:hover {
-    background: linear-gradient(135deg, var(--getcited-accent-light) 0%, var(--getcited-accent) 100%);
+    background: var(--getcited-accent-light);
 }
 
 .getcited-waitlist-count {
@@ -2283,4 +2283,579 @@
     color: var(--getcited-gray-500);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   Two-Column Settings Grid Layout
+   ========================================================================== */
+
+.getcited-settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--getcited-space-lg);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+@media (max-width: 900px) {
+    .getcited-settings-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.getcited-settings-grid .getcited-section {
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Collapsible Sections
+   ========================================================================== */
+
+.getcited-collapsible .getcited-collapsible-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.getcited-collapsible .getcited-collapsible-header .dashicons {
+    transition: transform 0.2s ease;
+    color: var(--getcited-gray-400);
+}
+
+.getcited-collapsible[data-collapsed="false"] .getcited-collapsible-header .dashicons {
+    transform: rotate(180deg);
+}
+
+.getcited-collapsible .getcited-collapsible-content {
+    margin-top: var(--getcited-space-md);
+}
+
+/* ==========================================================================
+   Compact Form Layout
+   ========================================================================== */
+
+.getcited-compact-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--getcited-space-md);
+}
+
+@media (max-width: 782px) {
+    .getcited-compact-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+.getcited-compact-form .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-xs);
+}
+
+.getcited-compact-form .form-row-full {
+    grid-column: 1 / -1;
+}
+
+.getcited-compact-form label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--getcited-gray-700);
+}
+
+.getcited-compact-form input,
+.getcited-compact-form textarea {
+    width: 100%;
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    border: 1px solid var(--getcited-gray-300);
+    border-radius: var(--getcited-radius-sm);
+    font-size: 14px;
+}
+
+.getcited-compact-form input:focus,
+.getcited-compact-form textarea:focus {
+    outline: none;
+    border-color: var(--getcited-primary);
+    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.1);
+}
+
+/* ==========================================================================
+   Source Toggle (Radio Options)
+   ========================================================================== */
+
+.getcited-source-toggle {
+    margin-top: var(--getcited-space-lg);
+    padding-top: var(--getcited-space-md);
+    border-top: 1px solid var(--getcited-gray-200);
+}
+
+.getcited-source-toggle h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--getcited-gray-700);
+    margin: 0 0 var(--getcited-space-sm) 0;
+}
+
+.getcited-radio-option {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) 0;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--getcited-gray-700);
+}
+
+.getcited-radio-option input[type="radio"] {
+    margin: 0;
+}
+
+.getcited-radio-option .getcited-badge {
+    margin-left: var(--getcited-space-sm);
+}
+
+/* ==========================================================================
+   Crawler Stats Section
+   ========================================================================== */
+
+.getcited-crawler-stats {
+    text-align: center;
+}
+
+.getcited-stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--getcited-space-sm);
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-stat-row .stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.getcited-stat-row .stat-number.allowed {
+    color: var(--getcited-success);
+}
+
+.getcited-stat-row .stat-number.blocked {
+    color: var(--getcited-error);
+}
+
+.getcited-stat-row .stat-label {
+    font-size: 14px;
+    color: var(--getcited-gray-600);
+}
+
+.getcited-bulk-buttons {
+    display: flex;
+    gap: var(--getcited-space-sm);
+    justify-content: center;
+    margin-top: var(--getcited-space-md);
+}
+
+.getcited-crawler-stats .getcited-list-info {
+    margin-top: var(--getcited-space-md);
+    font-size: 11px;
+    color: var(--getcited-gray-400);
+}
+
+/* ==========================================================================
+   Preview Actions
+   ========================================================================== */
+
+.getcited-preview-actions {
+    display: flex;
+    gap: var(--getcited-space-sm);
+    margin-bottom: var(--getcited-space-md);
+}
+
+/* ==========================================================================
+   Page Teaser (Compact Banner)
+   ========================================================================== */
+
+.getcited-page-teaser {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--getcited-space-md);
+    padding: var(--getcited-space-md) var(--getcited-space-lg);
+    background: var(--getcited-dark-bg);
+    border: 1px solid var(--getcited-dark-border);
+    border-radius: var(--getcited-radius-md);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-page-teaser .teaser-content {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-md);
+    color: var(--getcited-dark-text);
+}
+
+.getcited-page-teaser .teaser-content .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--getcited-accent);
+}
+
+.getcited-page-teaser .teaser-text {
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.getcited-page-teaser .teaser-text strong {
+    color: var(--getcited-accent-light);
+}
+
+.getcited-page-teaser .teaser-text .teaser-message {
+    color: var(--getcited-dark-muted);
+    font-size: 13px;
+}
+
+/* Inline form in page teaser */
+.getcited-teaser-form {
+    display: flex;
+    gap: var(--getcited-space-sm);
+    align-items: center;
+}
+
+.getcited-teaser-form input[type="email"] {
+    padding: 6px 12px;
+    border: 1px solid var(--getcited-dark-border);
+    border-radius: var(--getcited-radius-sm);
+    background: var(--getcited-dark-card);
+    color: var(--getcited-dark-text);
+    font-size: 13px;
+    width: 180px;
+}
+
+.getcited-teaser-form input[type="email"]::placeholder {
+    color: var(--getcited-dark-muted);
+}
+
+.getcited-teaser-form input[type="email"]:focus {
+    outline: none;
+    border-color: var(--getcited-accent);
+}
+
+.getcited-teaser-form .button-primary {
+    background: var(--getcited-accent);
+    border-color: var(--getcited-accent);
+    color: #fff;
+    padding: 6px 14px;
+    white-space: nowrap;
+}
+
+.getcited-teaser-form .button-primary:hover {
+    background: var(--getcited-accent-light);
+    border-color: var(--getcited-accent-light);
+    color: #fff;
+}
+
+.getcited-teaser-form .button-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.getcited-page-teaser .teaser-joined {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+    color: var(--getcited-success);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.getcited-page-teaser .teaser-joined .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+@media (max-width: 768px) {
+    .getcited-page-teaser {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--getcited-space-sm);
+    }
+
+    .getcited-teaser-form {
+        width: 100%;
+    }
+
+    .getcited-teaser-form input[type="email"] {
+        flex: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .getcited-teaser-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .getcited-teaser-form input[type="email"] {
+        width: 100%;
+    }
+}
+
+/* ==========================================================================
+   Waitlist Confirmed State
+   ========================================================================== */
+
+.getcited-waitlist-confirmed {
+    text-align: center;
+    padding: var(--getcited-space-lg);
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: var(--getcited-radius-md);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-waitlist-confirmed .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--getcited-success);
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-waitlist-confirmed p {
+    color: var(--getcited-dark-text);
+    margin: 0;
+}
+
+/* ==========================================================================
+   Sample Report Button (Hero Size)
+   ========================================================================== */
+
+.getcited-sample-report {
+    text-align: center;
+    padding-top: var(--getcited-space-lg);
+    border-top: 1px solid var(--getcited-dark-border);
+}
+
+.getcited-sample-report .button-hero {
+    font-size: 16px;
+    padding: var(--getcited-space-md) var(--getcited-space-xl);
+    height: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    background: var(--getcited-primary);
+    border-color: var(--getcited-primary);
+    color: #fff;
+}
+
+.getcited-sample-report .button-hero:hover {
+    background: var(--getcited-primary-dark);
+    border-color: var(--getcited-primary-dark);
+    color: #fff;
+}
+
+.getcited-sample-report .button-hero .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.getcited-sample-report .sample-hint {
+    margin-top: var(--getcited-space-sm);
+    font-size: 13px;
+    color: var(--getcited-dark-muted);
+}
+
+/* ==========================================================================
+   File Status & Manual Write
+   ========================================================================== */
+
+.getcited-file-status {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+    font-size: 13px;
+    margin: var(--getcited-space-sm) 0;
+}
+
+.getcited-file-status .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.getcited-manual-write {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    margin-top: var(--getcited-space-md);
+}
+
+.getcited-manual-write .button .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    vertical-align: text-bottom;
+    margin-right: 4px;
+}
+
+/* ==========================================================================
+   Notice Styles
+   ========================================================================== */
+
+.getcited-notice {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    border-radius: var(--getcited-radius-sm);
+    font-size: 13px;
+    margin: var(--getcited-space-sm) 0;
+}
+
+.getcited-notice-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #92400e;
+}
+
+.getcited-notice .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ==========================================================================
+   Citability Quick Stats
+   ========================================================================== */
+
+.getcited-quick-stats {
+    text-align: center;
+}
+
+.getcited-stat-items {
+    display: flex;
+    justify-content: center;
+    gap: var(--getcited-space-xl);
+}
+
+.getcited-stat-items .stat-item {
+    text-align: center;
+}
+
+.getcited-stat-items .stat-value {
+    display: block;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--getcited-gray-900);
+    line-height: 1;
+    margin-bottom: var(--getcited-space-xs);
+}
+
+.getcited-stat-items .stat-label {
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-score-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--getcited-space-xs);
+    margin-top: var(--getcited-space-md);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Inline Upsell
+   ========================================================================== */
+
+.getcited-inline-upsell {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-md);
+    background: var(--getcited-gray-100);
+    border-radius: var(--getcited-radius-sm);
+    margin-top: var(--getcited-space-md);
+    font-size: 13px;
+    color: var(--getcited-gray-600);
+}
+
+.getcited-inline-upsell .dashicons {
+    color: var(--getcited-gray-400);
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.getcited-inline-upsell .button {
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   Compact Schema Checkbox
+   ========================================================================== */
+
+.getcited-schema-options-compact {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-checkbox-compact {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    background: var(--getcited-gray-50);
+    border-radius: var(--getcited-radius-sm);
+    cursor: pointer;
+    transition: background var(--getcited-transition);
+}
+
+.getcited-checkbox-compact:hover {
+    background: var(--getcited-gray-100);
+}
+
+.getcited-checkbox-compact input {
+    margin-top: 2px;
+}
+
+.getcited-checkbox-compact .checkbox-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.getcited-checkbox-compact .checkbox-label strong {
+    font-size: 14px;
+    color: var(--getcited-gray-800);
+}
+
+.getcited-checkbox-compact .checkbox-label .description {
+    font-size: 12px;
+    color: var(--getcited-gray-500);
+}
+
+/* Schema Test Button */
+.getcited-schema-test {
+    margin-top: var(--getcited-space-md);
+}
+
+.getcited-schema-test .button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+}
+
+.getcited-schema-test .button .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
 }

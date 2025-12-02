@@ -26,20 +26,66 @@ $average_score = $citability->get_average_score();
     </p>
 
     <div class="getcited-citability-page">
-        
-        <!-- Average Score -->
-        <div class="getcited-section getcited-average-score">
-            <div class="getcited-score-display large">
-                <span class="score"><?php echo esc_html( $average_score ?: '—' ); ?></span>
-                <span class="max">/100</span>
+
+        <!-- Pro Teaser Banner -->
+        <?php $pro_teaser->render_page_teaser( 'citability' ); ?>
+
+        <!-- Two-Column Grid: Score + Recent Posts -->
+        <div class="getcited-settings-grid">
+            <!-- Left Column: Average Score -->
+            <div class="getcited-section getcited-average-score">
+                <h2><?php esc_html_e( 'Average Score', 'getcited' ); ?></h2>
+                <div class="getcited-score-display large">
+                    <span class="score"><?php echo esc_html( $average_score ?: '—' ); ?></span>
+                    <span class="max">/100</span>
+                </div>
+                <p class="description"><?php esc_html_e( 'Across recent posts', 'getcited' ); ?></p>
+
+                <?php if ( $average_score ) : ?>
+                    <p class="getcited-score-rating">
+                        <?php if ( $average_score >= 70 ) : ?>
+                            <span class="dashicons dashicons-yes-alt" style="color: #46b450;"></span>
+                            <?php esc_html_e( 'Good citability', 'getcited' ); ?>
+                        <?php elseif ( $average_score >= 40 ) : ?>
+                            <span class="dashicons dashicons-marker" style="color: #ffb900;"></span>
+                            <?php esc_html_e( 'Room for improvement', 'getcited' ); ?>
+                        <?php else : ?>
+                            <span class="dashicons dashicons-warning" style="color: #dc3232;"></span>
+                            <?php esc_html_e( 'Needs attention', 'getcited' ); ?>
+                        <?php endif; ?>
+                    </p>
+                <?php endif; ?>
             </div>
-            <p><?php esc_html_e( 'Average citability score across recent posts', 'getcited' ); ?></p>
+
+            <!-- Right Column: Quick Stats -->
+            <div class="getcited-section getcited-quick-stats">
+                <h2><?php esc_html_e( 'Quick Stats', 'getcited' ); ?></h2>
+                <?php
+                $total_posts = absint( wp_count_posts( 'post' )->publish );
+                $analyzed_count = 0;
+                foreach ( $recent_posts as $post ) {
+                    if ( get_post_meta( $post->ID, '_getcited_citability_score', true ) ) {
+                        $analyzed_count++;
+                    }
+                }
+                ?>
+                <div class="getcited-stat-items">
+                    <div class="stat-item">
+                        <span class="stat-value"><?php echo esc_html( $total_posts ); ?></span>
+                        <span class="stat-label"><?php esc_html_e( 'Published Posts', 'getcited' ); ?></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value"><?php echo esc_html( $analyzed_count ); ?>/5</span>
+                        <span class="stat-label"><?php esc_html_e( 'Analyzed (Free)', 'getcited' ); ?></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Recent Posts Analysis -->
         <div class="getcited-section getcited-recent-posts">
             <h2><?php esc_html_e( 'Recent Posts', 'getcited' ); ?></h2>
-            
+
             <?php if ( empty( $recent_posts ) ) : ?>
                 <p><?php esc_html_e( 'No published posts found to analyze.', 'getcited' ); ?></p>
             <?php else : ?>
@@ -53,10 +99,11 @@ $average_score = $citability->get_average_score();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ( $recent_posts as $post ) : 
-                            $score = get_post_meta( $post->ID, '_getcited_citability_score', true );
+                        <?php
+                        foreach ( $recent_posts as $post ) :
+                            $score      = get_post_meta( $post->ID, '_getcited_citability_score', true );
                             $last_audit = get_post_meta( $post->ID, '_getcited_last_audit', true );
-                        ?>
+                            ?>
                             <tr data-post-id="<?php echo esc_attr( $post->ID ); ?>">
                                 <td>
                                     <a href="<?php echo esc_url( get_edit_post_link( $post->ID ) ); ?>">
@@ -74,15 +121,15 @@ $average_score = $citability->get_average_score();
                                 </td>
                                 <td>
                                     <?php if ( $last_audit ) : ?>
-                                        <?php echo esc_html( human_time_diff( strtotime( $last_audit ) ) ); ?> 
+                                        <?php echo esc_html( human_time_diff( strtotime( $last_audit ) ) ); ?>
                                         <?php esc_html_e( 'ago', 'getcited' ); ?>
                                     <?php else : ?>
                                         <?php esc_html_e( 'Never', 'getcited' ); ?>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <button type="button" 
-                                            class="button getcited-analyze-post" 
+                                    <button type="button"
+                                            class="button getcited-analyze-post"
                                             data-post-id="<?php echo esc_attr( $post->ID ); ?>">
                                         <?php esc_html_e( 'Analyze', 'getcited' ); ?>
                                     </button>
@@ -92,23 +139,19 @@ $average_score = $citability->get_average_score();
                     </tbody>
                 </table>
             <?php endif; ?>
-        </div>
 
-        <!-- Pro Upsell: Full Audit -->
-        <div class="getcited-section getcited-full-audit-teaser">
-            <div class="getcited-locked-feature">
+            <!-- Pro Upsell inline -->
+            <div class="getcited-inline-upsell">
                 <span class="dashicons dashicons-lock"></span>
-                <h3><?php esc_html_e( 'Full Site Audit', 'getcited' ); ?></h3>
-                <p>
-                    <?php
-                    printf(
-                        /* translators: %d: number of published posts */
-                        esc_html__( 'Free users can analyze their 5 most recent posts. Upgrade to Pro to audit all %d posts with detailed recommendations.', 'getcited' ),
-                        absint( wp_count_posts( 'post' )->publish )
-                    ); ?>
-                </p>
-                <button type="button" class="button button-primary getcited-join-waitlist">
-                    <?php esc_html_e( 'Join Pro Waitlist', 'getcited' ); ?>
+                <?php
+                printf(
+                    /* translators: %d: number of published posts */
+                    esc_html__( 'Upgrade to Pro to audit all %d posts with detailed recommendations.', 'getcited' ),
+                    $total_posts
+                );
+                ?>
+                <button type="button" class="button getcited-join-waitlist">
+                    <?php esc_html_e( 'Join Waitlist', 'getcited' ); ?>
                 </button>
             </div>
         </div>
@@ -121,14 +164,18 @@ $average_score = $citability->get_average_score();
             </div>
         </div>
 
-        <!-- Scoring Rubric -->
-        <div class="getcited-section getcited-rubric">
-            <h2><?php esc_html_e( 'Scoring Rubric', 'getcited' ); ?></h2>
-            <p class="description">
-                <?php esc_html_e( 'These factors determine how likely AI systems are to cite your content:', 'getcited' ); ?>
-            </p>
-            
-            <table class="getcited-rubric-table">
+        <!-- Scoring Rubric (Collapsible) -->
+        <div class="getcited-section getcited-rubric getcited-collapsible" data-collapsed="true">
+            <h2 class="getcited-collapsible-header">
+                <?php esc_html_e( 'Scoring Rubric', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
+            </h2>
+            <div class="getcited-collapsible-content" style="display: none;">
+                <p class="description">
+                    <?php esc_html_e( 'These factors determine how likely AI systems are to cite your content:', 'getcited' ); ?>
+                </p>
+
+                <table class="getcited-rubric-table">
                 <thead>
                     <tr>
                         <th><?php esc_html_e( 'Factor', 'getcited' ); ?></th>
@@ -152,7 +199,8 @@ $average_score = $citability->get_average_score();
                         <td></td>
                     </tr>
                 </tfoot>
-            </table>
+                </table>
+            </div>
         </div>
 
     </div>

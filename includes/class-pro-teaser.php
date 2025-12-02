@@ -76,6 +76,36 @@ class GetCited_Pro_Teaser {
     }
 
     /**
+     * Get page-specific teaser content
+     */
+    public function get_page_teaser( $page ) {
+        $teasers = array(
+            'llms' => array(
+                'feature' => 'citations',
+                'message' => __( 'See when AI actually cites your llms.txt content', 'getcited' ),
+            ),
+            'crawlers' => array(
+                'feature' => 'traffic',
+                'message' => __( 'Know exactly which AI crawlers are driving real traffic', 'getcited' ),
+            ),
+            'schema' => array(
+                'feature' => 'full_audit',
+                'message' => __( 'Audit your entire site\'s schema for AI optimization', 'getcited' ),
+            ),
+            'citability' => array(
+                'feature' => 'full_audit',
+                'message' => __( 'Unlock unlimited citability audits for your whole site', 'getcited' ),
+            ),
+            'settings' => array(
+                'feature' => 'alerts',
+                'message' => __( 'Get instant alerts when AI cites your content', 'getcited' ),
+            ),
+        );
+
+        return $teasers[ $page ] ?? $teasers['llms'];
+    }
+
+    /**
      * Get sample report data (for modal preview)
      */
     public function get_sample_report() {
@@ -110,12 +140,63 @@ class GetCited_Pro_Teaser {
     }
 
     /**
+     * Check if user has already joined waitlist
+     */
+    public function has_joined_waitlist() {
+        $settings = GetCited_Settings::instance();
+        return $settings->get( 'waitlist_submitted' );
+    }
+
+    /**
+     * Render compact page teaser (for non-dashboard pages)
+     */
+    public function render_page_teaser( $page ) {
+        $settings = GetCited_Settings::instance();
+        if ( $settings->get( 'license_status' ) !== 'free' ) {
+            return; // Don't show to Pro users
+        }
+
+        $teaser_data = $this->get_page_teaser( $page );
+        $features    = $this->get_features();
+        $feature     = $features[ $teaser_data['feature'] ] ?? $features['traffic'];
+        $has_joined  = $this->has_joined_waitlist();
+        ?>
+        <div class="getcited-page-teaser">
+            <div class="teaser-content">
+                <span class="dashicons <?php echo esc_attr( $feature['icon'] ); ?>"></span>
+                <div class="teaser-text">
+                    <strong><?php esc_html_e( 'GetCited Pro - Coming Soon', 'getcited' ); ?></strong>
+                    <span class="teaser-message"><?php echo esc_html( $teaser_data['message'] ); ?></span>
+                </div>
+            </div>
+            <?php if ( ! $has_joined ) : ?>
+                <form class="getcited-teaser-form">
+                    <input type="email"
+                           name="email"
+                           placeholder="<?php esc_attr_e( 'your@email.com', 'getcited' ); ?>"
+                           required>
+                    <button type="submit" class="button button-primary">
+                        <?php esc_html_e( 'Reserve Your Spot', 'getcited' ); ?>
+                    </button>
+                </form>
+            <?php else : ?>
+                <span class="teaser-joined">
+                    <span class="dashicons dashicons-yes-alt"></span>
+                    <?php esc_html_e( 'On the list!', 'getcited' ); ?>
+                </span>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
      * Render Pro teaser section for dashboard
      */
     public function render_dashboard_teasers() {
         $features = $this->get_features();
         $settings = GetCited_Settings::instance();
         $is_pro = $settings->get( 'license_status' ) !== 'free';
+        $has_joined = $this->has_joined_waitlist();
 
         if ( $is_pro ) {
             return; // Don't show teasers to Pro users
@@ -145,33 +226,42 @@ class GetCited_Pro_Teaser {
                 <?php endforeach; ?>
             </div>
 
-            <div class="getcited-waitlist-form">
-                <p><?php esc_html_e( 'Be first to know when Pro launches:', 'getcited' ); ?></p>
-                <form id="getcited-waitlist-form">
-                    <input type="email" 
-                           name="email" 
-                           placeholder="<?php esc_attr_e( 'your@email.com', 'getcited' ); ?>" 
-                           required>
-                    <button type="submit" class="button button-primary">
-                        <?php esc_html_e( 'Reserve Your Spot', 'getcited' ); ?>
-                    </button>
-                </form>
-                <div class="getcited-waitlist-message" style="display: none;"></div>
-                <?php 
-                $waitlist_count = $this->get_waitlist_count();
-                if ( $waitlist_count >= 100 ) : ?>
-                    <p class="getcited-waitlist-count">
-                        <?php esc_html_e( 'Join', 'getcited' ); ?> 
-                        <span class="count"><?php echo esc_html( number_format( $waitlist_count ) ); ?></span> 
-                        <?php esc_html_e( 'publishers on the waitlist', 'getcited' ); ?>
-                    </p>
-                <?php endif; ?>
-            </div>
+            <?php if ( ! $has_joined ) : ?>
+                <div class="getcited-waitlist-form">
+                    <p><?php esc_html_e( 'Be first to know when Pro launches:', 'getcited' ); ?></p>
+                    <form id="getcited-waitlist-form">
+                        <input type="email"
+                               name="email"
+                               placeholder="<?php esc_attr_e( 'your@email.com', 'getcited' ); ?>"
+                               required>
+                        <button type="submit" class="button button-primary">
+                            <?php esc_html_e( 'Reserve Your Spot', 'getcited' ); ?>
+                        </button>
+                    </form>
+                    <div class="getcited-waitlist-message" style="display: none;"></div>
+                    <?php
+                    $waitlist_count = $this->get_waitlist_count();
+                    if ( $waitlist_count >= 100 ) : ?>
+                        <p class="getcited-waitlist-count">
+                            <?php esc_html_e( 'Join', 'getcited' ); ?>
+                            <span class="count"><?php echo esc_html( number_format( $waitlist_count ) ); ?></span>
+                            <?php esc_html_e( 'publishers on the waitlist', 'getcited' ); ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            <?php else : ?>
+                <div class="getcited-waitlist-confirmed">
+                    <span class="dashicons dashicons-yes-alt"></span>
+                    <p><?php esc_html_e( "You're on the list! We'll email you when Pro launches.", 'getcited' ); ?></p>
+                </div>
+            <?php endif; ?>
 
             <div class="getcited-sample-report">
-                <button type="button" class="button getcited-view-sample">
+                <button type="button" class="button button-hero getcited-view-sample">
+                    <span class="dashicons dashicons-chart-bar"></span>
                     <?php esc_html_e( 'View Sample Report', 'getcited' ); ?>
                 </button>
+                <p class="sample-hint"><?php esc_html_e( 'See what Pro users will see', 'getcited' ); ?></p>
             </div>
         </div>
         <?php
@@ -278,7 +368,7 @@ class GetCited_Pro_Teaser {
 
         // For now, since the endpoint doesn't exist, we'll simulate success
         // In production, this would POST to WAITLIST_URL
-        
+
         $response = wp_remote_post( self::WAITLIST_URL, array(
             'timeout' => 5,
             'headers' => array(
@@ -291,28 +381,22 @@ class GetCited_Pro_Teaser {
             ) ),
         ) );
 
-        // If endpoint doesn't exist yet, still show success
-        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-            // Store locally for now
-            $waitlist = get_option( 'getcited_local_waitlist', array() );
-            $waitlist[] = array(
-                'email' => $email,
-                'site_url' => home_url(),
-                'timestamp' => current_time( 'c' ),
-            );
-            update_option( 'getcited_local_waitlist', $waitlist );
+        // Store locally for now
+        $waitlist = get_option( 'getcited_local_waitlist', array() );
+        $waitlist[] = array(
+            'email' => $email,
+            'site_url' => home_url(),
+            'timestamp' => current_time( 'c' ),
+        );
+        update_option( 'getcited_local_waitlist', $waitlist );
 
-            wp_send_json_success( array(
-                'message' => __( "You're on the list! We'll email you when Pro launches.", 'getcited' ),
-                'count' => count( $waitlist ),
-            ) );
-        }
-
-        $body = json_decode( wp_remote_retrieve_body( $response ), true );
+        // Remember that user has joined waitlist
+        $settings = GetCited_Settings::instance();
+        $settings->set( 'waitlist_submitted', true );
 
         wp_send_json_success( array(
             'message' => __( "You're on the list! We'll email you when Pro launches.", 'getcited' ),
-            'count' => $body['waitlist_count'] ?? '--',
+            'count' => count( $waitlist ),
         ) );
     }
 

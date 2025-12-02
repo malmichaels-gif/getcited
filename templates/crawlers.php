@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $crawler_list = GetCited_Crawler_List::instance();
 $settings = GetCited_Settings::instance();
 $robots = GetCited_Robots::instance();
+$pro_teaser = GetCited_Pro_Teaser::instance();
 
 $grouped_crawlers = $crawler_list->get_grouped();
 $crawler_states = $settings->get( 'crawlers' );
@@ -26,6 +27,20 @@ $can_write = $robots->can_write_physical_file();
 
 $list_version = $crawler_list->get_version();
 $list_updated = $crawler_list->get_last_updated();
+
+// Count stats
+$allowed_count = 0;
+$blocked_count = 0;
+foreach ( $grouped_crawlers as $crawlers ) {
+    foreach ( $crawlers as $crawler ) {
+        $status = $crawler_states[ $crawler['name'] ] ?? 'allow';
+        if ( $status === 'allow' ) {
+            $allowed_count++;
+        } else {
+            $blocked_count++;
+        }
+    }
+}
 ?>
 
 <div class="wrap getcited-wrap">
@@ -35,24 +50,92 @@ $list_updated = $crawler_list->get_last_updated();
     </p>
 
     <div class="getcited-crawlers-page">
-        
-        <!-- Bulk Actions -->
-        <div class="getcited-section getcited-bulk-actions">
-            <button type="button" class="button getcited-allow-all">
-                <?php esc_html_e( 'Allow All', 'getcited' ); ?>
-            </button>
-            <button type="button" class="button getcited-block-all">
-                <?php esc_html_e( 'Block All', 'getcited' ); ?>
-            </button>
-            <span class="getcited-list-info">
-                <?php
-                printf(
-                    /* translators: %1$s: version number, %2$s: last updated date */
-                    esc_html__( 'Crawler list v%1$s (updated %2$s)', 'getcited' ),
-                    esc_html( $list_version ),
-                    esc_html( $list_updated )
-                ); ?>
-            </span>
+
+        <!-- Pro Teaser Banner -->
+        <?php $pro_teaser->render_page_teaser( 'crawlers' ); ?>
+
+        <!-- Two-Column Settings Grid -->
+        <div class="getcited-settings-grid">
+            <!-- Left Column: Quick Stats + Bulk Actions -->
+            <div class="getcited-section getcited-crawler-stats">
+                <h2><?php esc_html_e( 'Crawler Status', 'getcited' ); ?></h2>
+                <div class="getcited-stat-row">
+                    <span class="stat-number allowed"><?php echo esc_html( $allowed_count ); ?></span>
+                    <span class="stat-label"><?php esc_html_e( 'Allowed', 'getcited' ); ?></span>
+                </div>
+                <div class="getcited-stat-row">
+                    <span class="stat-number blocked"><?php echo esc_html( $blocked_count ); ?></span>
+                    <span class="stat-label"><?php esc_html_e( 'Blocked', 'getcited' ); ?></span>
+                </div>
+                <div class="getcited-bulk-buttons">
+                    <button type="button" class="button getcited-allow-all">
+                        <?php esc_html_e( 'Allow All', 'getcited' ); ?>
+                    </button>
+                    <button type="button" class="button getcited-block-all">
+                        <?php esc_html_e( 'Block All', 'getcited' ); ?>
+                    </button>
+                </div>
+                <p class="getcited-list-info">
+                    <?php
+                    printf(
+                        /* translators: %1$s: version number, %2$s: last updated date */
+                        esc_html__( 'List v%1$s (%2$s)', 'getcited' ),
+                        esc_html( $list_version ),
+                        esc_html( $list_updated )
+                    ); ?>
+                </p>
+            </div>
+
+            <!-- Right Column: robots.txt Settings -->
+            <div class="getcited-section getcited-robots-settings">
+                <h2><?php esc_html_e( 'robots.txt', 'getcited' ); ?></h2>
+
+                <label class="getcited-toggle-label">
+                    <input type="checkbox"
+                           name="robots_write_physical"
+                           id="robots_write_physical"
+                           value="1"
+                           <?php checked( $robots_write_physical ); ?>
+                           <?php disabled( ! $can_write ); ?>>
+                    <strong><?php esc_html_e( 'Auto-write rules', 'getcited' ); ?></strong>
+                </label>
+                <p class="description">
+                    <?php esc_html_e( 'Automatically sync crawler rules to robots.txt.', 'getcited' ); ?>
+                </p>
+
+                <?php if ( ! $can_write ) : ?>
+                    <p class="getcited-notice getcited-notice-warning">
+                        <span class="dashicons dashicons-warning"></span>
+                        <?php esc_html_e( 'Cannot write to robots.txt.', 'getcited' ); ?>
+                    </p>
+                <?php endif; ?>
+
+                <?php if ( $physical_exists ) : ?>
+                    <p class="getcited-file-status">
+                        <?php if ( $rules_exist ) : ?>
+                            <span class="dashicons dashicons-yes-alt" style="color: #46b450;"></span>
+                            <?php esc_html_e( 'Rules present', 'getcited' ); ?>
+                        <?php else : ?>
+                            <span class="dashicons dashicons-info" style="color: #0073aa;"></span>
+                            <?php esc_html_e( 'No GetCited rules yet', 'getcited' ); ?>
+                        <?php endif; ?>
+                    </p>
+                <?php endif; ?>
+
+                <?php if ( $can_write ) : ?>
+                    <div class="getcited-robots-actions">
+                        <button type="button" class="button getcited-write-robots-file">
+                            <?php esc_html_e( 'Write Now', 'getcited' ); ?>
+                        </button>
+                        <?php if ( $rules_exist ) : ?>
+                            <button type="button" class="button getcited-remove-robots-rules">
+                                <?php esc_html_e( 'Remove', 'getcited' ); ?>
+                            </button>
+                        <?php endif; ?>
+                        <span class="getcited-robots-status"></span>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
 
         <!-- Crawler Groups -->
@@ -147,85 +230,27 @@ $list_updated = $crawler_list->get_last_updated();
             </div>
         </div>
 
-        <!-- robots.txt Settings -->
-        <div class="getcited-section getcited-robots-settings">
-            <h2><?php esc_html_e( 'robots.txt Settings', 'getcited' ); ?></h2>
-
-            <label class="getcited-toggle-label">
-                <input type="checkbox"
-                       name="robots_write_physical"
-                       id="robots_write_physical"
-                       value="1"
-                       <?php checked( $robots_write_physical ); ?>
-                       <?php disabled( ! $can_write ); ?>>
-                <strong><?php esc_html_e( 'Auto-write to robots.txt', 'getcited' ); ?></strong>
-            </label>
-            <p class="description">
-                <?php esc_html_e( 'Automatically add AI crawler rules to your physical robots.txt file. Existing entries (sitemaps, other rules) are preserved.', 'getcited' ); ?>
-            </p>
-
-            <?php if ( ! $can_write ) : ?>
-                <p class="getcited-notice getcited-notice-warning">
-                    <span class="dashicons dashicons-warning"></span>
-                    <?php esc_html_e( 'Cannot write to robots.txt. Check file permissions or contact your host.', 'getcited' ); ?>
-                </p>
-            <?php endif; ?>
-
-            <?php if ( $physical_exists ) : ?>
-                <p class="getcited-file-status">
-                    <?php if ( $rules_exist ) : ?>
-                        <span class="dashicons dashicons-yes-alt" style="color: #46b450;"></span>
-                        <?php esc_html_e( 'GetCited rules are present in robots.txt', 'getcited' ); ?>
-                    <?php else : ?>
-                        <span class="dashicons dashicons-info" style="color: #0073aa;"></span>
-                        <?php esc_html_e( 'Physical robots.txt exists but does not contain GetCited rules', 'getcited' ); ?>
-                    <?php endif; ?>
-                </p>
-            <?php else : ?>
-                <p class="getcited-file-status">
-                    <span class="dashicons dashicons-info" style="color: #0073aa;"></span>
-                    <?php esc_html_e( 'No physical robots.txt file exists. WordPress generates it dynamically.', 'getcited' ); ?>
-                </p>
-            <?php endif; ?>
-
-            <div class="getcited-robots-actions">
-                <?php if ( $can_write ) : ?>
-                    <button type="button" class="button getcited-write-robots-file">
-                        <span class="dashicons dashicons-media-text"></span>
-                        <?php esc_html_e( 'Write Rules Now', 'getcited' ); ?>
-                    </button>
-                    <?php if ( $rules_exist ) : ?>
-                        <button type="button" class="button getcited-remove-robots-rules">
-                            <span class="dashicons dashicons-trash"></span>
-                            <?php esc_html_e( 'Remove Rules', 'getcited' ); ?>
-                        </button>
-                    <?php endif; ?>
-                <?php endif; ?>
-                <span class="getcited-robots-status"></span>
-            </div>
-        </div>
-
-        <!-- robots.txt Preview -->
-        <div class="getcited-section getcited-robots-preview">
-            <div class="getcited-preview-header">
-                <h2>
-                    <?php esc_html_e( 'robots.txt Preview', 'getcited' ); ?>
+        <!-- robots.txt Preview (Collapsible) -->
+        <div class="getcited-section getcited-robots-preview getcited-collapsible" data-collapsed="true">
+            <h2 class="getcited-collapsible-header">
+                <?php esc_html_e( 'robots.txt Preview', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
+            </h2>
+            <div class="getcited-collapsible-content" style="display: none;">
+                <div class="getcited-preview-actions">
                     <a href="<?php echo esc_url( home_url( '/robots.txt' ) ); ?>" target="_blank" class="button">
                         <?php esc_html_e( 'View Live', 'getcited' ); ?>
                     </a>
-                </h2>
-                <button type="button" class="button getcited-copy-content" data-target="robots_txt_preview">
-                    <span class="dashicons dashicons-clipboard"></span>
-                    <?php esc_html_e( 'Copy', 'getcited' ); ?>
-                </button>
+                    <button type="button" class="button getcited-copy-content" data-target="robots_txt_preview">
+                        <span class="dashicons dashicons-clipboard"></span>
+                        <?php esc_html_e( 'Copy', 'getcited' ); ?>
+                    </button>
+                </div>
+                <pre class="getcited-preview-code" id="robots_txt_preview"><?php echo esc_html( $robots->get_preview() ); ?></pre>
+                <p class="description getcited-copy-hint">
+                    <?php esc_html_e( 'Copy and paste into robots.txt if auto-write is unavailable.', 'getcited' ); ?>
+                </p>
             </div>
-            <p class="description">
-                <?php esc_html_e( 'This preview shows the GetCited rules that will be added to your robots.txt:', 'getcited' ); ?>
-            </p>
-            <pre class="getcited-preview-code" id="robots_txt_preview"><?php echo esc_html( $robots->get_preview() ); ?></pre>
-            <p class="description getcited-copy-hint">
-                <?php esc_html_e( 'Copy and paste into robots.txt in your site root if auto-write is unavailable.', 'getcited' ); ?>
-            </p>
         </div>
 
     </div>

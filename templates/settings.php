@@ -11,31 +11,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ( function() {
-$settings = GetCited_Settings::instance();
-$dashboard = GetCited_Dashboard::instance();
+$settings   = GetCited_Settings::instance();
+$dashboard  = GetCited_Dashboard::instance();
+$pro_teaser = GetCited_Pro_Teaser::instance();
 
-$debug_mode = $settings->get( 'debug_mode' );
+$debug_mode     = $settings->get( 'debug_mode' );
 $keep_on_delete = $settings->get( 'keep_on_delete' );
-$site_type = $settings->get( 'site_type' );
-$wizard_completed = $settings->get( 'wizard_completed' );
+$site_type      = $settings->get( 'site_type' );
 ?>
 
 <div class="wrap getcited-wrap">
     <h1><?php esc_html_e( 'Settings', 'getcited' ); ?></h1>
+    <p class="description">
+        <?php esc_html_e( 'Configure general options for GetCited.', 'getcited' ); ?>
+    </p>
 
     <div class="getcited-settings-page">
-        
-        <!-- General Settings -->
-        <div class="getcited-section">
-            <h2><?php esc_html_e( 'General', 'getcited' ); ?></h2>
-            
-            <table class="form-table">
-                <tr>
-                    <th scope="row">
+
+        <!-- Pro Teaser Banner -->
+        <?php $pro_teaser->render_page_teaser( 'settings' ); ?>
+
+        <!-- Two-Column Grid: General + Advanced -->
+        <div class="getcited-settings-grid">
+            <!-- Left Column: General Settings -->
+            <div class="getcited-section">
+                <h2><?php esc_html_e( 'General', 'getcited' ); ?></h2>
+
+                <div class="getcited-compact-form">
+                    <div class="form-row form-row-full">
                         <label for="site_type"><?php esc_html_e( 'Site Type', 'getcited' ); ?></label>
-                    </th>
-                    <td>
-                        <select name="site_type" id="site_type">
+                        <select name="site_type" id="site_type" style="width: 100%; max-width: 300px;">
                             <option value="blog" <?php selected( $site_type, 'blog' ); ?>>
                                 <?php esc_html_e( 'Blog', 'getcited' ); ?>
                             </option>
@@ -64,123 +69,105 @@ $wizard_completed = $settings->get( 'wizard_completed' );
                                 <?php esc_html_e( 'Other', 'getcited' ); ?>
                             </option>
                         </select>
-                        <p class="description">
-                            <?php esc_html_e( 'This helps optimize llms.txt templates and schema output.', 'getcited' ); ?>
+                        <p class="description" style="margin-top: 4px;">
+                            <?php esc_html_e( 'Optimizes llms.txt templates and schema output.', 'getcited' ); ?>
                         </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <?php esc_html_e( 'Setup Wizard', 'getcited' ); ?>
-                    </th>
-                    <td>
+                    </div>
+                    <div class="form-row form-row-full" style="margin-top: var(--getcited-space-md);">
+                        <label><?php esc_html_e( 'Setup Wizard', 'getcited' ); ?></label>
                         <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited&wizard=1' ) ); ?>" class="button">
+                            <span class="dashicons dashicons-admin-tools" style="vertical-align: text-bottom; margin-right: 4px;"></span>
                             <?php esc_html_e( 'Run Setup Wizard Again', 'getcited' ); ?>
                         </a>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Advanced Settings -->
+            <div class="getcited-section">
+                <h2><?php esc_html_e( 'Advanced', 'getcited' ); ?></h2>
+
+                <div class="getcited-schema-options-compact">
+                    <label class="getcited-checkbox-compact">
+                        <input type="checkbox"
+                               name="debug_mode"
+                               id="debug_mode"
+                               value="1"
+                               <?php checked( $debug_mode ); ?>>
+                        <span class="checkbox-label">
+                            <strong><?php esc_html_e( 'Debug Mode', 'getcited' ); ?></strong>
+                            <span class="description"><?php esc_html_e( 'Log detailed info for troubleshooting', 'getcited' ); ?></span>
+                        </span>
+                    </label>
+
+                    <label class="getcited-checkbox-compact">
+                        <input type="checkbox"
+                               name="keep_on_delete"
+                               id="keep_on_delete"
+                               value="1"
+                               <?php checked( $keep_on_delete ); ?>>
+                        <span class="checkbox-label">
+                            <strong><?php esc_html_e( 'Keep Settings on Delete', 'getcited' ); ?></strong>
+                            <span class="description"><?php esc_html_e( 'Preserve config when uninstalling', 'getcited' ); ?></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
         </div>
 
-        <!-- Advanced Settings -->
-        <div class="getcited-section">
-            <h2><?php esc_html_e( 'Advanced', 'getcited' ); ?></h2>
-            
-            <table class="form-table">
-                <tr>
-                    <th scope="row">
-                        <label for="debug_mode"><?php esc_html_e( 'Debug Mode', 'getcited' ); ?></label>
-                    </th>
-                    <td>
-                        <label>
-                            <input type="checkbox" 
-                                   name="debug_mode" 
-                                   id="debug_mode"
-                                   value="1"
-                                   <?php checked( $debug_mode ); ?>>
-                            <?php esc_html_e( 'Enable debug mode', 'getcited' ); ?>
-                        </label>
-                        <p class="description">
-                            <?php esc_html_e( 'Logs detailed information for troubleshooting. Only enable when needed.', 'getcited' ); ?>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="keep_on_delete"><?php esc_html_e( 'Keep Settings', 'getcited' ); ?></label>
-                    </th>
-                    <td>
-                        <label>
-                            <input type="checkbox" 
-                                   name="keep_on_delete" 
-                                   id="keep_on_delete"
-                                   value="1"
-                                   <?php checked( $keep_on_delete ); ?>>
-                            <?php esc_html_e( 'Keep settings if plugin is deleted', 'getcited' ); ?>
-                        </label>
-                        <p class="description">
-                            <?php esc_html_e( 'Preserve your configuration when uninstalling. Useful if you plan to reinstall.', 'getcited' ); ?>
-                        </p>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Import/Export -->
-        <div class="getcited-section">
-            <h2><?php esc_html_e( 'Import / Export', 'getcited' ); ?></h2>
-            
-            <table class="form-table">
-                <tr>
-                    <th scope="row">
-                        <?php esc_html_e( 'Export Settings', 'getcited' ); ?>
-                    </th>
-                    <td>
+        <!-- Import/Export (Collapsible) -->
+        <div class="getcited-section getcited-collapsible" data-collapsed="true">
+            <h2 class="getcited-collapsible-header">
+                <?php esc_html_e( 'Import / Export', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
+            </h2>
+            <div class="getcited-collapsible-content" style="display: none;">
+                <div class="getcited-compact-form">
+                    <div class="form-row">
+                        <label><?php esc_html_e( 'Export Settings', 'getcited' ); ?></label>
                         <button type="button" class="button getcited-export-settings">
-                            <?php esc_html_e( 'Download Settings (JSON)', 'getcited' ); ?>
+                            <span class="dashicons dashicons-download" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+                            <?php esc_html_e( 'Download JSON', 'getcited' ); ?>
                         </button>
-                        <p class="description">
-                            <?php esc_html_e( 'Download your current settings as a JSON file.', 'getcited' ); ?>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <?php esc_html_e( 'Import Settings', 'getcited' ); ?>
-                    </th>
-                    <td>
-                        <input type="file" 
-                               id="getcited-import-file" 
+                    </div>
+                    <div class="form-row">
+                        <label><?php esc_html_e( 'Import Settings', 'getcited' ); ?></label>
+                        <input type="file"
+                               id="getcited-import-file"
                                accept=".json"
                                style="display: none;">
                         <button type="button" class="button getcited-import-settings">
-                            <?php esc_html_e( 'Import Settings (JSON)', 'getcited' ); ?>
+                            <span class="dashicons dashicons-upload" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+                            <?php esc_html_e( 'Upload JSON', 'getcited' ); ?>
                         </button>
-                        <p class="description">
-                            <?php esc_html_e( 'Upload a previously exported settings file.', 'getcited' ); ?>
-                        </p>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- System Info -->
-        <div class="getcited-section">
-            <h2><?php esc_html_e( 'System Information', 'getcited' ); ?></h2>
-            <p class="description">
-                <?php esc_html_e( 'Copy this information when requesting support.', 'getcited' ); ?>
-            </p>
-            
-            <textarea id="getcited-system-info" 
-                      rows="15" 
-                      readonly 
-                      class="large-text code"><?php echo esc_textarea( $dashboard->render_system_info() ); ?></textarea>
-            
-            <p>
-                <button type="button" class="button getcited-copy-system-info">
-                    <?php esc_html_e( 'Copy to Clipboard', 'getcited' ); ?>
-                </button>
-            </p>
+        <!-- System Info (Collapsible) -->
+        <div class="getcited-section getcited-collapsible" data-collapsed="true">
+            <h2 class="getcited-collapsible-header">
+                <?php esc_html_e( 'System Information', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
+            </h2>
+            <div class="getcited-collapsible-content" style="display: none;">
+                <p class="description">
+                    <?php esc_html_e( 'Copy this information when requesting support.', 'getcited' ); ?>
+                </p>
+
+                <textarea id="getcited-system-info"
+                          rows="12"
+                          readonly
+                          class="large-text code"><?php echo esc_textarea( $dashboard->render_system_info() ); ?></textarea>
+
+                <p style="margin-top: var(--getcited-space-sm);">
+                    <button type="button" class="button getcited-copy-system-info">
+                        <span class="dashicons dashicons-clipboard" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+                        <?php esc_html_e( 'Copy to Clipboard', 'getcited' ); ?>
+                    </button>
+                </p>
+            </div>
         </div>
 
         <!-- Save Button -->

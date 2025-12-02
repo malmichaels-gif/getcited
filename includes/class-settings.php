@@ -43,6 +43,7 @@ class GetCited_Settings {
         // llms.txt
         'llms_txt_content' => '',
         'llms_txt_enabled' => true,
+        'llms_txt_source' => 'getcited', // 'getcited' or 'existing' - which llms.txt to use
         'llms_write_physical' => true,
         'llms_founder_name' => '',
         'llms_founder_title' => '',
@@ -81,6 +82,7 @@ class GetCited_Settings {
         'site_uuid' => '',
         'ga4_connected' => false,
         'ga4_property_id' => '',
+        'waitlist_submitted' => false, // Remember if user joined waitlist
 
         // Version tracking
         'db_version' => '1.0',
@@ -285,7 +287,11 @@ class GetCited_Settings {
             case 'debug_mode':
             case 'keep_on_delete':
             case 'ga4_connected':
+            case 'waitlist_submitted':
                 return (bool) $value;
+
+            case 'llms_txt_source':
+                return in_array( $value, array( 'getcited', 'existing' ), true ) ? $value : 'getcited';
 
             case 'llms_founder_name':
             case 'llms_founder_title':

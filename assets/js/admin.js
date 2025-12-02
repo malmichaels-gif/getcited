@@ -23,11 +23,14 @@
         initHealthCheck();
         initRobotsRulesActions();
         initWaitlistForm();
+        initCompactWaitlistButtons();
         initSampleModal();
         initWizard();
         initSettingsPage();
         initExportImport();
         initCopyButtons();
+        initCollapsibleSections();
+        initSourceToggle();
     }
 
     // ==========================================================================
@@ -1623,7 +1626,7 @@
                 reader.onload = (event) => {
                     try {
                         const data = JSON.parse(event.target.result);
-                        
+
                         if (!confirm('This will replace your current settings. Continue?')) {
                             return;
                         }
@@ -1641,6 +1644,112 @@
                 reader.readAsText(file);
             });
         }
+    }
+
+    // ==========================================================================
+    // Collapsible Sections
+    // ==========================================================================
+
+    function initCollapsibleSections() {
+        document.querySelectorAll('.getcited-collapsible-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const section = this.closest('.getcited-collapsible');
+                const content = section.querySelector('.getcited-collapsible-content');
+                const isCollapsed = section.dataset.collapsed === 'true';
+
+                if (isCollapsed) {
+                    content.style.display = 'block';
+                    section.dataset.collapsed = 'false';
+                } else {
+                    content.style.display = 'none';
+                    section.dataset.collapsed = 'true';
+                }
+            });
+        });
+    }
+
+    // ==========================================================================
+    // Source Toggle (llms.txt)
+    // ==========================================================================
+
+    function initSourceToggle() {
+        const sourceRadios = document.querySelectorAll('input[name="llms_txt_source"]');
+        if (!sourceRadios.length) return;
+
+        sourceRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Save preference immediately
+                ajax('getcited_save_settings', {
+                    section: 'llms_txt',
+                    data: {
+                        llms_txt_source: this.value
+                    }
+                }).then(response => {
+                    if (response.success) {
+                        // Show brief feedback
+                        const label = this.closest('.getcited-radio-option');
+                        if (label) {
+                            const feedback = document.createElement('span');
+                            feedback.className = 'getcited-inline-saved';
+                            feedback.textContent = '✓';
+                            feedback.style.cssText = 'color: #10b981; margin-left: 8px;';
+                            label.appendChild(feedback);
+                            setTimeout(() => feedback.remove(), 2000);
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    // ==========================================================================
+    // Page Teaser Waitlist Forms
+    // ==========================================================================
+
+    function initCompactWaitlistButtons() {
+        // Handle inline teaser forms
+        document.querySelectorAll('.getcited-teaser-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const emailInput = this.querySelector('input[type="email"]');
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const email = emailInput.value.trim();
+
+                if (!email) return;
+
+                // Disable form while submitting
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                emailInput.disabled = true;
+                submitBtn.textContent = 'Joining...';
+
+                ajax('getcited_waitlist_signup', { email: email })
+                    .then(response => {
+                        if (response.success) {
+                            // Replace form with confirmation
+                            this.outerHTML = '<span class="teaser-joined"><span class="dashicons dashicons-yes-alt"></span> On the list!</span>';
+                        } else {
+                            submitBtn.disabled = false;
+                            emailInput.disabled = false;
+                            submitBtn.textContent = originalText;
+                            // Show error inline
+                            const errorMsg = response.data?.message || 'Failed to join waitlist.';
+                            emailInput.setCustomValidity(errorMsg);
+                            emailInput.reportValidity();
+                            setTimeout(() => emailInput.setCustomValidity(''), 3000);
+                        }
+                    })
+                    .catch(() => {
+                        submitBtn.disabled = false;
+                        emailInput.disabled = false;
+                        submitBtn.textContent = originalText;
+                        emailInput.setCustomValidity('Failed to join. Please try again.');
+                        emailInput.reportValidity();
+                        setTimeout(() => emailInput.setCustomValidity(''), 3000);
+                    });
+            });
+        });
     }
 
 })();
