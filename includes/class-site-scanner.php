@@ -125,6 +125,7 @@ class GetCited_Site_Scanner {
 
 	/**
 	 * Get key pages (About, Contact, Services, etc.)
+	 * Optimized to use a single query instead of individual lookups.
 	 */
 	private function get_key_pages() {
 		$key_slugs = array(
@@ -150,16 +151,26 @@ class GetCited_Site_Scanner {
 
 		$pages = array();
 
-		foreach ( $key_slugs as $slug ) {
-			$page = get_page_by_path( $slug );
-			if ( $page && $page->post_status === 'publish' ) {
-				$pages[ $slug ] = array(
-					'title'           => $page->post_title,
-					'url'             => get_permalink( $page ),
-					'excerpt'         => $this->get_clean_excerpt( $page ),
-					'content_preview' => $this->get_content_preview( $page->post_content, 500 ),
-				);
-			}
+		// Batch query: get all pages with these slugs in a single query
+		$found_pages = get_posts(
+			array(
+				'post_type'      => 'page',
+				'post_status'    => 'publish',
+				'post_name__in'  => $key_slugs,
+				'posts_per_page' => count( $key_slugs ),
+				'no_found_rows'  => true,
+			)
+		);
+
+		// Index found pages by slug for quick lookup
+		foreach ( $found_pages as $page ) {
+			$slug           = $page->post_name;
+			$pages[ $slug ] = array(
+				'title'           => $page->post_title,
+				'url'             => get_permalink( $page ),
+				'excerpt'         => $this->get_clean_excerpt( $page ),
+				'content_preview' => $this->get_content_preview( $page->post_content, 500 ),
+			);
 		}
 
 		// Also check homepage if it's a static page
@@ -207,13 +218,14 @@ class GetCited_Site_Scanner {
 	}
 
 	/**
-	 * Get all categories with post counts
+	 * Get top categories with post counts (limited for performance)
 	 */
 	private function get_categories() {
 		$categories = get_categories(
 			array(
 				'orderby'    => 'count',
 				'order'      => 'DESC',
+				'number'     => 20,
 				'hide_empty' => true,
 			)
 		);
@@ -296,8 +308,7 @@ class GetCited_Site_Scanner {
 
 		$result = array();
 		foreach ( $menu_items as $item ) {
-			// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- Menu item parent can be string "0"
-			if ( $item->menu_item_parent == 0 ) { // Top-level items only
+			if ( (int) $item->menu_item_parent === 0 ) { // Top-level items only
 				$result[] = array(
 					'title' => $item->title,
 					'url'   => $item->url,
@@ -314,21 +325,24 @@ class GetCited_Site_Scanner {
 	private function get_social_links() {
 		$social = array();
 
-		// Check theme mods (common location for social links)
-		$social_platforms = array(
-			'facebook',
-			'twitter',
-			'x',
-			'instagram',
-			'linkedin',
-			'youtube',
-			'tiktok',
-			'pinterest',
-			'github',
-			'threads',
-			'mastodon',
-			'bluesky',
+		// Social platform patterns for URL matching
+		$social_patterns = array(
+			'facebook'  => 'facebook.com',
+			'x'         => array( 'twitter.com', 'x.com' ),
+			'instagram' => 'instagram.com',
+			'linkedin'  => 'linkedin.com',
+			'youtube'   => array( 'youtube.com', 'youtu.be' ),
+			'tiktok'    => 'tiktok.com',
+			'pinterest' => 'pinterest.com',
+			'github'    => 'github.com',
+			'threads'   => 'threads.net',
+			'mastodon'  => 'mastodon',
+			'bluesky'   => 'bsky.app',
 		);
+
+		// Check theme mods (common location for social links)
+		$social_platforms = array_keys( $social_patterns );
+		$social_platforms[] = 'twitter'; // Also check twitter explicitly
 
 		foreach ( $social_platforms as $platform ) {
 			// Check various common theme mod names
@@ -346,6 +360,34 @@ class GetCited_Site_Scanner {
 				$social[ $key ] = $value;
 			}
 		}
+
+		// Check TagDiv theme options (Newspaper theme)
+		$td_options = get_option( 'td_options' );
+		if ( $td_options && is_array( $td_options ) ) {
+			$td_social_keys = array(
+				'tds_social_facebook'  => 'facebook',
+				'tds_social_twitter'   => 'x',
+				'tds_social_instagram' => 'instagram',
+				'tds_social_linkedin'  => 'linkedin',
+				'tds_social_youtube'   => 'youtube',
+				'tds_social_pinterest' => 'pinterest',
+				'tds_social_tiktok'    => 'tiktok',
+			);
+			foreach ( $td_social_keys as $td_key => $platform ) {
+				if ( ! empty( $td_options[ $td_key ] ) && empty( $social[ $platform ] ) ) {
+					$url = $td_options[ $td_key ];
+					if ( filter_var( $url, FILTER_VALIDATE_URL ) ) {
+						$social[ $platform ] = $url;
+					}
+				}
+			}
+		}
+
+		// Check widget areas for social links (many themes use footer widgets)
+		$social = $this->scan_widgets_for_social( $social, $social_patterns );
+
+		// Check menu items for social links
+		$social = $this->scan_menus_for_social( $social, $social_patterns );
 
 		// Check Yoast SEO social settings if available
 		if ( defined( 'WPSEO_VERSION' ) ) {
@@ -420,6 +462,108 @@ class GetCited_Site_Scanner {
 	}
 
 	/**
+	 * Scan menus for social media links
+	 *
+	 * @param array $social          Existing social links.
+	 * @param array $social_patterns Platform URL patterns.
+	 * @return array Updated social links.
+	 */
+	private function scan_menus_for_social( $social, $social_patterns ) {
+		// Get all menus
+		$menus = wp_get_nav_menus();
+		if ( ! $menus ) {
+			return $social;
+		}
+
+		foreach ( $menus as $menu ) {
+			$menu_items = wp_get_nav_menu_items( $menu->term_id );
+			if ( ! $menu_items ) {
+				continue;
+			}
+
+			foreach ( $menu_items as $item ) {
+				$url = $item->url;
+				if ( ! $url ) {
+					continue;
+				}
+
+				// Check URL against known social patterns
+				foreach ( $social_patterns as $platform => $patterns ) {
+					if ( isset( $social[ $platform ] ) ) {
+						continue; // Already found this platform
+					}
+
+					$patterns_array = is_array( $patterns ) ? $patterns : array( $patterns );
+					foreach ( $patterns_array as $pattern ) {
+						if ( stripos( $url, $pattern ) !== false ) {
+							$social[ $platform ] = $url;
+							break 2;
+						}
+					}
+				}
+			}
+		}
+
+		return $social;
+	}
+
+	/**
+	 * Scan widgets for social media links
+	 *
+	 * @param array $social          Existing social links.
+	 * @param array $social_patterns Platform URL patterns.
+	 * @return array Updated social links.
+	 */
+	private function scan_widgets_for_social( $social, $social_patterns ) {
+		// Get all active widgets
+		$sidebars = wp_get_sidebars_widgets();
+		if ( ! $sidebars ) {
+			return $social;
+		}
+
+		// Check text/custom HTML widgets for social URLs
+		$text_widgets    = get_option( 'widget_text' );
+		$html_widgets    = get_option( 'widget_custom_html' );
+		$widgets_to_scan = array();
+
+		if ( $text_widgets && is_array( $text_widgets ) ) {
+			$widgets_to_scan = array_merge( $widgets_to_scan, $text_widgets );
+		}
+		if ( $html_widgets && is_array( $html_widgets ) ) {
+			$widgets_to_scan = array_merge( $widgets_to_scan, $html_widgets );
+		}
+
+		foreach ( $widgets_to_scan as $widget ) {
+			if ( ! isset( $widget['content'] ) && ! isset( $widget['text'] ) ) {
+				continue;
+			}
+
+			$content = isset( $widget['content'] ) ? $widget['content'] : $widget['text'];
+
+			// Extract URLs from content
+			if ( preg_match_all( '/href=["\']([^"\']+)["\']/', $content, $matches ) ) {
+				foreach ( $matches[1] as $url ) {
+					foreach ( $social_patterns as $platform => $patterns ) {
+						if ( isset( $social[ $platform ] ) ) {
+							continue;
+						}
+
+						$patterns_array = is_array( $patterns ) ? $patterns : array( $patterns );
+						foreach ( $patterns_array as $pattern ) {
+							if ( stripos( $url, $pattern ) !== false ) {
+								$social[ $platform ] = $url;
+								break 2;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $social;
+	}
+
+	/**
 	 * Get contact information
 	 */
 	private function get_contact_info() {
@@ -449,10 +593,51 @@ class GetCited_Site_Scanner {
 			'objects'
 		);
 
+		// Common internal/admin post types to skip
+		$skip_types = array(
+			'product',
+			'shop_order',
+			'shop_coupon',
+			'elementor_library',
+			'elementor_font',
+			'elementor_icons',
+			'e-landing-page',
+			'tdb_templates',
+			'tdc-locker',
+			'tdc-email',
+			'tdc-cloud-templates',
+			'wpforms',
+			'wpforms-template',
+			'edd_download',
+			'mc4wp-form',
+			'wpcf7_contact_form',
+			'acf-field-group',
+			'custom_css',
+			'customize_changeset',
+			'oembed_cache',
+			'user_request',
+			'wp_block',
+			'wp_template',
+			'wp_template_part',
+			'wp_global_styles',
+			'wp_navigation',
+		);
+
 		$result = array();
 		foreach ( $custom_types as $type ) {
-			// Skip WooCommerce types (handled separately)
-			if ( in_array( $type->name, array( 'product', 'shop_order', 'shop_coupon' ), true ) ) {
+			// Skip known internal/WooCommerce types
+			if ( in_array( $type->name, $skip_types, true ) ) {
+				continue;
+			}
+
+			// Skip types that start with common internal prefixes
+			if ( preg_match( '/^(tdc_|tdb_|td_|elementor_|wpforms_|acf_|wpcf7_|mc4wp_|fl_|bb_|et_|divi_)/', $type->name ) ) {
+				continue;
+			}
+
+			// Skip if no archive support or no published posts
+			$archive_url = get_post_type_archive_link( $type->name );
+			if ( ! $archive_url ) {
 				continue;
 			}
 
@@ -461,7 +646,7 @@ class GetCited_Site_Scanner {
 				$result[ $type->name ] = array(
 					'label'       => $type->label,
 					'count'       => $count->publish,
-					'archive_url' => get_post_type_archive_link( $type->name ),
+					'archive_url' => $archive_url,
 				);
 			}
 		}
@@ -515,22 +700,48 @@ class GetCited_Site_Scanner {
 	 */
 	private function get_clean_excerpt( $post ) {
 		if ( ! empty( $post->post_excerpt ) ) {
-			return wp_strip_all_tags( $post->post_excerpt );
+			return wp_strip_all_tags( strip_shortcodes( $post->post_excerpt ) );
 		}
-		return wp_trim_words( wp_strip_all_tags( $post->post_content ), 30 );
+
+		// Strip shortcodes and page builder content
+		$content = strip_shortcodes( $post->post_content );
+		$content = preg_replace( '/\[[^\]]*\]/', '', $content );
+		$content = preg_replace( '/[A-Za-z0-9+\/=]{50,}/', '', $content );
+		$content = wp_strip_all_tags( $content );
+
+		return wp_trim_words( $content, 30 );
 	}
 
 	/**
-	 * Get content preview with HTML stripped
+	 * Get content preview with HTML and shortcodes stripped
 	 *
 	 * @param string $content The content to preview.
 	 * @param int    $length  Maximum length.
 	 * @return string Clean content preview.
 	 */
 	private function get_content_preview( $content, $length = 500 ) {
-		$text = wp_strip_all_tags( $content );
-		$text = preg_replace( '/\s+/', ' ', $text ); // Normalize whitespace
+		// Strip shortcodes first (including page builder shortcodes)
+		$text = strip_shortcodes( $content );
+
+		// Remove common page builder patterns that look like shortcodes but aren't caught
+		// Matches [anything_with_underscores ...] style shortcodes
+		$text = preg_replace( '/\[[^\]]*\]/', '', $text );
+
+		// Remove base64-encoded content (common in page builders)
+		$text = preg_replace( '/[A-Za-z0-9+\/=]{50,}/', '', $text );
+
+		// Strip HTML tags
+		$text = wp_strip_all_tags( $text );
+
+		// Normalize whitespace
+		$text = preg_replace( '/\s+/', ' ', $text );
 		$text = trim( $text );
+
+		// If result is too short or empty after cleaning, return empty
+		if ( mb_strlen( $text ) < 20 ) {
+			return '';
+		}
+
 		return mb_substr( $text, 0, $length );
 	}
 

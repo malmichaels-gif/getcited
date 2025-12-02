@@ -193,15 +193,26 @@ class GetCited_Robots {
      * @return bool
      */
     public function can_write_physical_file() {
+        global $wp_filesystem;
+
+        // Initialize WP_Filesystem if needed
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        if ( ! WP_Filesystem() ) {
+            return false;
+        }
+
         $file_path = ABSPATH . 'robots.txt';
 
         // If file exists, check if writable
-        if ( file_exists( $file_path ) ) {
-            return is_writable( $file_path );
+        if ( $wp_filesystem->exists( $file_path ) ) {
+            return $wp_filesystem->is_writable( $file_path );
         }
 
         // If file doesn't exist, check if directory is writable
-        return is_writable( ABSPATH );
+        return $wp_filesystem->is_writable( ABSPATH );
     }
 
     /**
@@ -300,22 +311,6 @@ class GetCited_Robots {
     public function remove_rules_from_physical_file() {
         $file_path = ABSPATH . 'robots.txt';
 
-        // Check if file exists
-        if ( ! file_exists( $file_path ) ) {
-            return array(
-                'success' => true,
-                'message' => __( 'No robots.txt file exists.', 'getcited' ),
-            );
-        }
-
-        // Check write permissions
-        if ( ! is_writable( $file_path ) ) {
-            return array(
-                'success' => false,
-                'message' => __( 'Cannot write to robots.txt. Check file permissions.', 'getcited' ),
-            );
-        }
-
         // Initialize WP_Filesystem
         global $wp_filesystem;
         if ( ! function_exists( 'WP_Filesystem' ) ) {
@@ -326,6 +321,22 @@ class GetCited_Robots {
             return array(
                 'success' => false,
                 'message' => __( 'Could not initialize filesystem.', 'getcited' ),
+            );
+        }
+
+        // Check if file exists
+        if ( ! $wp_filesystem->exists( $file_path ) ) {
+            return array(
+                'success' => true,
+                'message' => __( 'No robots.txt file exists.', 'getcited' ),
+            );
+        }
+
+        // Check write permissions using WP_Filesystem
+        if ( ! $wp_filesystem->is_writable( $file_path ) ) {
+            return array(
+                'success' => false,
+                'message' => __( 'Cannot write to robots.txt. Check file permissions.', 'getcited' ),
             );
         }
 

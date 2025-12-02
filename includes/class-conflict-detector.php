@@ -395,6 +395,34 @@ class GetCited_Conflict_Detector {
     }
 
     /**
+     * Check if robots.txt is writable using WP_Filesystem
+     *
+     * @return bool Whether the file or directory is writable
+     */
+    private function check_robots_txt_writable() {
+        global $wp_filesystem;
+
+        // Initialize WP_Filesystem if needed
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        if ( ! WP_Filesystem() ) {
+            return false;
+        }
+
+        $file_path = ABSPATH . 'robots.txt';
+
+        // If file exists, check if it's writable
+        if ( $wp_filesystem->exists( $file_path ) ) {
+            return $wp_filesystem->is_writable( $file_path );
+        }
+
+        // If file doesn't exist, check if directory is writable
+        return $wp_filesystem->is_writable( ABSPATH );
+    }
+
+    /**
      * Get summary of robots.txt handling situation
      *
      * @return array Summary with status and details
@@ -402,7 +430,7 @@ class GetCited_Conflict_Detector {
     public function get_robots_txt_summary() {
         $summary = array(
             'physical_file_exists' => file_exists( ABSPATH . 'robots.txt' ),
-            'physical_file_writable' => is_writable( ABSPATH . 'robots.txt' ) || ( ! file_exists( ABSPATH . 'robots.txt' ) && is_writable( ABSPATH ) ),
+            'physical_file_writable' => $this->check_robots_txt_writable(),
             'hooks_detected' => array(),
             'seo_plugin_with_editor' => null,
             'getcited_priority' => null,

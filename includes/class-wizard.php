@@ -41,6 +41,7 @@ class GetCited_Wizard {
         add_action( 'wp_ajax_getcited_wizard_save', array( $this, 'ajax_save_step' ) );
         add_action( 'wp_ajax_getcited_wizard_skip', array( $this, 'ajax_skip_wizard' ) );
         add_action( 'wp_ajax_getcited_wizard_complete', array( $this, 'ajax_complete_wizard' ) );
+        add_action( 'wp_ajax_getcited_wizard_scan', array( $this, 'ajax_run_scan' ) );
     }
 
     /**
@@ -309,9 +310,7 @@ class GetCited_Wizard {
             case 'site_type':
                 $site_type = sanitize_text_field( $data['site_type'] ?? 'blog' );
                 $this->apply_preset( $site_type );
-
-                // Run site scan after site type selection for the "wow" moment
-                $this->run_site_scan();
+                // Note: Site scan is now triggered asynchronously via getcited_wizard_scan
                 break;
 
             case 'organization':
@@ -344,17 +343,41 @@ class GetCited_Wizard {
     }
 
     /**
-     * Run site scan and store results for wizard completion
+     * AJAX: Run site scan asynchronously
      *
-     * Called after site type selection to generate personalized llms.txt content.
+     * Called from JavaScript after site type selection to generate personalized llms.txt content.
      * Results are stored in a transient for display in the completion step.
      */
-    private function run_site_scan() {
-        $scanner       = GetCited_Site_Scanner::instance();
-        $scan_data     = $scanner->scan_site();
+    public function ajax_run_scan() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        // Rate limiting: prevent rapid successive scans
+        $last_scan = get_transient( 'getcited_scan_throttle' );
+        if ( $last_scan ) {
+            // Return cached results if available
+            $cached = get_transient( 'getcited_wizard_scan' );
+            if ( $cached ) {
+                wp_send_json_success( array(
+                    'scan_data' => $cached['scan_data'],
+                    'llms_txt'  => $cached['llms_txt'],
+                    'cached'    => true,
+                ) );
+            }
+            wp_send_json_error( array( 'message' => 'Please wait before scanning again' ) );
+        }
+
+        // Set rate limit transient (60 seconds)
+        set_transient( 'getcited_scan_throttle', time(), 60 );
+
+        $scanner        = GetCited_Site_Scanner::instance();
+        $scan_data      = $scanner->scan_site();
         $generated_llms = $scanner->generate_llms_txt( $scan_data );
 
-        // Store for step 5 (complete) display
+        // Store for step 5 (complete) display - 24 hour TTL
         set_transient(
             'getcited_wizard_scan',
             array(
@@ -362,7 +385,7 @@ class GetCited_Wizard {
                 'llms_txt'   => $generated_llms,
                 'scanned_at' => current_time( 'mysql' ),
             ),
-            HOUR_IN_SECONDS
+            DAY_IN_SECONDS
         );
 
         // Pre-fill organization info from scan if not already set
@@ -373,6 +396,11 @@ class GetCited_Wizard {
             $org['name'] = $scan_data['site']['name'];
             $settings->set( 'organization', $org );
         }
+
+        wp_send_json_success( array(
+            'scan_data' => $scan_data,
+            'llms_txt'  => $generated_llms,
+        ) );
     }
 
     /**

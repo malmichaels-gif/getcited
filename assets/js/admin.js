@@ -173,10 +173,32 @@
             statusLabel.className = 'status-label ' + (checked ? 'allowed' : 'blocked');
         });
 
-        // Save all at once
+        // Preserve custom crawlers when doing bulk action
+        const customCrawlers = [];
+        const container = document.querySelector('.getcited-custom-list');
+        if (container) {
+            container.querySelectorAll('.getcited-custom-item').forEach(item => {
+                const userAgent = item.querySelector('input[name*="[user_agent]"]')?.value?.trim();
+                const name = item.querySelector('input[name*="[name]"]')?.value?.trim();
+                const action = item.querySelector('select')?.value || 'allow';
+
+                if (userAgent) {
+                    customCrawlers.push({
+                        user_agent: userAgent,
+                        name: name || '',
+                        action: action
+                    });
+                }
+            });
+        }
+
+        // Save all at once (including custom crawlers)
         ajax('getcited_save_settings', {
             section: 'crawlers',
-            data: { crawlers }
+            data: {
+                crawlers: crawlers,
+                custom_crawlers: customCrawlers
+            }
         }).then(() => {
             updateRobotsPreview();
         });
@@ -185,6 +207,7 @@
     function initCustomCrawlers() {
         const addBtn = document.querySelector('.getcited-add-custom');
         const container = document.querySelector('.getcited-custom-list');
+        const saveBtn = document.querySelector('.getcited-save-crawlers');
 
         if (!addBtn || !container) return;
 
@@ -209,6 +232,59 @@
                 e.target.closest('.getcited-custom-item').remove();
             }
         });
+
+        // Save custom crawlers
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                const statusEl = saveBtn.nextElementSibling;
+                saveBtn.disabled = true;
+                saveBtn.textContent = getcitedAdmin.strings?.saving || 'Saving...';
+
+                // Collect all crawler toggle states
+                const crawlers = {};
+                document.querySelectorAll('.getcited-crawler-item .getcited-toggle input').forEach(toggle => {
+                    crawlers[toggle.dataset.crawler] = toggle.checked ? 'allow' : 'block';
+                });
+
+                // Collect custom crawlers
+                const customCrawlers = [];
+                container.querySelectorAll('.getcited-custom-item').forEach(item => {
+                    const userAgent = item.querySelector('input[name*="[user_agent]"]')?.value?.trim();
+                    const name = item.querySelector('input[name*="[name]"]')?.value?.trim();
+                    const action = item.querySelector('select')?.value || 'allow';
+
+                    if (userAgent) {
+                        customCrawlers.push({
+                            user_agent: userAgent,
+                            name: name || '',
+                            action: action
+                        });
+                    }
+                });
+
+                ajax('getcited_save_settings', {
+                    section: 'crawlers',
+                    data: {
+                        crawlers: crawlers,
+                        custom_crawlers: customCrawlers
+                    }
+                }).then(response => {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = getcitedAdmin.strings?.save_changes || 'Save Changes';
+
+                    if (response.success) {
+                        showStatus(statusEl, getcitedAdmin.strings?.saved || 'Saved!', 'success');
+                        updateRobotsPreview();
+                    } else {
+                        showStatus(statusEl, getcitedAdmin.strings?.error || 'Error saving', 'error');
+                    }
+                }).catch(() => {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = getcitedAdmin.strings?.save_changes || 'Save Changes';
+                    showStatus(statusEl, getcitedAdmin.strings?.error || 'Error saving', 'error');
+                });
+            });
+        }
     }
 
     function updateRobotsPreview() {
@@ -653,7 +729,7 @@
             });
         }
 
-        // Expand/collapse health details
+        // Expand/collapse health details (details now nested inside .getcited-health-item)
         healthSection.querySelectorAll('.getcited-health-expand').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -665,30 +741,10 @@
                     return;
                 }
 
-                const checkKey = item.dataset.check;
-                if (!checkKey) {
-                    console.warn('GetCited: No data-check attribute on health item');
-                    return;
-                }
-
-                // Try to find details by data attribute first
-                let details = healthSection.querySelector('.getcited-health-details[data-check="' + checkKey + '"]');
-
-                // Fallback: look for details as child element
+                // Details is now nested inside the health item
+                const details = item.querySelector('.getcited-health-details');
                 if (!details) {
-                    details = item.querySelector('.getcited-health-details');
-                }
-
-                // Fallback: look for next sibling
-                if (!details) {
-                    details = item.nextElementSibling;
-                    if (details && !details.classList.contains('getcited-health-details')) {
-                        details = null;
-                    }
-                }
-
-                if (!details) {
-                    console.warn('GetCited: Could not find details element for check:', checkKey);
+                    console.warn('GetCited: Could not find details element');
                     return;
                 }
 
@@ -699,10 +755,12 @@
                     details.style.display = 'block';
                     this.classList.add('expanded');
                     this.setAttribute('aria-expanded', 'true');
+                    item.classList.add('expanded');
                 } else {
                     details.style.display = 'none';
                     this.classList.remove('expanded');
                     this.setAttribute('aria-expanded', 'false');
+                    item.classList.remove('expanded');
                 }
 
                 // Rotate arrow icon
@@ -944,28 +1002,46 @@
     // ==========================================================================
 
     function initWizard() {
-        const wizard = document.querySelector('.getcited-wizard');
-        if (!wizard) return;
+        var wizard = document.querySelector('.getcited-wizard');
+        if (!wizard) {
+            return;
+        }
 
-        const steps = ['welcome', 'site_type', 'organization', 'crawlers', 'complete'];
-        let currentStep = 0;
+        var steps = ['welcome', 'site_type', 'organization', 'crawlers', 'complete'];
+        var currentStep = 0;
+
+        // Get all step elements upfront
+        var stepElements = {};
+        steps.forEach(function(stepName) {
+            var el = wizard.querySelector('.getcited-wizard-step[data-step="' + stepName + '"]');
+            if (el) {
+                stepElements[stepName] = el;
+            }
+        });
 
         function showStep(index) {
-            // Hide all steps
-            wizard.querySelectorAll('.getcited-wizard-step').forEach(step => {
-                step.style.display = 'none';
+            // Validate index
+            if (index < 0 || index >= steps.length) {
+                return;
+            }
+
+            var stepName = steps[index];
+            var stepEl = stepElements[stepName];
+
+            // Hide all steps first
+            Object.keys(stepElements).forEach(function(key) {
+                stepElements[key].style.display = 'none';
             });
 
             // Show current step
-            const stepEl = wizard.querySelector(`[data-step="${steps[index]}"]`);
             if (stepEl) {
                 stepEl.style.display = 'block';
-            } else {
-                console.warn('GetCited: Wizard step element not found:', steps[index]);
+                stepEl.style.visibility = 'visible';
+                stepEl.style.opacity = '1';
             }
 
-            // Update progress
-            wizard.querySelectorAll('.progress-step').forEach((step, i) => {
+            // Update progress bar
+            wizard.querySelectorAll('.progress-step').forEach(function(step, i) {
                 step.classList.remove('active', 'completed');
                 if (i < index) {
                     step.classList.add('completed');
@@ -977,13 +1053,35 @@
             currentStep = index;
         }
 
-        // Next buttons
-        wizard.querySelectorAll('.getcited-wizard-next').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const currentStepName = steps[currentStep];
-                
-                // Save current step data
-                saveWizardStep(currentStepName).then(() => {
+        // Next buttons - handle click on each button
+        wizard.querySelectorAll('.getcited-wizard-next').forEach(function(nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                var stepName = steps[currentStep];
+                var clickedBtn = this;
+
+                // Disable button to prevent double-clicks
+                clickedBtn.disabled = true;
+
+                // For site_type step, run scan with progress UI
+                if (stepName === 'site_type') {
+                    saveWizardStepWithScan(stepName, wizard, function() {
+                        clickedBtn.disabled = false;
+                        if (currentStep < steps.length - 1) {
+                            showStep(currentStep + 1);
+                        }
+                    });
+                    return;
+                }
+
+                // For other steps, just save and continue
+                saveWizardStep(stepName).then(function() {
+                    clickedBtn.disabled = false;
+                    if (currentStep < steps.length - 1) {
+                        showStep(currentStep + 1);
+                    }
+                }).catch(function() {
+                    clickedBtn.disabled = false;
+                    // Continue anyway to prevent getting stuck
                     if (currentStep < steps.length - 1) {
                         showStep(currentStep + 1);
                     }
@@ -992,30 +1090,30 @@
         });
 
         // Back buttons
-        wizard.querySelectorAll('.getcited-wizard-back').forEach(btn => {
-            btn.addEventListener('click', () => {
+        wizard.querySelectorAll('.getcited-wizard-back').forEach(function(backBtn) {
+            backBtn.addEventListener('click', function() {
                 if (currentStep > 0) {
                     showStep(currentStep - 1);
                 }
             });
         });
 
-        // Skip button
-        const skipBtn = wizard.querySelector('.getcited-wizard-skip');
+        // Skip wizard button
+        var skipBtn = wizard.querySelector('.getcited-wizard-skip');
         if (skipBtn) {
-            skipBtn.addEventListener('click', (e) => {
+            skipBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                ajax('getcited_wizard_skip').then(() => {
+                ajax('getcited_wizard_skip').then(function() {
                     window.location.href = window.location.href.replace('&wizard=1', '');
                 });
             });
         }
 
         // Complete button
-        const completeBtn = wizard.querySelector('.getcited-wizard-complete');
+        var completeBtn = wizard.querySelector('.getcited-wizard-complete');
         if (completeBtn) {
-            completeBtn.addEventListener('click', () => {
-                ajax('getcited_wizard_complete').then(response => {
+            completeBtn.addEventListener('click', function() {
+                ajax('getcited_wizard_complete').then(function(response) {
                     if (response.success && response.data.redirect) {
                         window.location.href = response.data.redirect;
                     }
@@ -1023,58 +1121,246 @@
             });
         }
 
-        // Site type selection
-        wizard.querySelectorAll('.getcited-site-type input').forEach(input => {
+        // Site type selection - visual update
+        wizard.querySelectorAll('.getcited-site-type input').forEach(function(input) {
             input.addEventListener('change', function() {
-                // Update visual selection
-                wizard.querySelectorAll('.site-type-card').forEach(card => {
-                    card.closest('.getcited-site-type').querySelector('input').checked 
-                        ? card.classList.add('selected') 
-                        : card.classList.remove('selected');
+                wizard.querySelectorAll('.site-type-card').forEach(function(card) {
+                    card.classList.remove('selected');
                 });
+                if (this.checked) {
+                    this.closest('.getcited-site-type').querySelector('.site-type-card').classList.add('selected');
+                }
             });
         });
 
-        // Crawler choice selection
-        wizard.querySelectorAll('.getcited-radio-card input').forEach(input => {
+        // Crawler choice selection - visual update
+        wizard.querySelectorAll('.getcited-radio-card input').forEach(function(input) {
             input.addEventListener('change', function() {
-                wizard.querySelectorAll('.getcited-radio-card').forEach(card => {
+                wizard.querySelectorAll('.getcited-radio-card').forEach(function(card) {
                     card.classList.remove('selected');
                 });
                 this.closest('.getcited-radio-card').classList.add('selected');
             });
         });
 
-        // Initialize first step - ensure it's visible on page load
+        // Initialize first step - show it immediately
         showStep(0);
     }
 
+    /**
+     * Save wizard step data (simple version for most steps)
+     */
     function saveWizardStep(stepName) {
-        const data = {};
+        var data = {};
 
         switch (stepName) {
-            case 'site_type':
-                const siteType = document.querySelector('input[name="site_type"]:checked');
-                if (siteType) {
-                    data.site_type = siteType.value;
-                }
-                break;
-
             case 'organization':
-                data.name = document.getElementById('wizard_org_name')?.value || '';
-                data.logo_url = document.getElementById('wizard_org_logo')?.value || '';
+                var nameEl = document.getElementById('wizard_org_name');
+                var logoEl = document.getElementById('wizard_org_logo');
+                data.name = nameEl ? nameEl.value : '';
+                data.logo_url = logoEl ? logoEl.value : '';
                 break;
 
             case 'crawlers':
-                const choice = document.querySelector('input[name="crawler_choice"]:checked');
-                data.allow_all = choice?.value === 'allow_all' ? 'true' : 'false';
+                var choice = document.querySelector('input[name="crawler_choice"]:checked');
+                data.allow_all = (choice && choice.value === 'allow_all') ? 'true' : 'false';
                 break;
 
             default:
+                // welcome step - no data to save
                 return Promise.resolve();
         }
 
-        return ajax('getcited_wizard_save', { step: stepName, data });
+        return ajax('getcited_wizard_save', { step: stepName, data: data });
+    }
+
+    /**
+     * Save site_type step and run scan with progress UI
+     */
+    function saveWizardStepWithScan(stepName, wizard, onComplete) {
+        var siteTypeInput = document.querySelector('input[name="site_type"]:checked');
+        var data = {
+            site_type: siteTypeInput ? siteTypeInput.value : 'blog'
+        };
+
+        // Get UI elements
+        var progressContainer = wizard.querySelector('.getcited-scan-progress');
+        var progressFill = wizard.querySelector('.scan-progress-fill');
+        var statusText = wizard.querySelector('.scan-status-text');
+        var skipLink = wizard.querySelector('.getcited-skip-scan');
+        var stepEl = wizard.querySelector('[data-step="site_type"]');
+        var nextBtn = stepEl ? stepEl.querySelector('.getcited-wizard-next') : null;
+        var backBtn = stepEl ? stepEl.querySelector('.getcited-wizard-back') : null;
+
+        // First save the step
+        ajax('getcited_wizard_save', { step: stepName, data: data })
+            .then(function() {
+                // Show progress UI
+                if (progressContainer) progressContainer.style.display = 'block';
+                if (skipLink) skipLink.style.display = 'inline';
+                if (nextBtn) nextBtn.disabled = true;
+                if (backBtn) backBtn.disabled = true;
+
+                // Status text rotation
+                var messages = ['Finding your pages...', 'Analyzing content...', 'Building your llms.txt...'];
+                var msgIndex = 0;
+                var statusInterval = setInterval(function() {
+                    msgIndex = (msgIndex + 1) % messages.length;
+                    if (statusText) statusText.textContent = messages[msgIndex];
+                }, 2000);
+
+                // Progress bar animation
+                var progress = 0;
+                var progressInterval = setInterval(function() {
+                    progress += 2;
+                    if (progress > 90) progress = 90;
+                    if (progressFill) progressFill.style.width = progress + '%';
+                }, 200);
+
+                // Timeout after 30 seconds
+                var timeoutId = setTimeout(function() {
+                    if (statusText) statusText.textContent = 'This is taking longer than expected...';
+                    if (skipLink) skipLink.classList.add('prominent');
+                }, 30000);
+
+                // Cleanup function
+                function cleanup() {
+                    clearInterval(statusInterval);
+                    clearInterval(progressInterval);
+                    clearTimeout(timeoutId);
+                    if (progressContainer) progressContainer.style.display = 'none';
+                    if (skipLink) skipLink.style.display = 'none';
+                    if (nextBtn) nextBtn.disabled = false;
+                    if (backBtn) backBtn.disabled = false;
+                }
+
+                // Skip scan handler
+                function handleSkip(e) {
+                    e.preventDefault();
+                    cleanup();
+                    if (skipLink) skipLink.removeEventListener('click', handleSkip);
+                    onComplete();
+                }
+                if (skipLink) skipLink.addEventListener('click', handleSkip);
+
+                // Run the scan
+                ajax('getcited_wizard_scan')
+                    .then(function(response) {
+                        cleanup();
+                        if (progressFill) progressFill.style.width = '100%';
+                        if (skipLink) skipLink.removeEventListener('click', handleSkip);
+
+                        // Store scan data and populate Step 5
+                        if (response.success && response.data) {
+                            populateWizardStep5(wizard, response.data);
+                        }
+
+                        onComplete();
+                    })
+                    .catch(function() {
+                        cleanup();
+                        if (skipLink) skipLink.removeEventListener('click', handleSkip);
+                        onComplete(); // Continue even on error
+                    });
+            })
+            .catch(function() {
+                // If save fails, still continue
+                onComplete();
+            });
+    }
+
+    /**
+     * Populate wizard Step 5 with scan results
+     */
+    function populateWizardStep5(wizard, scanData) {
+        var step5 = wizard.querySelector('[data-step="complete"]');
+        if (!step5) return;
+
+        var llmsTxt = scanData.llms_txt || '';
+        var data = scanData.scan_data || {};
+
+        // Find or create the preview container
+        var previewContainer = step5.querySelector('.getcited-wizard-preview');
+        var summaryContainer = step5.querySelector('.getcited-setup-summary');
+        var statsContainer = step5.querySelector('.getcited-scan-stats');
+        var subtitle = step5.querySelector('.wizard-subtitle');
+
+        // If we have llms.txt content, show the preview version
+        if (llmsTxt) {
+            // Update subtitle
+            if (subtitle) {
+                subtitle.textContent = "We scanned your site and created your llms.txt. Here's what AI systems will see:";
+            }
+
+            // Hide the generic summary if it exists
+            if (summaryContainer) {
+                summaryContainer.style.display = 'none';
+            }
+
+            // Create or update preview
+            if (!previewContainer) {
+                previewContainer = document.createElement('div');
+                previewContainer.className = 'getcited-wizard-preview';
+                previewContainer.innerHTML = '<div class="preview-header"><span class="dashicons dashicons-media-text"></span><span>Your llms.txt</span></div><pre class="preview-content"></pre>';
+
+                var wizardContent = step5.querySelector('.wizard-content');
+                if (wizardContent && subtitle) {
+                    subtitle.insertAdjacentElement('afterend', previewContainer);
+                }
+            }
+            previewContainer.style.display = 'block';
+
+            var preContent = previewContainer.querySelector('.preview-content');
+            if (preContent) {
+                preContent.textContent = llmsTxt;
+            }
+
+            // Create or update stats
+            if (!statsContainer) {
+                statsContainer = document.createElement('div');
+                statsContainer.className = 'getcited-scan-stats';
+                previewContainer.insertAdjacentElement('afterend', statsContainer);
+            }
+            statsContainer.style.display = 'flex';
+
+            var pages = (data.pages || []).length;
+            var categories = (data.categories || []).length;
+            var posts = (data.posts || []).length;
+            var menu = (data.menu || []).length;
+            var social = Object.keys(data.social || {}).length;
+
+            statsContainer.innerHTML =
+                '<div class="stat-item"><span class="stat-number">' + pages + '</span><span class="stat-label">Pages</span></div>' +
+                '<div class="stat-item"><span class="stat-number">' + categories + '</span><span class="stat-label">Categories</span></div>' +
+                '<div class="stat-item"><span class="stat-number">' + posts + '</span><span class="stat-label">Posts</span></div>' +
+                '<div class="stat-item"><span class="stat-number">' + menu + '</span><span class="stat-label">Menu Items</span></div>' +
+                '<div class="stat-item"><span class="stat-number">' + social + '</span><span class="stat-label">Social Links</span></div>';
+
+            // Add description if not present
+            var description = step5.querySelector('.wizard-content > p.description');
+            if (!description) {
+                description = document.createElement('p');
+                description.className = 'description';
+                description.style.textAlign = 'center';
+                description.textContent = 'You can edit this anytime from the llms.txt Editor page.';
+                statsContainer.insertAdjacentElement('afterend', description);
+            }
+
+            // Show the secondary action link
+            var secondaryAction = step5.querySelector('.wizard-secondary-action');
+            if (!secondaryAction) {
+                var wizardActions = step5.querySelector('.wizard-actions');
+                if (wizardActions) {
+                    secondaryAction = document.createElement('p');
+                    secondaryAction.className = 'wizard-secondary-action';
+                    secondaryAction.innerHTML = '<a href="' + (getcitedAdmin.adminUrl || '/wp-admin/') + 'admin.php?page=getcited-llms-txt">or edit your llms.txt first</a>';
+                    wizardActions.appendChild(secondaryAction);
+                }
+            }
+            if (secondaryAction) {
+                secondaryAction.style.display = 'block';
+            }
+        }
     }
 
     // ==========================================================================

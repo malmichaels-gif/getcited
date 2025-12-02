@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,21 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.1.1 =
+* Fixed: Setup wizard now works correctly when launched from Settings page (was hanging on Step 2)
+* Fixed: Health Check expand buttons now work properly (restructured DOM for reliable toggling)
+* Fixed: Custom Crawlers now save properly with new "Save Changes" button
+* Fixed: Bulk actions (Allow All/Block All) now preserve custom crawler settings
+* Performance: Site scan now runs asynchronously with progress bar UI
+* Performance: Optimized key pages query from 17 individual queries to single batch query
+* Performance: Added 20-item limit to category queries for large sites
+* UX: Added scan progress bar with status text ("Finding your pages...", "Analyzing content...", "Building your llms.txt...")
+* UX: Added "Skip scan" option for users who prefer manual configuration
+* UX: Scan timeout (30 seconds) shows prominent skip option
+* UX: Extended wizard scan cache from 1 hour to 24 hours
+* UX: Added 60-second rate limiting on scan endpoint to prevent abuse
+* Code: Strict equality comparison for menu item parent check
 
 = 1.1.0 =
 * New: Intelligent Site Scanner for llms.txt generation

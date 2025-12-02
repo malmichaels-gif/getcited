@@ -70,7 +70,7 @@ if ( empty( $org['name'] ) ) {
                 <p class="wizard-subtitle">
                     <?php esc_html_e( 'This helps us configure optimal llms.txt and schema settings.', 'getcited' ); ?>
                 </p>
-                
+
                 <div class="getcited-site-types">
                     <?php foreach ( $site_types as $key => $type ) : ?>
                         <label class="getcited-site-type">
@@ -83,6 +83,14 @@ if ( empty( $org['name'] ) ) {
                         </label>
                     <?php endforeach; ?>
                 </div>
+
+                <!-- Scan Progress (hidden by default, shown during async scan) -->
+                <div class="getcited-scan-progress" style="display: none;">
+                    <div class="scan-progress-bar">
+                        <div class="scan-progress-fill"></div>
+                    </div>
+                    <p class="scan-status-text"><?php esc_html_e( 'Scanning your site...', 'getcited' ); ?></p>
+                </div>
             </div>
             <div class="wizard-actions">
                 <button type="button" class="button getcited-wizard-back">
@@ -91,6 +99,9 @@ if ( empty( $org['name'] ) ) {
                 <button type="button" class="button button-primary getcited-wizard-next">
                     <?php esc_html_e( 'Continue', 'getcited' ); ?> →
                 </button>
+                <a href="#" class="getcited-skip-scan" style="display: none;">
+                    <?php esc_html_e( 'Skip scan', 'getcited' ); ?>
+                </a>
             </div>
         </div>
 
@@ -245,15 +256,17 @@ if ( empty( $org['name'] ) ) {
                     </div>
                 <?php endif; ?>
             </div>
-            <div class="wizard-actions">
-                <?php if ( $has_scan ) : ?>
-                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>" class="button">
-                        <?php esc_html_e( 'Edit llms.txt', 'getcited' ); ?>
-                    </a>
-                <?php endif; ?>
+            <div class="wizard-actions wizard-actions-stacked">
                 <button type="button" class="button button-primary button-hero getcited-wizard-complete">
                     <?php esc_html_e( 'Go to Dashboard', 'getcited' ); ?> →
                 </button>
+                <?php if ( $has_scan ) : ?>
+                    <p class="wizard-secondary-action">
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>">
+                            <?php esc_html_e( 'or edit your llms.txt first', 'getcited' ); ?>
+                        </a>
+                    </p>
+                <?php endif; ?>
             </div>
         </div>
 

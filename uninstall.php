@@ -94,13 +94,23 @@ function getcited_cleanup_robots_txt() {
         return;
     }
 
-    // Check if writable
-    if ( ! is_writable( $file_path ) ) {
+    // Initialize WP_Filesystem
+    global $wp_filesystem;
+    if ( ! function_exists( 'WP_Filesystem' ) ) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
+
+    if ( ! WP_Filesystem() ) {
+        return;
+    }
+
+    // Check if writable using WP_Filesystem
+    if ( ! $wp_filesystem->is_writable( $file_path ) ) {
         return;
     }
 
     // Read current content
-    $content = file_get_contents( $file_path );
+    $content = $wp_filesystem->get_contents( $file_path );
     if ( $content === false ) {
         return;
     }
@@ -118,9 +128,8 @@ function getcited_cleanup_robots_txt() {
     $new_content = preg_replace( $pattern, "\n", $content );
     $new_content = trim( $new_content ) . "\n";
 
-    // Write file
-    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Uninstall runs outside normal WP context
-    file_put_contents( $file_path, $new_content );
+    // Write file using WP_Filesystem
+    $wp_filesystem->put_contents( $file_path, $new_content, FS_CHMOD_FILE );
 }
 
 // Run uninstall

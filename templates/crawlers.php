@@ -133,6 +133,13 @@ $list_updated = $crawler_list->get_last_updated();
             <button type="button" class="button getcited-add-custom">
                 <?php esc_html_e( '+ Add Custom Crawler', 'getcited' ); ?>
             </button>
+
+            <div class="getcited-custom-actions">
+                <button type="button" class="button button-primary getcited-save-crawlers">
+                    <?php esc_html_e( 'Save Changes', 'getcited' ); ?>
+                </button>
+                <span class="getcited-save-status"></span>
+            </div>
         </div>
 
         <!-- robots.txt Preview -->
