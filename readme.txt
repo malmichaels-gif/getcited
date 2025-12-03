@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.1.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,14 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.3.0 =
+* Added: Logo URL now supports WordPress Media Library picker (Upload button works)
+* Added: Social profiles auto-populate from Setup Wizard site scan
+* Added: Load More Posts button in Citability (free tier: up to 10 posts)
+* Added: Top 3 recommendations now display in post editor meta box after analysis
+* Improved: FAQ scoring clarifies it checks content, not schema settings
+* Improved: Large post counts now formatted with locale separators (e.g., 153,153)
 
 = 1.1.1 =
 * Fixed: Setup wizard now works correctly when launched from Settings page (was hanging on Step 2)

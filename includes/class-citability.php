@@ -101,6 +101,9 @@ class GetCited_Citability {
         // AJAX handler for analyzing posts
         add_action( 'wp_ajax_getcited_analyze_post', array( $this, 'ajax_analyze_post' ) );
 
+        // AJAX handler for loading more posts
+        add_action( 'wp_ajax_getcited_load_more_posts', array( $this, 'ajax_load_more_posts' ) );
+
         // Register post meta
         add_action( 'init', array( $this, 'register_meta' ) );
     }
@@ -256,6 +259,77 @@ class GetCited_Citability {
         do_action( 'getcited_citability_scored', $post_id, $result['score'] );
 
         wp_send_json_success( $result );
+    }
+
+    /**
+     * AJAX handler for loading more posts
+     */
+    public function ajax_load_more_posts() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $offset   = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
+        $limit    = 5;
+        $max_free = 10; // Free tier shows max 10 posts
+
+        // Enforce free tier limit
+        if ( $offset >= $max_free ) {
+            wp_send_json_error( array( 'message' => 'Free tier limit reached' ) );
+        }
+
+        $posts = get_posts( array(
+            'post_type'      => 'post',
+            'post_status'    => 'publish',
+            'posts_per_page' => min( $limit, $max_free - $offset ),
+            'offset'         => $offset,
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+        ) );
+
+        if ( empty( $posts ) ) {
+            wp_send_json_success( array(
+                'html'     => '',
+                'has_more' => false,
+            ) );
+        }
+
+        $html = '';
+        foreach ( $posts as $post ) {
+            $score      = get_post_meta( $post->ID, '_getcited_citability_score', true );
+            $last_audit = get_post_meta( $post->ID, '_getcited_last_audit', true );
+
+            $score_class = '';
+            if ( $score ) {
+                $score_class = $score >= 70 ? 'good' : ( $score >= 40 ? 'ok' : 'low' );
+            }
+
+            $html .= '<tr data-post-id="' . esc_attr( $post->ID ) . '">';
+            $html .= '<td><a href="' . esc_url( get_edit_post_link( $post->ID ) ) . '">' . esc_html( $post->post_title ) . '</a></td>';
+            $html .= '<td class="score-cell">';
+            if ( $score ) {
+                $html .= '<span class="getcited-score-badge ' . esc_attr( $score_class ) . '">' . esc_html( $score ) . '/100</span>';
+            } else {
+                $html .= '<span class="getcited-score-badge none">—</span>';
+            }
+            $html .= '</td>';
+            $html .= '<td>';
+            if ( $last_audit ) {
+                $html .= esc_html( human_time_diff( strtotime( $last_audit ) ) ) . ' ' . esc_html__( 'ago', 'getcited' );
+            } else {
+                $html .= esc_html__( 'Never', 'getcited' );
+            }
+            $html .= '</td>';
+            $html .= '<td><button type="button" class="button getcited-analyze-post" data-post-id="' . esc_attr( $post->ID ) . '">' . esc_html__( 'Analyze', 'getcited' ) . '</button></td>';
+            $html .= '</tr>';
+        }
+
+        wp_send_json_success( array(
+            'html'     => $html,
+            'has_more' => ( $offset + count( $posts ) ) < $max_free && count( $posts ) === $limit,
+        ) );
     }
 
     /**
@@ -513,7 +587,7 @@ class GetCited_Citability {
                 'score' => 0,
                 'passed' => false,
                 'message' => __( 'No FAQ section found', 'getcited' ),
-                'recommendation' => __( 'Add an FAQ section — AI systems heavily parse Q&A content for citations', 'getcited' ),
+                'recommendation' => __( 'Add an FAQ section to your content — AI systems heavily cite Q&A format. This scoring is based on content, not the FAQ schema setting.', 'getcited' ),
             );
         }
     }

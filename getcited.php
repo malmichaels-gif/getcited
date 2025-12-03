@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.1.3
+ * Version: 1.3.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Malcolm Michaels
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.1.3' );
+define( 'GETCITED_VERSION', '1.3.0' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -280,6 +280,11 @@ final class GetCited {
             return;
         }
 
+        // Enqueue WordPress media library for logo upload
+        if ( $is_getcited_page ) {
+            wp_enqueue_media();
+        }
+
         wp_enqueue_style(
             'getcited-admin',
             GETCITED_PLUGIN_URL . 'assets/css/admin.css',
@@ -328,6 +333,11 @@ final class GetCited {
                 'categories' => __( 'categories', 'getcited' ),
                 'menu_items' => __( 'menu items', 'getcited' ),
                 'social_links' => __( 'social links', 'getcited' ),
+                'select_logo' => __( 'Select Logo', 'getcited' ),
+                'use_logo' => __( 'Use as Logo', 'getcited' ),
+                'load_more' => __( 'Load More Posts', 'getcited' ),
+                'loading' => __( 'Loading...', 'getcited' ),
+                'no_more_posts' => __( 'No more posts to show', 'getcited' ),
             ),
         ) );
     }

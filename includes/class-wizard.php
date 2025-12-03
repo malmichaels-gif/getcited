@@ -402,8 +402,20 @@ class GetCited_Wizard {
         $settings = GetCited_Settings::instance();
         $org      = $settings->get( 'organization' );
 
+        $org_updated = false;
+
         if ( empty( $org['name'] ) && ! empty( $scan_data['site']['name'] ) ) {
             $org['name'] = $scan_data['site']['name'];
+            $org_updated = true;
+        }
+
+        // Auto-populate social URLs from scan if not already set
+        if ( empty( $org['social_urls'] ) && ! empty( $scan_data['social'] ) ) {
+            $org['social_urls'] = array_values( array_filter( $scan_data['social'] ) );
+            $org_updated        = true;
+        }
+
+        if ( $org_updated ) {
             $settings->set( 'organization', $org );
         }
 

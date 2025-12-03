@@ -31,6 +31,8 @@
         initCopyButtons();
         initCollapsibleSections();
         initSourceToggle();
+        initMediaUpload();
+        initLoadMorePosts();
     }
 
     // ==========================================================================
@@ -763,12 +765,24 @@
                     if (metaBox) {
                         const scoreDisplay = metaBox.querySelector('.getcited-score-display');
                         if (scoreDisplay) {
-                            scoreDisplay.innerHTML = `
+                            let metaHtml = `
                                 <div class="getcited-score-number">
                                     <span class="score">${data.score}</span>
                                     <span class="max">/100</span>
                                 </div>
                             `;
+
+                            // Add top 3 recommendations to meta box
+                            if (data.recommendations && data.recommendations.length) {
+                                metaHtml += '<div class="getcited-meta-recommendations">';
+                                metaHtml += '<strong>Top Recommendations:</strong><ol>';
+                                data.recommendations.slice(0, 3).forEach(rec => {
+                                    metaHtml += `<li>${rec}</li>`;
+                                });
+                                metaHtml += '</ol></div>';
+                            }
+
+                            scoreDisplay.innerHTML = metaHtml;
                         }
                     }
 
@@ -1748,6 +1762,109 @@
                         emailInput.reportValidity();
                         setTimeout(() => emailInput.setCustomValidity(''), 3000);
                     });
+            });
+        });
+    }
+
+    // ==========================================================================
+    // Media Upload (Logo Picker)
+    // ==========================================================================
+
+    function initMediaUpload() {
+        document.querySelectorAll('.getcited-upload-logo').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Find the associated input field
+                const wrapper = this.closest('.input-with-button');
+                const input = wrapper?.querySelector('input[type="url"]')
+                           || document.getElementById('org_logo')
+                           || document.getElementById('wizard_org_logo');
+
+                if (!input) return;
+
+                // Check if wp.media is available
+                if (typeof wp === 'undefined' || typeof wp.media !== 'function') {
+                    console.warn('WordPress media library not available');
+                    return;
+                }
+
+                const frame = wp.media({
+                    title: getcitedAdmin.strings?.select_logo || 'Select Logo',
+                    button: { text: getcitedAdmin.strings?.use_logo || 'Use as Logo' },
+                    multiple: false,
+                    library: { type: 'image' }
+                });
+
+                frame.on('select', function() {
+                    const attachment = frame.state().get('selection').first().toJSON();
+                    input.value = attachment.url;
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+
+                frame.open();
+            });
+        });
+    }
+
+    // ==========================================================================
+    // Load More Posts (Citability)
+    // ==========================================================================
+
+    function initLoadMorePosts() {
+        const loadMoreBtn = document.querySelector('.getcited-load-more-posts');
+        if (!loadMoreBtn) return;
+
+        loadMoreBtn.addEventListener('click', function() {
+            const offset = parseInt(this.dataset.offset, 10) || 5;
+            const originalText = this.textContent;
+
+            this.disabled = true;
+            this.textContent = getcitedAdmin.strings?.loading || 'Loading...';
+
+            ajax('getcited_load_more_posts', { offset })
+                .then(response => {
+                    if (response.success && response.data.html) {
+                        // Append new rows to the table
+                        const tbody = document.querySelector('.getcited-posts-table tbody');
+                        if (tbody) {
+                            tbody.insertAdjacentHTML('beforeend', response.data.html);
+                            // Re-attach analyze handlers to new buttons
+                            attachAnalyzeHandlers();
+                        }
+
+                        // Update offset or hide button if no more posts
+                        if (response.data.has_more) {
+                            this.dataset.offset = offset + 5;
+                            this.disabled = false;
+                            this.textContent = originalText;
+                        } else {
+                            this.textContent = getcitedAdmin.strings?.no_more_posts || 'No more posts';
+                            this.disabled = true;
+                        }
+                    } else {
+                        this.disabled = false;
+                        this.textContent = originalText;
+                    }
+                })
+                .catch(() => {
+                    this.disabled = false;
+                    this.textContent = originalText;
+                });
+        });
+    }
+
+    /**
+     * Attach analyze handlers to buttons (used after loading more posts)
+     */
+    function attachAnalyzeHandlers() {
+        document.querySelectorAll('.getcited-analyze-post').forEach(btn => {
+            if (btn.dataset.handlerAttached) return;
+            btn.dataset.handlerAttached = 'true';
+
+            btn.addEventListener('click', function() {
+                const postId = this.dataset.postId;
+                analyzePost(postId, this);
             });
         });
     }

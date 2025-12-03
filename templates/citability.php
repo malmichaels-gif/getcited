@@ -71,7 +71,7 @@ $average_score = $citability->get_average_score();
                 ?>
                 <div class="getcited-stat-items">
                     <div class="stat-item">
-                        <span class="stat-value"><?php echo esc_html( $total_posts ); ?></span>
+                        <span class="stat-value"><?php echo esc_html( number_format_i18n( $total_posts ) ); ?></span>
                         <span class="stat-label"><?php esc_html_e( 'Published Posts', 'getcited' ); ?></span>
                     </div>
                     <div class="stat-item">
@@ -138,6 +138,17 @@ $average_score = $citability->get_average_score();
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
+                <?php if ( count( $recent_posts ) >= 5 && $total_posts > 5 ) : ?>
+                    <p class="getcited-load-more-wrap" style="margin-top: var(--getcited-space-md);">
+                        <button type="button" class="button getcited-load-more-posts" data-offset="5">
+                            <?php esc_html_e( 'Load More Posts', 'getcited' ); ?>
+                        </button>
+                        <span class="description" style="margin-left: 8px;">
+                            <?php esc_html_e( '(Free tier: up to 10 posts)', 'getcited' ); ?>
+                        </span>
+                    </p>
+                <?php endif; ?>
             <?php endif; ?>
 
             <!-- Pro Upsell inline -->
