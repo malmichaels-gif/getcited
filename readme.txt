@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.4.5
+Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,18 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.4.6 =
+* Changed: Full UI redesign with HeyTC orange (#FFA500) branding
+* Changed: Dashboard redesign with card-based score breakdown
+* Changed: Score breakdown cards link directly to config pages
+* Changed: Health Check simplified to summary badges
+* Changed: All pages updated with consistent styling
+* Changed: Primary buttons now use orange accent color
+* Changed: Section headers with orange left border accent
+* Fixed: Score circle sizing issue (was too large)
+* Removed: Redundant Status Cards section from Dashboard
+* Removed: Quick Links section (replaced by score navigation)
 
 = 1.4.5 =
 * New: AI Visibility Score - composite 0-100 score showing overall AI readiness

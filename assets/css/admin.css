@@ -1,10 +1,10 @@
 /**
  * GetCited Admin Styles
- * 
+ *
  * Design inspired by modern dashboard UIs:
  * - Card-based layouts with subtle shadows
  * - Clean typography with clear hierarchy
- * - Accent colors: teal/cyan for success, amber for warnings
+ * - Orange accent color (HeyTC branding)
  * - Dark accents for Pro/locked features
  */
 
@@ -13,17 +13,26 @@
    ========================================================================== */
 
 :root {
-    /* Primary palette */
-    --getcited-primary: #0d9488;
-    --getcited-primary-dark: #0f766e;
-    --getcited-primary-light: #14b8a6;
-    
+    /* Primary palette - Orange (HeyTC branding) */
+    --getcited-primary: #FFA500;
+    --getcited-primary-dark: #E69500;
+    --getcited-primary-light: #FFB733;
+
     /* Accent colors */
-    --getcited-accent: #8b5cf6;
-    --getcited-accent-light: #a78bfa;
-    --getcited-warning: #f59e0b;
+    --getcited-accent: #FFA500;
+    --getcited-accent-light: #FFF3E0;
+    --getcited-accent-hover: #E69500;
+    --getcited-warning: #eab308;
     --getcited-error: #ef4444;
-    --getcited-success: #10b981;
+    --getcited-success: #22c55e;
+
+    /* Status colors (semantic) */
+    --getcited-status-success: #22c55e;
+    --getcited-status-good: #84cc16;
+    --getcited-status-warning: #eab308;
+    --getcited-status-caution: #f97316;
+    --getcited-status-error: #ef4444;
+    --getcited-status-info: #6b7280;
     
     /* Neutrals */
     --getcited-gray-50: #f9fafb;
@@ -122,6 +131,59 @@
     color: var(--getcited-gray-500);
     font-size: 13px;
     margin: 0 0 var(--getcited-space-md) 0;
+}
+
+/* ==========================================================================
+   Global Button Styles
+   ========================================================================== */
+
+.getcited-wrap .button-primary,
+.getcited-wrap .button.button-primary {
+    background: var(--getcited-primary);
+    border-color: var(--getcited-primary);
+    color: #fff;
+}
+
+.getcited-wrap .button-primary:hover,
+.getcited-wrap .button-primary:focus,
+.getcited-wrap .button.button-primary:hover,
+.getcited-wrap .button.button-primary:focus {
+    background: var(--getcited-primary-dark);
+    border-color: var(--getcited-primary-dark);
+    color: #fff;
+}
+
+.getcited-wrap .button:not(.button-primary):hover {
+    border-color: var(--getcited-primary);
+    color: var(--getcited-primary);
+}
+
+/* ==========================================================================
+   Global Form Element Styles
+   ========================================================================== */
+
+.getcited-wrap input[type="text"]:focus,
+.getcited-wrap input[type="email"]:focus,
+.getcited-wrap input[type="url"]:focus,
+.getcited-wrap input[type="number"]:focus,
+.getcited-wrap textarea:focus,
+.getcited-wrap select:focus {
+    border-color: var(--getcited-primary);
+    box-shadow: 0 0 0 1px var(--getcited-primary);
+    outline: none;
+}
+
+.getcited-wrap input[type="checkbox"]:checked {
+    background-color: var(--getcited-primary);
+    border-color: var(--getcited-primary);
+}
+
+.getcited-wrap input[type="radio"]:checked {
+    border-color: var(--getcited-primary);
+}
+
+.getcited-wrap input[type="radio"]:checked::before {
+    background: var(--getcited-primary);
 }
 
 /* ==========================================================================
@@ -3118,32 +3180,25 @@
    ========================================================================== */
 
 .getcited-visibility-score-section {
-    background: linear-gradient(135deg, var(--getcited-primary), var(--getcited-primary-dark, #065f56));
-    color: #fff;
+    background: #fff;
+    color: var(--getcited-gray-800);
     border-radius: var(--getcited-radius-lg);
     padding: var(--getcited-space-xl);
+    border-left: 4px solid var(--getcited-primary);
+    box-shadow: var(--getcited-shadow-md);
 }
 
 .visibility-score-container {
-    display: grid;
-    grid-template-columns: auto 1fr 1fr;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: var(--getcited-space-xl);
-    align-items: start;
-}
-
-@media (max-width: 1024px) {
-    .visibility-score-container {
-        grid-template-columns: 1fr 1fr;
-    }
-    .visibility-score-circle {
-        grid-column: 1 / -1;
-        justify-self: center;
-    }
 }
 
 @media (max-width: 600px) {
     .visibility-score-container {
-        grid-template-columns: 1fr;
+        flex-direction: column-reverse;
+        text-align: center;
     }
 }
 
@@ -3151,22 +3206,30 @@
     position: relative;
     width: 140px;
     height: 140px;
+    min-width: 140px;
+    max-width: 140px;
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .visibility-score-circle .score-svg {
-    width: 100%;
-    height: 100%;
+    width: 140px;
+    height: 140px;
+    max-width: 140px;
+    max-height: 140px;
     transform: rotate(-90deg);
+    display: block;
 }
 
 .visibility-score-circle .score-bg {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.2);
+    stroke: var(--getcited-gray-200);
     stroke-width: 8;
 }
 
 .visibility-score-circle .score-progress {
     fill: none;
+    stroke: var(--getcited-primary);
     stroke-width: 8;
     stroke-linecap: round;
     transition: stroke-dasharray 0.5s ease;
@@ -3185,17 +3248,18 @@
     font-weight: 700;
     line-height: 1;
     display: block;
+    color: var(--getcited-gray-900);
 }
 
 .visibility-score-circle .score-max {
     font-size: 14px;
-    opacity: 0.7;
+    color: var(--getcited-gray-500);
 }
 
 .visibility-score-info h2 {
     margin: 0 0 var(--getcited-space-xs) 0;
     font-size: 18px;
-    color: #fff;
+    color: var(--getcited-gray-900);
 }
 
 .visibility-score-info .tier-label {
@@ -3204,21 +3268,21 @@
     font-weight: 600;
 }
 
-.tier-label.tier-excellent { color: #86efac; }
-.tier-label.tier-good { color: #bef264; }
-.tier-label.tier-fair { color: #fde047; }
-.tier-label.tier-needs-work { color: #fdba74; }
-.tier-label.tier-poor { color: #fca5a5; }
+.tier-label.tier-excellent { color: var(--getcited-status-success); }
+.tier-label.tier-good { color: var(--getcited-status-good); }
+.tier-label.tier-fair { color: var(--getcited-status-warning); }
+.tier-label.tier-needs-work { color: var(--getcited-status-caution); }
+.tier-label.tier-poor { color: var(--getcited-status-error); }
 
 .visibility-score-info .button {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: var(--getcited-primary);
+    border: 1px solid var(--getcited-primary);
     color: #fff;
 }
 
 .visibility-score-info .button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: var(--getcited-primary-dark);
+    border-color: var(--getcited-primary-dark);
     color: #fff;
 }
 
@@ -3230,11 +3294,18 @@
     margin-right: 4px;
 }
 
+.visibility-score-info .score-recommendation {
+    margin: 0 0 var(--getcited-space-md) 0;
+    font-size: 14px;
+    color: var(--getcited-gray-600);
+    line-height: 1.5;
+}
+
 .visibility-score-breakdown h3 {
     margin: 0 0 var(--getcited-space-sm) 0;
     font-size: 14px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--getcited-gray-700);
 }
 
 .breakdown-item {
@@ -3249,23 +3320,23 @@
 }
 
 .breakdown-label .label-text {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--getcited-gray-700);
 }
 
 .breakdown-label .label-score {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--getcited-gray-500);
 }
 
 .breakdown-bar {
     height: 6px;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--getcited-gray-200);
     border-radius: 3px;
     overflow: hidden;
 }
 
 .breakdown-fill {
     height: 100%;
-    background: #fff;
+    background: var(--getcited-primary);
     border-radius: 3px;
     transition: width 0.3s ease;
 }
@@ -3274,8 +3345,9 @@
     grid-column: 1 / -1;
     margin-top: var(--getcited-space-md);
     padding: var(--getcited-space-md);
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--getcited-accent-light);
     border-radius: var(--getcited-radius-sm);
+    border-left: 3px solid var(--getcited-primary);
 }
 
 .visibility-score-recommendations h4 {
@@ -3284,13 +3356,201 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--getcited-gray-600);
 }
 
 .visibility-score-recommendations p {
     margin: 0;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--getcited-gray-800);
+}
+
+/* ==========================================================================
+   Score Breakdown Cards
+   ========================================================================== */
+
+.getcited-breakdown-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-breakdown-card {
+    flex: 1 1 180px;
+    min-width: 160px;
+    max-width: 220px;
+    background: #fff;
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-md);
+    padding: var(--getcited-space-md);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--getcited-transition), box-shadow var(--getcited-transition);
+}
+
+.getcited-breakdown-card:hover {
+    border-color: var(--getcited-primary);
+    box-shadow: var(--getcited-shadow-md);
+}
+
+.getcited-breakdown-card.card-info-only {
+    cursor: default;
+}
+
+.getcited-breakdown-card.card-info-only:hover {
+    border-color: var(--getcited-gray-200);
+    box-shadow: var(--getcited-shadow-sm);
+}
+
+.getcited-breakdown-card .card-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--getcited-accent-light);
+    border-radius: var(--getcited-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-breakdown-card .card-icon .dashicons {
+    color: var(--getcited-primary);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.getcited-breakdown-card .card-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--getcited-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+}
+
+.getcited-breakdown-card .card-score {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--getcited-gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-breakdown-card .card-score .score-max {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--getcited-gray-400);
+}
+
+.getcited-breakdown-card .card-status {
+    display: inline-flex;
+    align-items: center;
+    font-size: 12px;
+    margin-top: var(--getcited-space-xs);
+}
+
+.getcited-breakdown-card .card-status.status-complete {
+    color: var(--getcited-status-success);
+}
+
+.getcited-breakdown-card .card-status.status-incomplete {
+    color: var(--getcited-primary);
+}
+
+.getcited-breakdown-card .card-status .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    margin-right: 2px;
+}
+
+.getcited-breakdown-card .card-action {
+    font-size: 12px;
+    color: var(--getcited-primary);
+    margin-top: var(--getcited-space-sm);
+    font-weight: 500;
+}
+
+.getcited-breakdown-card .card-meta {
+    font-size: 12px;
+    color: var(--getcited-gray-500);
+    margin-top: var(--getcited-space-sm);
+}
+
+@media (max-width: 768px) {
+    .getcited-breakdown-card {
+        flex: 1 1 calc(50% - var(--getcited-space-md));
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .getcited-breakdown-card {
+        flex: 1 1 100%;
+    }
+}
+
+/* ==========================================================================
+   Dashboard Two-Column Grid
+   ========================================================================== */
+
+.getcited-dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--getcited-space-lg);
+}
+
+@media (max-width: 900px) {
+    .getcited-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   Health Check Summary (Dashboard)
+   ========================================================================== */
+
+.getcited-health-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--getcited-space-sm);
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-health-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: var(--getcited-gray-100);
+    border-radius: var(--getcited-radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--getcited-gray-600);
+}
+
+.getcited-health-badge.badge-ok {
+    background: #dcfce7;
+    color: var(--getcited-status-success);
+}
+
+.getcited-health-badge.badge-warning {
+    background: #fef3c7;
+    color: var(--getcited-status-warning);
+}
+
+.getcited-health-badge.badge-error {
+    background: #fee2e2;
+    color: var(--getcited-status-error);
+}
+
+.getcited-health-badge .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
 }
 
 /* ==========================================================================

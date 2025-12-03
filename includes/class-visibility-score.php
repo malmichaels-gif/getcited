@@ -491,4 +491,34 @@ class GetCited_Visibility_Score {
 			'freshness'      => 10,
 		);
 	}
+
+	/**
+	 * Get admin page links for each component
+	 *
+	 * @return array Component key => admin URL or null.
+	 */
+	public static function get_component_links() {
+		return array(
+			'crawler_access' => admin_url( 'admin.php?page=getcited-crawlers' ),
+			'llms_health'    => admin_url( 'admin.php?page=getcited-llms-txt' ),
+			'schema'         => admin_url( 'admin.php?page=getcited-schema' ),
+			'citability'     => admin_url( 'admin.php?page=getcited-citability' ),
+			'freshness'      => null, // Informational only - no dedicated page.
+		);
+	}
+
+	/**
+	 * Get dashicon class for each component
+	 *
+	 * @return array Component key => dashicon class.
+	 */
+	public static function get_component_icons() {
+		return array(
+			'crawler_access' => 'dashicons-admin-site-alt3',
+			'llms_health'    => 'dashicons-media-text',
+			'schema'         => 'dashicons-code-standards',
+			'citability'     => 'dashicons-edit-large',
+			'freshness'      => 'dashicons-calendar-alt',
+		);
+	}
 }

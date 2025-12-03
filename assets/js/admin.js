@@ -965,10 +965,36 @@
                             scoreProgress.style.stroke = score.tier.color;
                         }
 
-                        // Update breakdown bars
+                        // Update breakdown cards
                         if (score.breakdown) {
                             const maxPoints = { crawler_access: 25, llms_health: 25, schema: 20, citability: 20, freshness: 10 };
                             Object.keys(score.breakdown).forEach(key => {
+                                // Update breakdown cards (new layout)
+                                const card = document.querySelector(`.getcited-breakdown-card[data-key="${key}"]`);
+                                if (card) {
+                                    const cardScore = card.querySelector('.card-score');
+                                    const cardStatus = card.querySelector('.card-status, .card-action, .card-meta');
+                                    const newScore = score.breakdown[key];
+                                    const max = maxPoints[key];
+                                    const isPerfect = (newScore === max);
+
+                                    if (cardScore) {
+                                        cardScore.innerHTML = newScore + '<span class="score-max">/' + max + '</span>';
+                                    }
+
+                                    // Update status indicator
+                                    if (cardStatus && key !== 'freshness') {
+                                        if (isPerfect) {
+                                            cardStatus.className = 'card-status status-complete';
+                                            cardStatus.innerHTML = '<span class="dashicons dashicons-yes-alt"></span> Complete';
+                                        } else {
+                                            cardStatus.className = 'card-action';
+                                            cardStatus.textContent = 'Improve →';
+                                        }
+                                    }
+                                }
+
+                                // Update old breakdown bars (if present)
                                 const item = document.querySelector(`.breakdown-item[data-key="${key}"]`);
                                 if (item) {
                                     const fill = item.querySelector('.breakdown-fill');
@@ -983,6 +1009,12 @@
 
                         // Update recommendation if present
                         if (score.recommendations && score.recommendations.length > 0) {
+                            // Check for new layout (inline recommendation)
+                            const inlineRec = document.querySelector('.score-recommendation');
+                            if (inlineRec) {
+                                inlineRec.textContent = score.recommendations[0];
+                            }
+                            // Check for old layout
                             const recText = document.querySelector('.visibility-score-recommendations p');
                             if (recText) {
                                 recText.textContent = score.recommendations[0];
