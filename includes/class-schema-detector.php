@@ -165,6 +165,7 @@ class GetCited_Schema_Detector {
 	 * Detect existing JSON-LD schema on homepage
 	 *
 	 * Fetches the homepage and looks for existing schema markup.
+	 * Uses non-blocking request with short timeout to avoid deadlocks.
 	 *
 	 * @return array Detection result with 'found' boolean and 'types' array.
 	 */
@@ -174,13 +175,29 @@ class GetCited_Schema_Detector {
 			'types' => array(),
 		);
 
-		// Get homepage HTML.
+		// Skip if this is an AJAX request to prevent potential deadlock.
+		// The homepage fetch can trigger another WordPress load.
+		if ( wp_doing_ajax() ) {
+			// Return cached result if available, skip live fetch.
+			$cached = get_transient( self::TRANSIENT_NAME );
+			if ( false !== $cached && isset( $cached['json_ld_types'] ) ) {
+				return array(
+					'found' => $cached['json_ld_found'] ?? false,
+					'types' => $cached['json_ld_types'] ?? array(),
+				);
+			}
+			// No cache, return empty (plugin detection still works).
+			return $result;
+		}
+
+		// Get homepage HTML with short timeout.
 		$response = wp_remote_get(
 			home_url(),
 			array(
-				'timeout'    => 10,
+				'timeout'    => 5,
 				'user-agent' => 'GetCited Schema Detector',
 				'sslverify'  => false,
+				'blocking'   => true,
 			)
 		);
 

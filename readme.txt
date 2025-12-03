@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,11 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.4.1 =
+* Fixed: Schema re-scan AJAX could cause deadlock on some hosting (self-referential HTTP request)
+* Changed: Homepage JSON-LD scan now skipped during AJAX, uses cached results instead
+* Changed: Reduced HTTP timeout from 10s to 5s for schema detection
 
 = 1.4.0 =
 * New: Schema smart fallback - auto-disables when SEO plugin detected (Yoast, Rank Math, etc.)
