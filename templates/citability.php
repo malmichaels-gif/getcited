@@ -167,14 +167,6 @@ $average_score = $citability->get_average_score();
             </div>
         </div>
 
-        <!-- Analysis Results Area -->
-        <div class="getcited-section getcited-analysis-results" style="display: none;">
-            <h2><?php esc_html_e( 'Analysis Results', 'getcited' ); ?></h2>
-            <div class="getcited-results-content">
-                <!-- Filled by JavaScript -->
-            </div>
-        </div>
-
         <!-- Scoring Rubric (Collapsible) -->
         <div class="getcited-section getcited-rubric getcited-collapsible" data-collapsed="true">
             <h2 class="getcited-collapsible-header">

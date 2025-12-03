@@ -176,7 +176,7 @@ class GetCited_Pro_Teaser {
                            placeholder="<?php esc_attr_e( 'your@email.com', 'getcited' ); ?>"
                            required>
                     <button type="submit" class="button button-primary">
-                        <?php esc_html_e( 'Reserve Your Spot', 'getcited' ); ?>
+                        <?php esc_html_e( 'Get First Access', 'getcited' ); ?>
                     </button>
                 </form>
             <?php else : ?>
@@ -235,7 +235,7 @@ class GetCited_Pro_Teaser {
                                placeholder="<?php esc_attr_e( 'your@email.com', 'getcited' ); ?>"
                                required>
                         <button type="submit" class="button button-primary">
-                            <?php esc_html_e( 'Reserve Your Spot', 'getcited' ); ?>
+                            <?php esc_html_e( 'Get First Access', 'getcited' ); ?>
                         </button>
                     </form>
                     <div class="getcited-waitlist-message" style="display: none;"></div>

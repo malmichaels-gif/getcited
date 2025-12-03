@@ -751,13 +751,75 @@
 
                 if (response.success) {
                     const data = response.data;
-                    
+
                     // Update table row if exists
                     const row = document.querySelector(`tr[data-post-id="${postId}"]`);
                     if (row) {
                         const scoreCell = row.querySelector('.score-cell');
                         const scoreClass = data.score >= 70 ? 'good' : (data.score >= 40 ? 'ok' : 'low');
                         scoreCell.innerHTML = `<span class="getcited-score-badge ${scoreClass}">${data.score}/100</span>`;
+
+                        // Collapse any previously expanded row (one at a time)
+                        document.querySelectorAll('.getcited-expanded-row').forEach(el => el.remove());
+
+                        // Create inline expanded row with recommendations
+                        if (data.recommendations && data.recommendations.length) {
+                            const expandedRow = document.createElement('tr');
+                            expandedRow.className = 'getcited-expanded-row';
+
+                            // Build top 3 recommendations list
+                            const top3 = data.recommendations.slice(0, 3).map(r => `<li>${r}</li>`).join('');
+
+                            // Build full factor breakdown HTML
+                            let factorsHtml = '<div class="getcited-factors-grid">';
+                            for (const [key, factor] of Object.entries(data.factors)) {
+                                const rubric = data.rubric[key] || {};
+                                const icon = factor.passed ? '✓' : '✗';
+                                const iconClass = factor.passed ? 'passed' : 'failed';
+                                factorsHtml += `
+                                    <div class="factor-item ${iconClass}">
+                                        <span class="factor-icon">${icon}</span>
+                                        <span class="factor-label">${rubric.label || key}</span>
+                                        <span class="factor-score">${factor.score}/${rubric.max_points || '?'}</span>
+                                        <span class="factor-message">${factor.message}</span>
+                                    </div>
+                                `;
+                            }
+                            factorsHtml += '</div>';
+
+                            expandedRow.innerHTML = `
+                                <td colspan="4">
+                                    <div class="getcited-inline-results">
+                                        <div class="getcited-recommendations-brief">
+                                            <strong>${getcitedAdmin.strings?.top_recommendations || 'Top 3 Recommendations'}:</strong>
+                                            <ol>${top3}</ol>
+                                        </div>
+                                        <button type="button" class="button getcited-expand-details">
+                                            <span class="dashicons dashicons-arrow-down-alt2"></span>
+                                            ${getcitedAdmin.strings?.view_full_analysis || 'View Full Analysis'}
+                                        </button>
+                                        <div class="getcited-full-details" style="display: none;">
+                                            ${factorsHtml}
+                                        </div>
+                                    </div>
+                                </td>
+                            `;
+                            row.after(expandedRow);
+
+                            // Add toggle handler for full details
+                            const toggleBtn = expandedRow.querySelector('.getcited-expand-details');
+                            const fullDetails = expandedRow.querySelector('.getcited-full-details');
+                            toggleBtn.addEventListener('click', function() {
+                                const isHidden = fullDetails.style.display === 'none';
+                                fullDetails.style.display = isHidden ? 'block' : 'none';
+                                this.querySelector('.dashicons').className = isHidden
+                                    ? 'dashicons dashicons-arrow-up-alt2'
+                                    : 'dashicons dashicons-arrow-down-alt2';
+                                this.childNodes[1].textContent = isHidden
+                                    ? (getcitedAdmin.strings?.hide_details || ' Hide Details')
+                                    : (getcitedAdmin.strings?.view_full_analysis || ' View Full Analysis');
+                            });
+                        }
                     }
 
                     // Update meta box if exists
@@ -785,59 +847,12 @@
                             scoreDisplay.innerHTML = metaHtml;
                         }
                     }
-
-                    // Show detailed results
-                    showAnalysisResults(data);
                 }
             })
             .catch(() => {
                 button.disabled = false;
                 button.textContent = originalText;
             });
-    }
-
-    function showAnalysisResults(data) {
-        const resultsSection = document.querySelector('.getcited-analysis-results');
-        const resultsContent = document.querySelector('.getcited-results-content');
-        
-        if (!resultsSection || !resultsContent) return;
-
-        let html = `
-            <div class="getcited-score-display large" style="text-align: center; margin-bottom: 20px;">
-                <span class="score">${data.score}</span>
-                <span class="max">/100</span>
-            </div>
-            <div class="getcited-factors">
-        `;
-
-        for (const [key, factor] of Object.entries(data.factors)) {
-            const rubric = data.rubric[key] || {};
-            const icon = factor.passed ? '✓' : '✗';
-            const iconClass = factor.passed ? 'passed' : 'failed';
-            
-            html += `
-                <div class="factor-item ${iconClass}">
-                    <span class="factor-icon">${icon}</span>
-                    <span class="factor-label">${rubric.label || key}</span>
-                    <span class="factor-score">${factor.score}/${rubric.max_points || '?'}</span>
-                    <span class="factor-message">${factor.message}</span>
-                </div>
-            `;
-        }
-
-        html += '</div>';
-
-        if (data.recommendations && data.recommendations.length) {
-            html += '<h3>Top Recommendations</h3><ol>';
-            data.recommendations.forEach(rec => {
-                html += `<li>${rec}</li>`;
-            });
-            html += '</ol>';
-        }
-
-        resultsContent.innerHTML = html;
-        resultsSection.style.display = 'block';
-        resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
 
     // ==========================================================================
