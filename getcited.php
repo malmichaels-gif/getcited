@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.4.6
+ * Version: 1.4.7
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Malcolm Michaels
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.4.6' );
+define( 'GETCITED_VERSION', '1.4.7' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -601,6 +601,12 @@ final class GetCited {
             $this->create_tables();
             $settings->set( 'db_version', '1.4.5' );
         }
+
+        // v1.4.7: Add index on category column for faster aggregation queries
+        if ( version_compare( $db_version, '1.4.7', '<' ) ) {
+            $this->add_category_index();
+            $settings->set( 'db_version', '1.4.7' );
+        }
     }
 
     /**
@@ -620,11 +626,36 @@ final class GetCited {
             category VARCHAR(20) DEFAULT 'unknown',
             ip_hash VARCHAR(64) DEFAULT NULL,
             INDEX idx_request_time (request_time),
-            INDEX idx_bot_name (bot_name)
+            INDEX idx_bot_name (bot_name),
+            INDEX idx_category (category)
         ) {$charset_collate};";
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
+    }
+
+    /**
+     * Add index on category column (migration for v1.4.7)
+     */
+    private function add_category_index() {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'getcited_llms_requests';
+
+        // Check if index already exists
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Migration requires direct query
+        $index_exists = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = %s AND table_name = %s AND index_name = 'idx_category'",
+                DB_NAME,
+                $table_name
+            )
+        );
+
+        if ( ! $index_exists ) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Migration requires direct DDL
+            $wpdb->query( "ALTER TABLE {$table_name} ADD INDEX idx_category (category)" );
+        }
     }
 
     /**

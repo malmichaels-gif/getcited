@@ -81,7 +81,16 @@
         }
 
         return fetch(getcitedAdmin.restUrl + endpoint, options)
-            .then(response => response.json());
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || `HTTP ${response.status}`);
+                    }).catch(() => {
+                        throw new Error(`HTTP ${response.status}`);
+                    });
+                }
+                return response.json();
+            });
     }
 
     /**
@@ -166,7 +175,7 @@
 
     function initCrawlerToggles() {
         const toggles = document.querySelectorAll('.getcited-crawler-item .getcited-toggle input');
-        
+
         toggles.forEach(toggle => {
             toggle.addEventListener('change', function() {
                 const crawler = this.dataset.crawler;
@@ -174,9 +183,10 @@
                 const item = this.closest('.getcited-crawler-item');
                 const statusLabel = item.querySelector('.status-label');
 
-                // Update UI immediately
+                // Update UI immediately (including ARIA state)
                 statusLabel.textContent = this.checked ? 'Allowed' : 'Blocked';
                 statusLabel.className = 'status-label ' + (this.checked ? 'allowed' : 'blocked');
+                this.setAttribute('aria-checked', this.checked ? 'true' : 'false');
 
                 // Save via API
                 api('crawlers/' + encodeURIComponent(crawler), 'POST', { status })
@@ -186,12 +196,14 @@
                             this.checked = !this.checked;
                             statusLabel.textContent = this.checked ? 'Allowed' : 'Blocked';
                             statusLabel.className = 'status-label ' + (this.checked ? 'allowed' : 'blocked');
+                            this.setAttribute('aria-checked', this.checked ? 'true' : 'false');
                         }
                         updateRobotsPreview();
                     })
                     .catch(() => {
                         // Revert on error
                         this.checked = !this.checked;
+                        this.setAttribute('aria-checked', this.checked ? 'true' : 'false');
                     });
             });
         });
@@ -219,11 +231,12 @@
             toggle.checked = checked;
             crawlers[toggle.dataset.crawler] = status;
 
-            // Update status label
+            // Update status label and ARIA state
             const item = toggle.closest('.getcited-crawler-item');
             const statusLabel = item.querySelector('.status-label');
             statusLabel.textContent = checked ? 'Allowed' : 'Blocked';
             statusLabel.className = 'status-label ' + (checked ? 'allowed' : 'blocked');
+            toggle.setAttribute('aria-checked', checked ? 'true' : 'false');
         });
 
         // Preserve custom crawlers when doing bulk action
@@ -268,13 +281,13 @@
             const index = container.children.length;
             const html = `
                 <div class="getcited-custom-item" data-index="${index}">
-                    <input type="text" name="custom_crawlers[${index}][user_agent]" placeholder="User-agent string">
-                    <input type="text" name="custom_crawlers[${index}][name]" placeholder="Name (optional)">
-                    <select name="custom_crawlers[${index}][action]">
+                    <input type="text" name="custom_crawlers[${index}][user_agent]" placeholder="User-agent string" aria-label="User-agent string">
+                    <input type="text" name="custom_crawlers[${index}][name]" placeholder="Name (optional)" aria-label="Crawler name">
+                    <select name="custom_crawlers[${index}][action]" aria-label="Crawler action">
                         <option value="allow">Allow</option>
                         <option value="block">Block</option>
                     </select>
-                    <button type="button" class="button getcited-remove-custom">×</button>
+                    <button type="button" class="button getcited-remove-custom" aria-label="Remove this crawler">×</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);

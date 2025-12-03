@@ -173,8 +173,7 @@ if ( ! empty( $recent_posts ) ) {
 										</td>
 										<td class="activity-category">
 											<span class="category-badge category-<?php echo esc_attr( $category_info['class'] ); ?>">
-												<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-												<span class="category-icon"><?php echo $category_info['icon']; ?></span>
+												<span class="category-icon" aria-hidden="true"><?php echo wp_kses( $category_info['icon'], array() ); ?></span>
 												<?php echo esc_html( $category_info['label'] ); ?>
 											</span>
 										</td>
@@ -267,22 +266,23 @@ if ( ! empty( $recent_posts ) ) {
 						$check        = $health_status[ $key ];
 						$status_class = $health->get_status_class( $check['status'] );
 						$has_details  = ! empty( $check['details'] ) || ! empty( $check['action_type'] );
+					$details_id = 'health-details-' . esc_attr( $key );
 					?>
 						<div class="getcited-health-item <?php echo esc_attr( $status_class ); ?><?php echo $has_details ? ' has-details' : ''; ?>" data-check="<?php echo esc_attr( $key ); ?>">
 							<div class="health-item-header">
-								<span class="health-icon"></span>
+								<span class="health-icon" aria-hidden="true"></span>
 								<span class="health-label"><?php echo esc_html( $label ); ?></span>
 								<span class="health-message"><?php echo esc_html( $check['message'] ); ?></span>
 
 								<?php if ( $has_details ) : ?>
-									<button type="button" class="getcited-health-expand" aria-expanded="false">
-										<span class="dashicons dashicons-arrow-down-alt2"></span>
+									<button type="button" class="getcited-health-expand" aria-expanded="false" aria-controls="<?php echo esc_attr( $details_id ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Show details for %s', 'getcited' ), $label ) ); ?>">
+										<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
 									</button>
 								<?php endif; ?>
 							</div>
 
 						<?php if ( $has_details ) : ?>
-							<div class="getcited-health-details" style="display: none;">
+							<div class="getcited-health-details" id="<?php echo esc_attr( $details_id ); ?>" style="display: none;">
 								<?php if ( ! empty( $check['details'] ) ) : ?>
 									<p class="details-text"><?php echo esc_html( $check['details'] ); ?></p>
 								<?php endif; ?>

@@ -44,16 +44,59 @@ class GetCited_Llms_Txt {
         add_action( 'wp_head', array( $this, 'add_link_tag' ), 1 );
 
         // Auto-write physical file when settings change
-        add_action( 'getcited_setting_updated', array( $this, 'maybe_auto_write' ), 10, 2 );
+        // Use getcited_settings_saved for batch updates (ensures all settings are saved first)
+        add_action( 'getcited_settings_saved', array( $this, 'maybe_auto_write_batch' ), 10, 2 );
+        // Use getcited_setting_updated for single setting updates
+        add_action( 'getcited_setting_updated', array( $this, 'maybe_auto_write' ), 10, 3 );
     }
 
     /**
-     * Maybe auto-write llms.txt when settings change
+     * Maybe auto-write llms.txt when a batch of settings is saved
      *
-     * @param string $key   The setting key that was updated.
-     * @param mixed  $value The new value.
+     * This is the preferred hook as it fires AFTER all settings are saved,
+     * avoiding timing issues where one setting is checked before another is updated.
+     *
+     * @param array $new_settings All current settings after save.
+     * @param array $old_settings All settings before save.
      */
-    public function maybe_auto_write( $key, $value ) {
+    public function maybe_auto_write_batch( $new_settings, $old_settings ) {
+        // Check if any llms.txt-related settings changed
+        $llms_keys = array( 'llms_txt_content', 'llms_txt_enabled', 'llms_write_physical' );
+        $changed = false;
+
+        foreach ( $llms_keys as $key ) {
+            $old_val = $old_settings[ $key ] ?? null;
+            $new_val = $new_settings[ $key ] ?? null;
+            if ( $old_val !== $new_val ) {
+                $changed = true;
+                break;
+            }
+        }
+
+        if ( ! $changed ) {
+            return;
+        }
+
+        // Check if auto-write is enabled and llms.txt is enabled using NEW values
+        $write_physical = $new_settings['llms_write_physical'] ?? false;
+        $llms_enabled = $new_settings['llms_txt_enabled'] ?? false;
+
+        if ( ! $write_physical || ! $llms_enabled ) {
+            return;
+        }
+
+        // Auto-write the file
+        $this->write_physical_file();
+    }
+
+    /**
+     * Maybe auto-write llms.txt when a single setting changes
+     *
+     * @param string $key       The setting key that was updated.
+     * @param mixed  $new_value The new value.
+     * @param mixed  $old_value The old value.
+     */
+    public function maybe_auto_write( $key, $new_value, $old_value = null ) {
         // Only trigger on llms.txt-related settings
         if ( ! in_array( $key, array( 'llms_txt_content', 'llms_txt_enabled', 'llms_write_physical' ), true ) ) {
             return;
@@ -71,6 +114,26 @@ class GetCited_Llms_Txt {
     }
 
     /**
+     * Initialize WP_Filesystem if needed
+     *
+     * @return bool True if filesystem is ready, false on failure.
+     */
+    private function init_filesystem() {
+        global $wp_filesystem;
+
+        // Already initialized
+        if ( $wp_filesystem instanceof WP_Filesystem_Base ) {
+            return true;
+        }
+
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        return WP_Filesystem();
+    }
+
+    /**
      * Check if we can write to site root
      *
      * @return bool
@@ -78,12 +141,7 @@ class GetCited_Llms_Txt {
     public function can_write_physical_file() {
         global $wp_filesystem;
 
-        // Initialize WP_Filesystem if needed
-        if ( ! function_exists( 'WP_Filesystem' ) ) {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
-        }
-
-        if ( ! WP_Filesystem() ) {
+        if ( ! $this->init_filesystem() ) {
             return false;
         }
 
@@ -104,9 +162,11 @@ class GetCited_Llms_Txt {
      * @return array Result with success status and message
      */
     public function write_physical_file() {
+        global $wp_filesystem;
+
         $file_path = ABSPATH . 'llms.txt';
 
-        // Check write permissions
+        // Check write permissions (also initializes filesystem)
         if ( ! $this->can_write_physical_file() ) {
             return array(
                 'success' => false,
@@ -115,18 +175,7 @@ class GetCited_Llms_Txt {
             );
         }
 
-        // Initialize WP_Filesystem
-        global $wp_filesystem;
-        if ( ! function_exists( 'WP_Filesystem' ) ) {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
-        }
-
-        if ( ! WP_Filesystem() ) {
-            return array(
-                'success' => false,
-                'message' => __( 'Could not initialize filesystem.', 'getcited' ),
-            );
-        }
+        // Filesystem is already initialized by can_write_physical_file()
 
         // Get content from settings
         $content = $this->get_content();

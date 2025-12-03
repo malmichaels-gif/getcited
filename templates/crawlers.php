@@ -153,12 +153,15 @@ foreach ( $grouped_crawlers as $crawlers ) {
                             <div class="getcited-crawler-item" data-crawler="<?php echo esc_attr( $name ); ?>">
                                 <div class="crawler-toggle">
                                     <label class="getcited-toggle">
-                                        <input type="checkbox" 
-                                               name="crawlers[<?php echo esc_attr( $name ); ?>]" 
+                                        <input type="checkbox"
+                                               name="crawlers[<?php echo esc_attr( $name ); ?>]"
                                                value="allow"
                                                <?php checked( $is_allowed ); ?>
-                                               data-crawler="<?php echo esc_attr( $name ); ?>">
-                                        <span class="toggle-slider"></span>
+                                               data-crawler="<?php echo esc_attr( $name ); ?>"
+                                               role="switch"
+                                               aria-checked="<?php echo $is_allowed ? 'true' : 'false'; ?>"
+                                               aria-label="<?php echo esc_attr( sprintf( __( 'Allow %s crawler', 'getcited' ), $name ) ); ?>">
+                                        <span class="toggle-slider" aria-hidden="true"></span>
                                     </label>
                                 </div>
                                 <div class="crawler-info">
@@ -196,15 +199,18 @@ foreach ( $grouped_crawlers as $crawlers ) {
                 <?php if ( ! empty( $custom_crawlers ) ) : ?>
                     <?php foreach ( $custom_crawlers as $index => $crawler ) : ?>
                         <div class="getcited-custom-item" data-index="<?php echo esc_attr( $index ); ?>">
-                            <input type="text" 
-                                   name="custom_crawlers[<?php echo esc_attr( $index ); ?>][user_agent]" 
+                            <input type="text"
+                                   name="custom_crawlers[<?php echo esc_attr( $index ); ?>][user_agent]"
                                    value="<?php echo esc_attr( $crawler['user_agent'] ); ?>"
-                                   placeholder="<?php esc_attr_e( 'User-agent string', 'getcited' ); ?>">
-                            <input type="text" 
-                                   name="custom_crawlers[<?php echo esc_attr( $index ); ?>][name]" 
+                                   placeholder="<?php esc_attr_e( 'User-agent string', 'getcited' ); ?>"
+                                   aria-label="<?php esc_attr_e( 'User-agent string', 'getcited' ); ?>">
+                            <input type="text"
+                                   name="custom_crawlers[<?php echo esc_attr( $index ); ?>][name]"
                                    value="<?php echo esc_attr( $crawler['name'] ); ?>"
-                                   placeholder="<?php esc_attr_e( 'Name (optional)', 'getcited' ); ?>">
-                            <select name="custom_crawlers[<?php echo esc_attr( $index ); ?>][action]">
+                                   placeholder="<?php esc_attr_e( 'Name (optional)', 'getcited' ); ?>"
+                                   aria-label="<?php esc_attr_e( 'Crawler name', 'getcited' ); ?>">
+                            <select name="custom_crawlers[<?php echo esc_attr( $index ); ?>][action]"
+                                    aria-label="<?php esc_attr_e( 'Crawler action', 'getcited' ); ?>">
                                 <option value="allow" <?php selected( $crawler['action'], 'allow' ); ?>>
                                     <?php esc_html_e( 'Allow', 'getcited' ); ?>
                                 </option>
@@ -212,7 +218,7 @@ foreach ( $grouped_crawlers as $crawlers ) {
                                     <?php esc_html_e( 'Block', 'getcited' ); ?>
                                 </option>
                             </select>
-                            <button type="button" class="button getcited-remove-custom">×</button>
+                            <button type="button" class="button getcited-remove-custom" aria-label="<?php esc_attr_e( 'Remove this crawler', 'getcited' ); ?>">×</button>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
