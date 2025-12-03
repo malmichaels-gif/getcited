@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.4.2
+ * Version: 1.4.5
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Malcolm Michaels
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.4.2' );
+define( 'GETCITED_VERSION', '1.4.5' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -69,6 +69,8 @@ final class GetCited {
         require_once GETCITED_PLUGIN_DIR . 'includes/class-schema.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-schema-detector.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-author-fields.php';
+        require_once GETCITED_PLUGIN_DIR . 'includes/class-request-logger.php';
+        require_once GETCITED_PLUGIN_DIR . 'includes/class-visibility-score.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-conflict-detector.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-health-check.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-citability.php';
@@ -138,6 +140,9 @@ final class GetCited {
         // Run initial schema detection
         GetCited_Schema_Detector::instance()->run_detection();
 
+        // Create custom database tables
+        $this->create_tables();
+
         // Flush rewrite rules
         $this->register_rewrites();
         flush_rewrite_rules();
@@ -187,6 +192,8 @@ final class GetCited {
         GetCited_Schema::instance();
         GetCited_Schema_Detector::instance();
         GetCited_Author_Fields::instance();
+        GetCited_Request_Logger::instance();
+        GetCited_Visibility_Score::instance();
         GetCited_Health_Check::instance();
         GetCited_Citability::instance();
         GetCited_Wizard::instance();
@@ -373,6 +380,11 @@ final class GetCited {
 
         // Run health checks
         GetCited_Health_Check::instance()->run_checks();
+
+        // Clean up old request log entries
+        if ( class_exists( 'GetCited_Request_Logger' ) ) {
+            GetCited_Request_Logger::instance()->cleanup_old_requests();
+        }
 
         // Fire hook for extensions
         do_action( 'getcited_daily_tasks' );
@@ -584,11 +596,35 @@ final class GetCited {
             $settings->set( 'db_version', '1.0' );
         }
 
-        // Future migrations go here
-        // if ( version_compare( $db_version, '2.0', '<' ) ) {
-        //     $this->migrate_to_v2();
-        //     $settings->set( 'db_version', '2.0' );
-        // }
+        // v1.4.5 migration: Create request log table
+        if ( version_compare( $db_version, '1.4.5', '<' ) ) {
+            $this->create_tables();
+            $settings->set( 'db_version', '1.4.5' );
+        }
+    }
+
+    /**
+     * Create custom database tables
+     */
+    private function create_tables() {
+        global $wpdb;
+
+        $table_name      = $wpdb->prefix . 'getcited_llms_requests';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            request_time DATETIME NOT NULL,
+            user_agent VARCHAR(500) NOT NULL,
+            bot_name VARCHAR(100) DEFAULT NULL,
+            category VARCHAR(20) DEFAULT 'unknown',
+            ip_hash VARCHAR(64) DEFAULT NULL,
+            INDEX idx_request_time (request_time),
+            INDEX idx_bot_name (bot_name)
+        ) {$charset_collate};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta( $sql );
     }
 
     /**

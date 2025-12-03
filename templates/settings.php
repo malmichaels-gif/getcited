@@ -15,9 +15,11 @@ $settings   = GetCited_Settings::instance();
 $dashboard  = GetCited_Dashboard::instance();
 $pro_teaser = GetCited_Pro_Teaser::instance();
 
-$debug_mode     = $settings->get( 'debug_mode' );
-$keep_on_delete = $settings->get( 'keep_on_delete' );
-$site_type      = $settings->get( 'site_type' );
+$debug_mode              = $settings->get( 'debug_mode' );
+$keep_on_delete          = $settings->get( 'keep_on_delete' );
+$site_type               = $settings->get( 'site_type' );
+$request_logging_enabled = $settings->get( 'request_logging_enabled' );
+$request_log_retention   = $settings->get( 'request_log_retention' );
 ?>
 
 <div class="wrap getcited-wrap">
@@ -111,6 +113,60 @@ $site_type      = $settings->get( 'site_type' );
                             <span class="description"><?php esc_html_e( 'Preserve config when uninstalling', 'getcited' ); ?></span>
                         </span>
                     </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Logging -->
+        <div class="getcited-section">
+            <h2><?php esc_html_e( 'Request Logging', 'getcited' ); ?></h2>
+            <p class="description">
+                <?php esc_html_e( 'Track when AI crawlers and other bots access your llms.txt file.', 'getcited' ); ?>
+            </p>
+
+            <div class="getcited-schema-options-compact">
+                <label class="getcited-checkbox-compact">
+                    <input type="checkbox"
+                           name="request_logging_enabled"
+                           id="request_logging_enabled"
+                           value="1"
+                           <?php checked( $request_logging_enabled ); ?>>
+                    <span class="checkbox-label">
+                        <strong><?php esc_html_e( 'Enable Request Logging', 'getcited' ); ?></strong>
+                        <span class="description"><?php esc_html_e( 'Log llms.txt access attempts', 'getcited' ); ?></span>
+                    </span>
+                </label>
+            </div>
+
+            <div class="getcited-compact-form" style="margin-top: var(--getcited-space-md);">
+                <div class="form-row">
+                    <label for="request_log_retention"><?php esc_html_e( 'Data Retention', 'getcited' ); ?></label>
+                    <select name="request_log_retention" id="request_log_retention">
+                        <option value="30" <?php selected( $request_log_retention, 30 ); ?>>
+                            <?php esc_html_e( '30 days', 'getcited' ); ?>
+                        </option>
+                        <option value="60" <?php selected( $request_log_retention, 60 ); ?>>
+                            <?php esc_html_e( '60 days', 'getcited' ); ?>
+                        </option>
+                        <option value="90" <?php selected( $request_log_retention, 90 ); ?>>
+                            <?php esc_html_e( '90 days', 'getcited' ); ?>
+                        </option>
+                        <option value="180" <?php selected( $request_log_retention, 180 ); ?>>
+                            <?php esc_html_e( '180 days', 'getcited' ); ?>
+                        </option>
+                    </select>
+                    <p class="description" style="margin-top: 4px;">
+                        <?php esc_html_e( 'Older log entries will be automatically deleted.', 'getcited' ); ?>
+                    </p>
+                </div>
+
+                <div class="form-row" style="margin-top: var(--getcited-space-md);">
+                    <label><?php esc_html_e( 'Clear Log', 'getcited' ); ?></label>
+                    <button type="button" class="button getcited-clear-request-log">
+                        <span class="dashicons dashicons-trash" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+                        <?php esc_html_e( 'Clear All Request Logs', 'getcited' ); ?>
+                    </button>
+                    <span class="getcited-clear-log-status"></span>
                 </div>
             </div>
         </div>

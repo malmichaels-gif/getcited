@@ -1,0 +1,494 @@
+<?php
+/**
+ * AI Visibility Score for GetCited
+ *
+ * Calculates a composite 0-100 score showing overall AI readiness.
+ *
+ * @package GetCited
+ * @since 1.4.5
+ */
+
+// Prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Visibility Score class
+ */
+class GetCited_Visibility_Score {
+
+	/**
+	 * Single instance
+	 *
+	 * @var GetCited_Visibility_Score|null
+	 */
+	private static $instance = null;
+
+	/**
+	 * Transient name for cached score
+	 */
+	const TRANSIENT_NAME = 'getcited_visibility_score';
+
+	/**
+	 * Transient expiration (24 hours)
+	 */
+	const TRANSIENT_EXPIRATION = DAY_IN_SECONDS;
+
+	/**
+	 * Major AI crawlers to check for crawler access score
+	 */
+	const MAJOR_CRAWLERS = array(
+		'GPTBot',
+		'ClaudeBot',
+		'PerplexityBot',
+		'ChatGPT-User',
+		'Google-Extended',
+		'Applebot-Extended',
+		'Amazonbot',
+	);
+
+	/**
+	 * Get instance
+	 *
+	 * @return GetCited_Visibility_Score
+	 */
+	public static function instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
+	/**
+	 * Constructor
+	 */
+	private function __construct() {
+		// Invalidate cache when settings are saved.
+		add_action( 'getcited_setting_updated', array( $this, 'invalidate_cache' ) );
+
+		// Invalidate cache when a post is published.
+		add_action( 'publish_post', array( $this, 'invalidate_cache' ) );
+	}
+
+	/**
+	 * Invalidate the cached score
+	 */
+	public function invalidate_cache() {
+		delete_transient( self::TRANSIENT_NAME );
+	}
+
+	/**
+	 * Get the visibility score (cached or fresh)
+	 *
+	 * @param bool $force Force recalculation.
+	 * @return array Score data.
+	 */
+	public function get_score( $force = false ) {
+		if ( ! $force ) {
+			$cached = get_transient( self::TRANSIENT_NAME );
+			if ( false !== $cached ) {
+				return $cached;
+			}
+		}
+
+		return $this->calculate_score();
+	}
+
+	/**
+	 * Calculate the full visibility score
+	 *
+	 * @return array Score data with total, breakdown, tier, and recommendations.
+	 */
+	public function calculate_score() {
+		$breakdown = array(
+			'crawler_access' => $this->score_crawler_access(),
+			'llms_health'    => $this->score_llms_health(),
+			'schema'         => $this->score_schema(),
+			'citability'     => $this->score_citability(),
+			'freshness'      => $this->score_freshness(),
+		);
+
+		$total = array_sum( $breakdown );
+		$tier  = $this->get_tier( $total );
+
+		$result = array(
+			'total'           => $total,
+			'breakdown'       => $breakdown,
+			'tier'            => $tier,
+			'recommendations' => $this->get_recommendations( $breakdown ),
+			'calculated_at'   => current_time( 'mysql' ),
+		);
+
+		// Cache the result.
+		set_transient( self::TRANSIENT_NAME, $result, self::TRANSIENT_EXPIRATION );
+
+		return $result;
+	}
+
+	/**
+	 * Score crawler access (0-25 points)
+	 *
+	 * Based on percentage of major AI crawlers allowed.
+	 *
+	 * @return int Points earned.
+	 */
+	private function score_crawler_access() {
+		$settings       = GetCited_Settings::instance();
+		$crawler_states = $settings->get( 'crawlers' );
+		$crawler_list   = GetCited_Crawler_List::instance();
+		$all_crawlers   = $crawler_list->get_all();
+
+		// Build lookup of crawler name to user_agent.
+		$crawler_map = array();
+		foreach ( $all_crawlers as $crawler ) {
+			$crawler_map[ $crawler['user_agent'] ] = $crawler['name'];
+		}
+
+		// Count how many major crawlers are allowed.
+		$allowed_count = 0;
+		foreach ( self::MAJOR_CRAWLERS as $major_crawler ) {
+			// Find the user_agent key for this crawler name.
+			foreach ( $crawler_map as $ua => $name ) {
+				if ( stripos( $name, $major_crawler ) !== false || stripos( $ua, $major_crawler ) !== false ) {
+					if ( isset( $crawler_states[ $ua ] ) && $crawler_states[ $ua ] === 'allow' ) {
+						$allowed_count++;
+						break;
+					}
+				}
+			}
+		}
+
+		// Calculate score: (allowed / total major) * 25.
+		$total_major = count( self::MAJOR_CRAWLERS );
+		return (int) round( ( $allowed_count / $total_major ) * 25 );
+	}
+
+	/**
+	 * Score llms.txt health (0-25 points)
+	 *
+	 * - Exists: 10 pts
+	 * - Valid format: 5 pts
+	 * - Accessible: 5 pts
+	 * - Has meaningful content (>100 chars): 5 pts
+	 *
+	 * @return int Points earned.
+	 */
+	private function score_llms_health() {
+		$settings = GetCited_Settings::instance();
+		$score    = 0;
+
+		// Check if enabled.
+		if ( ! $settings->get( 'llms_txt_enabled' ) ) {
+			return 0;
+		}
+
+		// llms.txt exists (enabled counts as exists).
+		$score += 10;
+
+		// Get content.
+		$llms    = GetCited_Llms_Txt::instance();
+		$content = $llms->get_content();
+
+		// Valid format (has headings).
+		if ( strpos( $content, '#' ) !== false ) {
+			$score += 5;
+		}
+
+		// Accessible - check health status.
+		$health = GetCited_Health_Check::instance()->get_status();
+		if ( isset( $health['llms_txt']['status'] ) && $health['llms_txt']['status'] === 'ok' ) {
+			$score += 5;
+		}
+
+		// Has meaningful content (>100 chars, excluding the marker).
+		$content_without_marker = str_replace( '# Generated by GetCited', '', $content );
+		if ( strlen( trim( $content_without_marker ) ) > 100 ) {
+			$score += 5;
+		}
+
+		return $score;
+	}
+
+	/**
+	 * Score schema presence (0-20 points)
+	 *
+	 * - Organization schema: 10 pts
+	 * - Article schema on posts: 10 pts
+	 *
+	 * Detects schema from GetCited OR other sources.
+	 *
+	 * @return int Points earned.
+	 */
+	private function score_schema() {
+		$score    = 0;
+		$settings = GetCited_Settings::instance();
+		$detector = GetCited_Schema_Detector::instance();
+
+		// Check if GetCited schema is enabled.
+		$getcited_enabled = $settings->get( 'schema_enabled' );
+		$schema_types     = $settings->get( 'schema_types' );
+
+		// Check detection for other schema sources.
+		$detection = $detector->get_detection_status();
+
+		// Organization schema - from GetCited or detected.
+		if ( $getcited_enabled && ! empty( $schema_types['organization'] ) ) {
+			$score += 10;
+		} elseif ( ! empty( $detection['json_ld_types'] ) && in_array( 'Organization', $detection['json_ld_types'], true ) ) {
+			$score += 10;
+		}
+
+		// Article schema - from GetCited or detected.
+		if ( $getcited_enabled && ! empty( $schema_types['article'] ) ) {
+			$score += 10;
+		} elseif ( ! empty( $detection['json_ld_types'] ) ) {
+			$article_types = array( 'Article', 'NewsArticle', 'BlogPosting' );
+			foreach ( $article_types as $type ) {
+				if ( in_array( $type, $detection['json_ld_types'], true ) ) {
+					$score += 10;
+					break;
+				}
+			}
+		}
+
+		return $score;
+	}
+
+	/**
+	 * Score citability average (0-20 points)
+	 *
+	 * Based on average citability score of 5 most recent posts.
+	 *
+	 * @return int Points earned.
+	 */
+	private function score_citability() {
+		$citability = GetCited_Citability::instance();
+		$avg_score  = $citability->get_average_score();
+
+		// Scale 0-100 citability to 0-20 points.
+		return (int) round( ( $avg_score / 100 ) * 20 );
+	}
+
+	/**
+	 * Score freshness (0-10 points)
+	 *
+	 * Based on most recent post age:
+	 * - Within 30 days: 10 pts
+	 * - Within 90 days: 7 pts
+	 * - Within 180 days: 4 pts
+	 * - Older: 0 pts
+	 *
+	 * @return int Points earned.
+	 */
+	private function score_freshness() {
+		$recent_posts = get_posts( array(
+			'numberposts' => 1,
+			'post_status' => 'publish',
+			'post_type'   => 'post',
+		) );
+
+		if ( empty( $recent_posts ) ) {
+			return 0;
+		}
+
+		$latest_post = $recent_posts[0];
+		$post_date   = strtotime( $latest_post->post_date );
+		$now         = current_time( 'timestamp' );
+		$days_ago    = ( $now - $post_date ) / DAY_IN_SECONDS;
+
+		if ( $days_ago <= 30 ) {
+			return 10;
+		} elseif ( $days_ago <= 90 ) {
+			return 7;
+		} elseif ( $days_ago <= 180 ) {
+			return 4;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Get the tier label for a score
+	 *
+	 * @param int $score The total score.
+	 * @return array Tier data with label, class, and color.
+	 */
+	public function get_tier( $score ) {
+		if ( $score >= 90 ) {
+			return array(
+				'label' => __( 'Excellent', 'getcited' ),
+				'class' => 'excellent',
+				'color' => '#22c55e', // Green.
+			);
+		} elseif ( $score >= 75 ) {
+			return array(
+				'label' => __( 'Good', 'getcited' ),
+				'class' => 'good',
+				'color' => '#84cc16', // Light green.
+			);
+		} elseif ( $score >= 50 ) {
+			return array(
+				'label' => __( 'Fair', 'getcited' ),
+				'class' => 'fair',
+				'color' => '#eab308', // Yellow.
+			);
+		} elseif ( $score >= 25 ) {
+			return array(
+				'label' => __( 'Needs Work', 'getcited' ),
+				'class' => 'needs-work',
+				'color' => '#f97316', // Orange.
+			);
+		}
+
+		return array(
+			'label' => __( 'Poor', 'getcited' ),
+			'class' => 'poor',
+			'color' => '#ef4444', // Red.
+		);
+	}
+
+	/**
+	 * Get recommendations based on lowest scoring factors
+	 *
+	 * @param array $breakdown Score breakdown by component.
+	 * @return array Array of 1-2 recommendation strings.
+	 */
+	public function get_recommendations( $breakdown ) {
+		$recommendations = array();
+		$max_points      = array(
+			'crawler_access' => 25,
+			'llms_health'    => 25,
+			'schema'         => 20,
+			'citability'     => 20,
+			'freshness'      => 10,
+		);
+
+		// Calculate deficit for each component.
+		$deficits = array();
+		foreach ( $breakdown as $key => $score ) {
+			$deficits[ $key ] = $max_points[ $key ] - $score;
+		}
+
+		// Sort by deficit (highest first).
+		arsort( $deficits );
+
+		// Generate recommendations for top deficits.
+		foreach ( $deficits as $key => $deficit ) {
+			if ( $deficit <= 0 || count( $recommendations ) >= 2 ) {
+				continue;
+			}
+
+			$rec = $this->get_recommendation_text( $key, $breakdown[ $key ], $max_points[ $key ] );
+			if ( $rec ) {
+				$recommendations[] = $rec;
+			}
+		}
+
+		return $recommendations;
+	}
+
+	/**
+	 * Get recommendation text for a specific component
+	 *
+	 * @param string $component The component key.
+	 * @param int    $score     Current score.
+	 * @param int    $max       Maximum possible score.
+	 * @return string|null Recommendation text or null.
+	 */
+	private function get_recommendation_text( $component, $score, $max ) {
+		$improvement = $max - $score;
+
+		switch ( $component ) {
+			case 'crawler_access':
+				if ( $score < $max ) {
+					return sprintf(
+						/* translators: %d: potential point improvement */
+						__( 'Some major AI crawlers are blocked. Allowing them could improve your score by up to %d points.', 'getcited' ),
+						$improvement
+					);
+				}
+				break;
+
+			case 'llms_health':
+				if ( $score === 0 ) {
+					return __( 'Enable llms.txt to help AI systems understand your site. This could add up to 25 points.', 'getcited' );
+				} elseif ( $score < $max ) {
+					return sprintf(
+						/* translators: %d: potential point improvement */
+						__( 'Your llms.txt could use more content or formatting. Improve it to gain up to %d points.', 'getcited' ),
+						$improvement
+					);
+				}
+				break;
+
+			case 'schema':
+				if ( $score === 0 ) {
+					return __( 'No schema markup detected. Enable GetCited schema or check your SEO plugin settings for up to 20 points.', 'getcited' );
+				} elseif ( $score < $max ) {
+					return sprintf(
+						/* translators: %d: potential point improvement */
+						__( 'Add more schema types (Organization or Article) to improve your score by %d points.', 'getcited' ),
+						$improvement
+					);
+				}
+				break;
+
+			case 'citability':
+				if ( $score < 10 ) {
+					return __( 'Your recent posts have low citability scores. Add clear summaries, headings, and author attribution.', 'getcited' );
+				} elseif ( $score < $max ) {
+					return sprintf(
+						/* translators: %d: potential point improvement */
+						__( 'Improving your content citability could add up to %d points. Check the Citability page for tips.', 'getcited' ),
+						$improvement
+					);
+				}
+				break;
+
+			case 'freshness':
+				if ( $score < $max ) {
+					$days = $score === 0 ? 180 : ( $score === 4 ? 90 : 30 );
+					return sprintf(
+						/* translators: 1: number of days, 2: potential point improvement */
+						__( 'Your most recent post is over %1$d days old. Publishing fresh content could add %2$d points.', 'getcited' ),
+						$days,
+						$improvement
+					);
+				}
+				break;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get component labels for display
+	 *
+	 * @return array Component key => label.
+	 */
+	public static function get_component_labels() {
+		return array(
+			'crawler_access' => __( 'Crawler Access', 'getcited' ),
+			'llms_health'    => __( 'llms.txt Health', 'getcited' ),
+			'schema'         => __( 'Schema Presence', 'getcited' ),
+			'citability'     => __( 'Content Citability', 'getcited' ),
+			'freshness'      => __( 'Freshness', 'getcited' ),
+		);
+	}
+
+	/**
+	 * Get max points for each component
+	 *
+	 * @return array Component key => max points.
+	 */
+	public static function get_max_points() {
+		return array(
+			'crawler_access' => 25,
+			'llms_health'    => 25,
+			'schema'         => 20,
+			'citability'     => 20,
+			'freshness'      => 10,
+		);
+	}
+}

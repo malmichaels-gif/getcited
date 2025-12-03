@@ -50,6 +50,12 @@ class GetCited_Dashboard {
 
         // Schema detection handlers
         add_action( 'wp_ajax_getcited_rescan_schema', array( $this, 'ajax_rescan_schema' ) );
+
+        // Visibility score handlers
+        add_action( 'wp_ajax_getcited_refresh_visibility_score', array( $this, 'ajax_refresh_visibility_score' ) );
+
+        // Request log handlers
+        add_action( 'wp_ajax_getcited_clear_request_log', array( $this, 'ajax_clear_request_log' ) );
     }
 
     /**
@@ -197,6 +203,15 @@ class GetCited_Dashboard {
                 }
                 if ( isset( $data['keep_on_delete'] ) ) {
                     $settings->set( 'keep_on_delete', filter_var( $data['keep_on_delete'], FILTER_VALIDATE_BOOLEAN ) ?? false );
+                }
+                if ( isset( $data['request_logging_enabled'] ) ) {
+                    $settings->set( 'request_logging_enabled', filter_var( $data['request_logging_enabled'], FILTER_VALIDATE_BOOLEAN ) ?? false );
+                }
+                if ( isset( $data['request_log_retention'] ) ) {
+                    $retention = absint( $data['request_log_retention'] );
+                    if ( in_array( $retention, array( 30, 60, 90, 180 ), true ) ) {
+                        $settings->set( 'request_log_retention', $retention );
+                    }
                 }
                 break;
         }
@@ -350,6 +365,23 @@ class GetCited_Dashboard {
             'citability' => array(
                 'average' => GetCited_Citability::instance()->get_average_score(),
             ),
+            'visibility_score' => GetCited_Visibility_Score::instance()->get_score(),
+            'llms_activity' => $this->get_llms_activity(),
+        );
+    }
+
+    /**
+     * Get llms.txt activity data for dashboard
+     *
+     * @return array Activity data with recent requests and stats.
+     */
+    public function get_llms_activity() {
+        $logger = GetCited_Request_Logger::instance();
+
+        return array(
+            'recent'   => $logger->get_recent_requests( 30, 10 ),
+            'stats'    => $logger->get_request_stats( 30 ),
+            'enabled'  => GetCited_Settings::instance()->get( 'request_logging_enabled' ),
         );
     }
 
@@ -430,5 +462,48 @@ class GetCited_Dashboard {
             'last_scan'    => $detector->get_last_scan_ago(),
             'message'      => __( 'Scan complete', 'getcited' ),
         ) );
+    }
+
+    /**
+     * AJAX: Refresh visibility score
+     */
+    public function ajax_refresh_visibility_score() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $score_class = GetCited_Visibility_Score::instance();
+        $score       = $score_class->get_score( true ); // Force recalculation.
+
+        wp_send_json_success( array(
+            'score'   => $score,
+            'message' => __( 'Score refreshed', 'getcited' ),
+        ) );
+    }
+
+    /**
+     * AJAX: Clear request log
+     */
+    public function ajax_clear_request_log() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $logger = GetCited_Request_Logger::instance();
+        $result = $logger->clear_all_requests();
+
+        if ( $result ) {
+            wp_send_json_success( array(
+                'message' => __( 'Request log cleared', 'getcited' ),
+            ) );
+        } else {
+            wp_send_json_error( array(
+                'message' => __( 'Failed to clear request log', 'getcited' ),
+            ) );
+        }
     }
 }

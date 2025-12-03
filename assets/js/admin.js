@@ -20,6 +20,7 @@
         initLlmsTxtEditor();
         initSchemaSettings();
         initCitabilityAnalysis();
+        initVisibilityScore();
         initHealthCheck();
         initRobotsRulesActions();
         initWaitlistForm();
@@ -928,6 +929,78 @@
     }
 
     // ==========================================================================
+    // AI Visibility Score
+    // ==========================================================================
+
+    function initVisibilityScore() {
+        const refreshBtn = document.querySelector('.getcited-refresh-score');
+        if (!refreshBtn) return;
+
+        refreshBtn.addEventListener('click', function() {
+            const originalHTML = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<span class="dashicons dashicons-update spinning"></span> ' + (getcitedAdmin.strings?.refreshing || 'Refreshing...');
+
+            ajax('getcited_refresh_visibility_score', {})
+                .then(response => {
+                    if (response.success && response.data.score) {
+                        // Update the score display
+                        const score = response.data.score;
+                        const scoreNumber = document.querySelector('.score-number');
+                        const tierLabel = document.querySelector('.tier-label');
+                        const scoreProgress = document.querySelector('.score-progress');
+
+                        if (scoreNumber) {
+                            scoreNumber.textContent = score.total;
+                        }
+
+                        if (tierLabel) {
+                            tierLabel.textContent = score.tier.label;
+                            tierLabel.className = 'tier-label tier-' + score.tier.class;
+                        }
+
+                        if (scoreProgress) {
+                            const dasharray = (score.total / 100) * 283;
+                            scoreProgress.setAttribute('stroke-dasharray', dasharray + ' 283');
+                            scoreProgress.style.stroke = score.tier.color;
+                        }
+
+                        // Update breakdown bars
+                        if (score.breakdown) {
+                            const maxPoints = { crawler_access: 25, llms_health: 25, schema: 20, citability: 20, freshness: 10 };
+                            Object.keys(score.breakdown).forEach(key => {
+                                const item = document.querySelector(`.breakdown-item[data-key="${key}"]`);
+                                if (item) {
+                                    const fill = item.querySelector('.breakdown-fill');
+                                    const scoreLabel = item.querySelector('.label-score');
+                                    const percent = (score.breakdown[key] / maxPoints[key]) * 100;
+
+                                    if (fill) fill.style.width = percent + '%';
+                                    if (scoreLabel) scoreLabel.textContent = score.breakdown[key] + '/' + maxPoints[key];
+                                }
+                            });
+                        }
+
+                        // Update recommendation if present
+                        if (score.recommendations && score.recommendations.length > 0) {
+                            const recText = document.querySelector('.visibility-score-recommendations p');
+                            if (recText) {
+                                recText.textContent = score.recommendations[0];
+                            }
+                        }
+                    }
+
+                    this.disabled = false;
+                    this.innerHTML = originalHTML;
+                })
+                .catch(() => {
+                    this.disabled = false;
+                    this.innerHTML = originalHTML;
+                });
+        });
+    }
+
+    // ==========================================================================
     // Health Check
     // ==========================================================================
 
@@ -1637,7 +1710,9 @@
             const data = {
                 site_type: document.getElementById('site_type')?.value || 'blog',
                 debug_mode: document.getElementById('debug_mode')?.checked || false,
-                keep_on_delete: document.getElementById('keep_on_delete')?.checked || false
+                keep_on_delete: document.getElementById('keep_on_delete')?.checked || false,
+                request_logging_enabled: document.getElementById('request_logging_enabled')?.checked || false,
+                request_log_retention: parseInt(document.getElementById('request_log_retention')?.value, 10) || 90
             };
 
             ajax('getcited_save_settings', {
@@ -1666,12 +1741,44 @@
                 const textarea = document.getElementById('getcited-system-info');
                 textarea.select();
                 document.execCommand('copy');
-                
+
                 const originalText = copyBtn.textContent;
                 copyBtn.textContent = 'Copied!';
                 setTimeout(() => {
                     copyBtn.textContent = originalText;
                 }, 2000);
+            });
+        }
+
+        // Clear request log
+        const clearLogBtn = document.querySelector('.getcited-clear-request-log');
+        if (clearLogBtn) {
+            clearLogBtn.addEventListener('click', () => {
+                if (!confirm(getcitedAdmin.strings?.confirm_clear_log || 'Are you sure you want to clear all request logs? This action cannot be undone.')) {
+                    return;
+                }
+
+                const statusEl = clearLogBtn.nextElementSibling;
+                const originalText = clearLogBtn.innerHTML;
+                clearLogBtn.disabled = true;
+                clearLogBtn.textContent = getcitedAdmin.strings?.clearing || 'Clearing...';
+
+                ajax('getcited_clear_request_log', {})
+                    .then(response => {
+                        clearLogBtn.disabled = false;
+                        clearLogBtn.innerHTML = originalText;
+
+                        if (response.success) {
+                            showStatus(statusEl, getcitedAdmin.strings?.cleared || 'Log cleared', 'success');
+                        } else {
+                            showStatus(statusEl, getcitedAdmin.strings?.error || 'Error', 'error');
+                        }
+                    })
+                    .catch(() => {
+                        clearLogBtn.disabled = false;
+                        clearLogBtn.innerHTML = originalText;
+                        showStatus(statusEl, getcitedAdmin.strings?.error || 'Error', 'error');
+                    });
             });
         }
     }

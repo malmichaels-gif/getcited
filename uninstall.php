@@ -53,6 +53,21 @@ function getcited_uninstall() {
          OR option_name LIKE '_transient_timeout_getcited_citability_cache_%'"
     );
 
+    // Delete request rate limiting transients
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires pattern delete
+    $wpdb->query(
+        "DELETE FROM {$wpdb->options}
+         WHERE option_name LIKE '_transient_getcited_req_%'
+         OR option_name LIKE '_transient_timeout_getcited_req_%'"
+    );
+
+    // Delete visibility score transient
+    delete_transient( 'getcited_visibility_score' );
+
+    // Drop llms.txt request log table
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Uninstall cleanup requires table drop
+    $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}getcited_llms_requests" );
+
     // 3. Delete post meta
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires bulk delete of plugin meta
     $wpdb->query(

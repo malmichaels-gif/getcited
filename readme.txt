@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.4.2
+Stable tag: 1.4.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,16 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.4.5 =
+* New: AI Visibility Score - composite 0-100 score showing overall AI readiness
+* New: Score breakdown with 5 factors: Crawler Access, llms.txt Health, Schema Presence, Citability, Freshness
+* New: Actionable recommendations based on lowest-scoring areas
+* New: llms.txt Request Log - track when AI crawlers access your llms.txt file
+* New: Bot classification (AI Crawler, Search Engine, Browser, Unknown)
+* New: Request logging settings with configurable retention period
+* New: Custom database table for efficient request storage
+* Added: Daily cron job for automatic log cleanup based on retention settings
 
 = 1.4.2 =
 * Fixed: Health check calling removed method get_detected_plugins() (now uses Schema Detector)

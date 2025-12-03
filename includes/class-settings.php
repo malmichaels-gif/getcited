@@ -78,6 +78,10 @@ class GetCited_Settings {
         'site_type' => 'blog',
         'wizard_completed' => false,
 
+        // Request logging
+        'request_logging_enabled' => true,
+        'request_log_retention' => 90, // Days to keep request logs
+
         // Advanced
         'debug_mode' => false,
         'keep_on_delete' => false,

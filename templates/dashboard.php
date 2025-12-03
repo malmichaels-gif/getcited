@@ -14,13 +14,69 @@ if ( ! defined( 'ABSPATH' ) ) {
 $stats = GetCited_Dashboard::instance()->get_stats();
 $health = GetCited_Health_Check::instance();
 $pro_teaser = GetCited_Pro_Teaser::instance();
+$visibility_score = $stats['visibility_score'];
+$llms_activity = $stats['llms_activity'];
 ?>
 
 <div class="wrap getcited-wrap">
     <h1><?php echo esc_html( apply_filters( 'getcited_brand_name', 'GetCited' ) ); ?></h1>
 
     <div class="getcited-dashboard">
-        
+
+        <!-- AI Visibility Score -->
+        <div class="getcited-section getcited-visibility-score-section">
+            <div class="visibility-score-container">
+                <div class="visibility-score-circle tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
+                    <svg viewBox="0 0 100 100" class="score-svg">
+                        <circle class="score-bg" cx="50" cy="50" r="45" />
+                        <circle class="score-progress" cx="50" cy="50" r="45"
+                            stroke-dasharray="<?php echo esc_attr( ( $visibility_score['total'] / 100 ) * 283 ); ?> 283"
+                            style="stroke: <?php echo esc_attr( $visibility_score['tier']['color'] ); ?>" />
+                    </svg>
+                    <div class="score-value">
+                        <span class="score-number"><?php echo esc_html( $visibility_score['total'] ); ?></span>
+                        <span class="score-max">/100</span>
+                    </div>
+                </div>
+                <div class="visibility-score-info">
+                    <h2><?php esc_html_e( 'AI Visibility Score', 'getcited' ); ?></h2>
+                    <p class="tier-label tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
+                        <?php echo esc_html( $visibility_score['tier']['label'] ); ?>
+                    </p>
+                    <button type="button" class="button getcited-refresh-score">
+                        <span class="dashicons dashicons-update"></span>
+                        <?php esc_html_e( 'Refresh', 'getcited' ); ?>
+                    </button>
+                </div>
+                <div class="visibility-score-breakdown">
+                    <h3><?php esc_html_e( 'Breakdown', 'getcited' ); ?></h3>
+                    <?php
+                    $labels = GetCited_Visibility_Score::get_component_labels();
+                    $max_points = GetCited_Visibility_Score::get_max_points();
+                    foreach ( $visibility_score['breakdown'] as $key => $score ) :
+                        $max = $max_points[ $key ];
+                        $percent = ( $score / $max ) * 100;
+                    ?>
+                    <div class="breakdown-item" data-key="<?php echo esc_attr( $key ); ?>">
+                        <div class="breakdown-label">
+                            <span class="label-text"><?php echo esc_html( $labels[ $key ] ); ?></span>
+                            <span class="label-score"><?php echo esc_html( $score ); ?>/<?php echo esc_html( $max ); ?></span>
+                        </div>
+                        <div class="breakdown-bar">
+                            <div class="breakdown-fill" style="width: <?php echo esc_attr( $percent ); ?>%;"></div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php if ( ! empty( $visibility_score['recommendations'] ) ) : ?>
+                <div class="visibility-score-recommendations">
+                    <h4><?php esc_html_e( 'Top Recommendation', 'getcited' ); ?></h4>
+                    <p><?php echo esc_html( $visibility_score['recommendations'][0] ); ?></p>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <!-- Status Overview -->
         <div class="getcited-section getcited-status-overview">
             <h2><?php esc_html_e( 'AI Visibility Status', 'getcited' ); ?></h2>
@@ -107,6 +163,107 @@ $pro_teaser = GetCited_Pro_Teaser::instance();
                     </a>
                 </div>
             </div>
+        </div>
+
+        <!-- llms.txt Activity -->
+        <div class="getcited-section getcited-llms-activity-section">
+            <h2><?php esc_html_e( 'llms.txt Activity', 'getcited' ); ?></h2>
+
+            <?php if ( ! $llms_activity['enabled'] ) : ?>
+                <div class="getcited-activity-disabled">
+                    <p><?php esc_html_e( 'Request logging is disabled.', 'getcited' ); ?></p>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-settings' ) ); ?>" class="button">
+                        <?php esc_html_e( 'Enable in Settings', 'getcited' ); ?>
+                    </a>
+                </div>
+
+            <?php elseif ( empty( $llms_activity['recent'] ) ) : ?>
+                <div class="getcited-activity-empty">
+                    <p><?php esc_html_e( 'No requests logged yet.', 'getcited' ); ?></p>
+                    <p class="description">
+                        <?php esc_html_e( 'AI crawlers typically visit within 1-7 days of your llms.txt going live. Check back soon!', 'getcited' ); ?>
+                    </p>
+                    <a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" class="button">
+                        <?php esc_html_e( 'Verify llms.txt is accessible', 'getcited' ); ?>
+                    </a>
+                </div>
+
+            <?php else : ?>
+                <div class="getcited-activity-content">
+                    <div class="activity-list">
+                        <table class="widefat">
+                            <thead>
+                                <tr>
+                                    <th><?php esc_html_e( 'Time', 'getcited' ); ?></th>
+                                    <th><?php esc_html_e( 'Bot', 'getcited' ); ?></th>
+                                    <th><?php esc_html_e( 'Type', 'getcited' ); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ( $llms_activity['recent'] as $request ) :
+                                    $category_info = GetCited_Request_Logger::get_category_display( $request->category );
+                                    $time = strtotime( $request->request_time );
+                                ?>
+                                <tr>
+                                    <td class="activity-time">
+                                        <?php echo esc_html( date_i18n( 'M j, H:i', $time ) ); ?>
+                                    </td>
+                                    <td class="activity-bot">
+                                        <?php echo esc_html( $request->bot_name ); ?>
+                                    </td>
+                                    <td class="activity-category">
+                                        <span class="category-badge category-<?php echo esc_attr( $category_info['class'] ); ?>">
+                                            <span class="category-icon"><?php echo $category_info['icon']; ?></span>
+                                            <?php echo esc_html( $category_info['label'] ); ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="activity-stats">
+                        <?php
+                        $stats_data = $llms_activity['stats'];
+                        $ai_percent = $stats_data['total'] > 0 ? round( ( $stats_data['ai_crawlers'] / $stats_data['total'] ) * 100 ) : 0;
+                        ?>
+                        <div class="stats-summary">
+                            <p>
+                                <strong><?php echo esc_html( $stats_data['total'] ); ?></strong>
+                                <?php esc_html_e( 'requests from', 'getcited' ); ?>
+                                <strong><?php echo esc_html( $stats_data['unique_bots'] ); ?></strong>
+                                <?php esc_html_e( 'unique bots', 'getcited' ); ?>
+                                <span class="stats-period"><?php esc_html_e( '(Last 30 days)', 'getcited' ); ?></span>
+                            </p>
+                            <?php if ( $stats_data['ai_crawlers'] > 0 ) : ?>
+                            <p class="ai-stats">
+                                <span class="category-badge category-ai-crawler">
+                                    <span class="category-icon">&#10003;</span>
+                                    <?php
+                                    printf(
+                                        /* translators: 1: number of AI crawler requests, 2: percentage */
+                                        esc_html__( 'AI Crawlers: %1$d requests (%2$d%%)', 'getcited' ),
+                                        $stats_data['ai_crawlers'],
+                                        $ai_percent
+                                    );
+                                    ?>
+                                </span>
+                            </p>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ( $stats_data['ai_crawlers'] > 0 ) : ?>
+                        <p class="activity-success">
+                            <?php esc_html_e( 'AI crawlers are actively visiting your site.', 'getcited' ); ?>
+                        </p>
+                        <?php elseif ( $stats_data['total'] > 0 ) : ?>
+                        <p class="activity-note">
+                            <?php esc_html_e( 'No AI crawlers detected yet. This is normal for new sites.', 'getcited' ); ?>
+                        </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
 
         <!-- Health Check Section -->
