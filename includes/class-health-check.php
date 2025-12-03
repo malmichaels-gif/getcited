@@ -510,7 +510,8 @@ class GetCited_Health_Check {
      */
     private function check_schema() {
         $settings = GetCited_Settings::instance();
-        
+        $detector = GetCited_Schema_Detector::instance();
+
         if ( ! $settings->get( 'schema_enabled' ) ) {
             return array(
                 'status' => 'disabled',
@@ -518,20 +519,42 @@ class GetCited_Health_Check {
             );
         }
 
-        // Check for conflicts
-        $schema = GetCited_Schema::instance();
-        $conflicts = $schema->get_detected_plugins();
+        // Check for conflicts using schema detector.
+        $detection = $detector->get_detection_status();
+        $conflicts = $detection['plugins'] ?? array();
 
         if ( ! empty( $conflicts ) ) {
             $names = array_map( function( $p ) { return $p['name']; }, $conflicts );
+
+            // Check if user force-enabled schema.
+            if ( $settings->get( 'schema_force_enabled' ) ) {
+                return array(
+                    'status' => 'warning',
+                    'message' => sprintf(
+                        /* translators: %s: comma-separated list of detected schema plugin names */
+                        __( 'Schema force-enabled despite %s detected. May cause duplicates.', 'getcited' ),
+                        implode( ', ', $names )
+                    ),
+                    'conflicts' => $conflicts,
+                );
+            }
+
             return array(
-                'status' => 'warning',
+                'status' => 'ok',
                 'message' => sprintf(
                     /* translators: %s: comma-separated list of detected schema plugin names */
-                    __( 'Schema plugins detected: %s. This may cause duplicate schema.', 'getcited' ),
+                    __( 'Schema auto-disabled — %s is handling schema.', 'getcited' ),
                     implode( ', ', $names )
                 ),
                 'conflicts' => $conflicts,
+            );
+        }
+
+        // Check for JSON-LD detected on homepage.
+        if ( ! empty( $detection['json_ld_found'] ) && ! $settings->get( 'schema_force_enabled' ) ) {
+            return array(
+                'status' => 'ok',
+                'message' => __( 'Schema auto-disabled — existing JSON-LD detected on homepage.', 'getcited' ),
             );
         }
 

@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,9 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.4.2 =
+* Fixed: Health check calling removed method get_detected_plugins() (now uses Schema Detector)
 
 = 1.4.1 =
 * Fixed: Schema re-scan AJAX could cause deadlock on some hosting (self-referential HTTP request)
