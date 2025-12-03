@@ -47,6 +47,9 @@ class GetCited_Dashboard {
         // llms.txt file management handlers
         add_action( 'wp_ajax_getcited_write_llms_file', array( $this, 'ajax_write_llms_file' ) );
         add_action( 'wp_ajax_getcited_delete_llms_file', array( $this, 'ajax_delete_llms_file' ) );
+
+        // Schema detection handlers
+        add_action( 'wp_ajax_getcited_rescan_schema', array( $this, 'ajax_rescan_schema' ) );
     }
 
     /**
@@ -168,6 +171,9 @@ class GetCited_Dashboard {
             case 'schema':
                 if ( isset( $data['schema_enabled'] ) ) {
                     $settings->set( 'schema_enabled', filter_var( $data['schema_enabled'], FILTER_VALIDATE_BOOLEAN ) ?? false );
+                }
+                if ( isset( $data['schema_force_enabled'] ) ) {
+                    $settings->set( 'schema_force_enabled', filter_var( $data['schema_force_enabled'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
                 if ( isset( $data['schema_types'] ) && is_array( $data['schema_types'] ) ) {
                     // Convert string "true"/"false" to actual booleans
@@ -402,5 +408,27 @@ class GetCited_Dashboard {
         $output .= "\n=== End System Info ===";
 
         return $output;
+    }
+
+    /**
+     * AJAX: Re-scan for schema sources
+     */
+    public function ajax_rescan_schema() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $detector = GetCited_Schema_Detector::instance();
+        $result   = $detector->refresh_detection();
+        $status   = $detector->get_status_message();
+
+        wp_send_json_success( array(
+            'detection'    => $result,
+            'status'       => $status,
+            'last_scan'    => $detector->get_last_scan_ago(),
+            'message'      => __( 'Scan complete', 'getcited' ),
+        ) );
     }
 }

@@ -56,6 +56,9 @@ class GetCited_Settings {
 
         // Schema
         'schema_enabled' => true,
+        'schema_force_enabled' => false, // User override when auto-disabled
+        'schema_last_scan' => 0,         // Timestamp of last detection scan
+        'schema_detected_source' => '',  // 'yoast', 'rankmath', 'json_ld', etc.
         'schema_types' => array(
             'organization' => true,
             'article' => true,
@@ -66,6 +69,9 @@ class GetCited_Settings {
             'name' => '',
             'logo_url' => '',
             'social_urls' => array(),
+            'linkedin_company' => '',    // LinkedIn company page
+            'wikipedia' => '',           // Wikipedia/Wikidata URL
+            'crunchbase' => '',          // Crunchbase URL
         ),
 
         // Site configuration
@@ -290,12 +296,19 @@ class GetCited_Settings {
             case 'llms_write_physical':
             case 'robots_write_physical':
             case 'schema_enabled':
+            case 'schema_force_enabled':
             case 'wizard_completed':
             case 'debug_mode':
             case 'keep_on_delete':
             case 'ga4_connected':
             case 'waitlist_submitted':
                 return (bool) $value;
+
+            case 'schema_last_scan':
+                return absint( $value );
+
+            case 'schema_detected_source':
+                return sanitize_text_field( $value );
 
             case 'llms_txt_source':
                 return in_array( $value, array( 'getcited', 'existing' ), true ) ? $value : 'getcited';
@@ -327,6 +340,9 @@ class GetCited_Settings {
                         'name' => sanitize_text_field( $value['name'] ?? '' ),
                         'logo_url' => esc_url_raw( $value['logo_url'] ?? '' ),
                         'social_urls' => array_map( 'esc_url_raw', (array) ( $value['social_urls'] ?? array() ) ),
+                        'linkedin_company' => esc_url_raw( $value['linkedin_company'] ?? '' ),
+                        'wikipedia' => esc_url_raw( $value['wikipedia'] ?? '' ),
+                        'crunchbase' => esc_url_raw( $value['crunchbase'] ?? '' ),
                     );
                 }
                 return $this->defaults['organization'];

@@ -651,7 +651,7 @@
 
     function initSchemaSettings() {
         const saveBtn = document.querySelector('.getcited-save-schema');
-        
+
         if (!saveBtn) return;
 
         saveBtn.addEventListener('click', () => {
@@ -676,11 +676,15 @@
 
             const data = {
                 schema_enabled: document.getElementById('schema_enabled')?.checked ?? true,
+                schema_force_enabled: document.getElementById('schema_force_enabled')?.checked ?? false,
                 schema_types: schemaTypes,
                 organization: {
                     name: document.getElementById('org_name')?.value || '',
                     logo_url: document.getElementById('org_logo')?.value || '',
-                    social_urls: socialUrls
+                    social_urls: socialUrls,
+                    linkedin_company: document.getElementById('org_linkedin_company')?.value || '',
+                    wikipedia: document.getElementById('org_wikipedia')?.value || '',
+                    crunchbase: document.getElementById('org_crunchbase')?.value || ''
                 }
             };
 
@@ -690,7 +694,7 @@
             }).then(response => {
                 saveBtn.disabled = false;
                 saveBtn.textContent = 'Save Changes';
-                
+
                 if (response.success) {
                     showStatus(statusEl, getcitedAdmin.strings.saved, 'success');
                 } else {
@@ -714,6 +718,74 @@
                 input.className = 'regular-text';
                 input.placeholder = 'https://...';
                 container.appendChild(input);
+            });
+        }
+
+        // Schema detection re-scan button
+        const rescanBtn = document.querySelector('.getcited-rescan-schema');
+        if (rescanBtn) {
+            rescanBtn.addEventListener('click', function() {
+                const originalText = this.textContent;
+                this.disabled = true;
+                this.textContent = getcitedAdmin.strings.rescanning || 'Rescanning...';
+
+                ajax('getcited_rescan_schema', {})
+                    .then(response => {
+                        this.disabled = false;
+                        this.textContent = originalText;
+
+                        if (response.success) {
+                            // Update the status indicator
+                            const statusIndicator = document.querySelector('.getcited-status-indicator');
+                            const statusMessage = statusIndicator?.querySelector('.status-message');
+                            const statusIcon = statusIndicator?.querySelector('.dashicons');
+
+                            if (statusMessage) {
+                                statusMessage.textContent = response.data.status.message;
+                            }
+
+                            if (statusIcon) {
+                                if (response.data.status.status === 'active') {
+                                    statusIcon.className = 'dashicons dashicons-yes-alt';
+                                    statusIcon.style.color = '#46b450';
+                                } else {
+                                    statusIcon.className = 'dashicons dashicons-warning';
+                                    statusIcon.style.color = '#f0b849';
+                                }
+                            }
+
+                            // Update the last scan time
+                            const lastScanTime = document.querySelector('.last-scan-time');
+                            if (lastScanTime) {
+                                lastScanTime.textContent = response.data.last_scan;
+                            }
+
+                            // Show success briefly
+                            this.textContent = getcitedAdmin.strings.rescan_complete || 'Scan complete';
+                            setTimeout(() => {
+                                this.textContent = originalText;
+                            }, 2000);
+
+                            // Reload page if status changed to show/hide force enable option
+                            if (response.data.detection.should_disable !== undefined) {
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1500);
+                            }
+                        } else {
+                            this.textContent = getcitedAdmin.strings.rescan_failed || 'Scan failed';
+                            setTimeout(() => {
+                                this.textContent = originalText;
+                            }, 2000);
+                        }
+                    })
+                    .catch(() => {
+                        this.disabled = false;
+                        this.textContent = getcitedAdmin.strings.rescan_failed || 'Scan failed';
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    });
             });
         }
     }

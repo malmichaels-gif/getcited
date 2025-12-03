@@ -933,6 +933,108 @@
     gap: var(--getcited-space-sm);
 }
 
+/* Schema Detection Status */
+.getcited-detection-status {
+    border-left: 4px solid var(--getcited-gray-300);
+}
+
+.getcited-detection-status.active {
+    border-left-color: var(--getcited-success);
+}
+
+.getcited-detection-status.disabled {
+    border-left-color: var(--getcited-warning);
+    background: rgba(245, 158, 11, 0.03);
+}
+
+.getcited-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.getcited-status-indicator .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.getcited-last-scan {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+    margin: var(--getcited-space-sm) 0;
+}
+
+.getcited-last-scan .button-small {
+    padding: 2px 8px;
+    font-size: 12px;
+}
+
+.getcited-force-enable {
+    margin-top: var(--getcited-space-md);
+    padding-top: var(--getcited-space-md);
+    border-top: 1px solid var(--getcited-gray-200);
+}
+
+.getcited-warning-text {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--getcited-space-xs);
+    color: #92400e;
+    background: rgba(245, 158, 11, 0.1);
+    padding: var(--getcited-space-sm);
+    border-radius: var(--getcited-radius-sm);
+    margin-top: var(--getcited-space-sm);
+}
+
+.getcited-warning-text .dashicons {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.getcited-detected-types {
+    margin-top: var(--getcited-space-md);
+    font-size: 13px;
+}
+
+.getcited-detected-types summary {
+    cursor: pointer;
+    color: var(--getcited-gray-600);
+}
+
+.getcited-detected-types summary:hover {
+    color: var(--getcited-primary);
+}
+
+.getcited-detected-types ul {
+    margin: var(--getcited-space-sm) 0 0 var(--getcited-space-md);
+    padding: 0;
+    list-style: disc;
+}
+
+.getcited-detected-types code {
+    background: var(--getcited-gray-100);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+/* Organization sameAs subsection */
+.getcited-subsection-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--getcited-gray-700);
+    margin: var(--getcited-space-lg) 0 var(--getcited-space-sm);
+    padding-top: var(--getcited-space-md);
+    border-top: 1px solid var(--getcited-gray-200);
+}
+
 .getcited-schema-options {
     display: flex;
     flex-direction: column;

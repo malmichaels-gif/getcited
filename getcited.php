@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.3.5
+ * Version: 1.4.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Malcolm Michaels
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.3.5' );
+define( 'GETCITED_VERSION', '1.4.0' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -67,6 +67,8 @@ final class GetCited {
         require_once GETCITED_PLUGIN_DIR . 'includes/class-robots.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-llms-txt.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-schema.php';
+        require_once GETCITED_PLUGIN_DIR . 'includes/class-schema-detector.php';
+        require_once GETCITED_PLUGIN_DIR . 'includes/class-author-fields.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-conflict-detector.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-health-check.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-citability.php';
@@ -103,6 +105,7 @@ final class GetCited {
 
         // Schedule cron
         add_action( 'getcited_daily_cron', array( $this, 'run_daily_tasks' ) );
+        add_action( 'getcited_weekly_schema_scan', array( $this, 'run_schema_scan' ) );
 
         // REST API
         add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
@@ -122,10 +125,18 @@ final class GetCited {
             $settings->set( 'site_uuid', wp_generate_uuid4() );
         }
 
-        // Schedule cron job
+        // Schedule cron jobs
         if ( ! wp_next_scheduled( 'getcited_daily_cron' ) ) {
             wp_schedule_event( time(), 'daily', 'getcited_daily_cron' );
         }
+
+        // Weekly schema detection scan
+        if ( ! wp_next_scheduled( 'getcited_weekly_schema_scan' ) ) {
+            wp_schedule_event( time(), 'weekly', 'getcited_weekly_schema_scan' );
+        }
+
+        // Run initial schema detection
+        GetCited_Schema_Detector::instance()->run_detection();
 
         // Flush rewrite rules
         $this->register_rewrites();
@@ -144,10 +155,15 @@ final class GetCited {
      * Plugin deactivation
      */
     public function deactivate() {
-        // Remove cron job
+        // Remove cron jobs
         $timestamp = wp_next_scheduled( 'getcited_daily_cron' );
         if ( $timestamp ) {
             wp_unschedule_event( $timestamp, 'getcited_daily_cron' );
+        }
+
+        $timestamp = wp_next_scheduled( 'getcited_weekly_schema_scan' );
+        if ( $timestamp ) {
+            wp_unschedule_event( $timestamp, 'getcited_weekly_schema_scan' );
         }
 
         // Flush rewrite rules
@@ -169,6 +185,8 @@ final class GetCited {
         GetCited_Robots::instance();
         GetCited_Llms_Txt::instance();
         GetCited_Schema::instance();
+        GetCited_Schema_Detector::instance();
+        GetCited_Author_Fields::instance();
         GetCited_Health_Check::instance();
         GetCited_Citability::instance();
         GetCited_Wizard::instance();
@@ -338,6 +356,10 @@ final class GetCited {
                 'load_more' => __( 'Load More Posts', 'getcited' ),
                 'loading' => __( 'Loading...', 'getcited' ),
                 'no_more_posts' => __( 'No more posts to show', 'getcited' ),
+                // Schema detection strings
+                'rescanning' => __( 'Rescanning...', 'getcited' ),
+                'rescan_complete' => __( 'Scan complete', 'getcited' ),
+                'rescan_failed' => __( 'Scan failed. Please try again.', 'getcited' ),
             ),
         ) );
     }
@@ -354,6 +376,16 @@ final class GetCited {
 
         // Fire hook for extensions
         do_action( 'getcited_daily_tasks' );
+    }
+
+    /**
+     * Run weekly schema detection scan
+     */
+    public function run_schema_scan() {
+        GetCited_Schema_Detector::instance()->refresh_detection();
+
+        // Fire hook for extensions
+        do_action( 'getcited_schema_scan' );
     }
 
     /**

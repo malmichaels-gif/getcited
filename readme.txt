@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,20 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.4.0 =
+* New: Schema smart fallback - auto-disables when SEO plugin detected (Yoast, Rank Math, etc.)
+* New: Homepage JSON-LD scan detects existing schema from any source
+* New: Force-enable option for users who want GetCited schema despite detection
+* New: @id entity graph connecting Organization → Author → Article for AI understanding
+* New: Enhanced Author schema with knowsAbout (expertise topics) and jobTitle
+* New: Author profile fields in WordPress user edit screen (LinkedIn, Twitter, Job Title, Expertise, ORCID)
+* New: Organization sameAs links (LinkedIn Company, Wikipedia, Crunchbase)
+* New: Weekly cron job for automatic schema source re-scanning
+* New: Manual "Re-scan" button on Schema settings page
+* New: Detection status UI shows what source is handling schema
+* Changed: Schema now works as "smart fallback" - fills gaps SEO plugins miss
+* Added: 8 SEO plugin detections (Yoast, Rank Math, AIOSEO, SEOPress, Schema Pro, Squirrly, SEO Framework, SmartCrawl)
 
 = 1.3.0 =
 * Added: Logo URL now supports WordPress Media Library picker (Upload button works)
