@@ -1383,8 +1383,9 @@
             return;
         }
 
-        var steps = ['welcome', 'site_type', 'organization', 'crawlers', 'complete'];
+        var steps = ['welcome', 'site_type', 'organization', 'crawlers', 'verify', 'complete'];
         var currentStep = 0;
+        var verifyData = null; // Store verification results
 
         // Get all step elements upfront
         var stepElements = {};
@@ -1518,6 +1519,232 @@
                 this.closest('.getcited-radio-card').classList.add('selected');
             });
         });
+
+        // Handle entering verify step
+        function runVerification() {
+            var verifyStep = stepElements['verify'];
+            if (!verifyStep) return;
+
+            // Get state containers
+            var checkingState = verifyStep.querySelector('.verify-checking');
+            var successState = verifyStep.querySelector('.verify-success');
+            var needsFixState = verifyStep.querySelector('.verify-needs-fix');
+            var fixingState = verifyStep.querySelector('.verify-fixing');
+            var manualState = verifyStep.querySelector('.verify-manual');
+
+            // Get buttons
+            var continueBtn = verifyStep.querySelector('.verify-continue-btn');
+            var fixBtn = verifyStep.querySelector('.getcited-verify-fix-btn');
+            var skipBtn = verifyStep.querySelector('.getcited-verify-skip-btn');
+
+            // Hide all states first
+            [checkingState, successState, needsFixState, fixingState, manualState].forEach(function(el) {
+                if (el) el.style.display = 'none';
+            });
+
+            // Hide all action buttons except back
+            if (continueBtn) continueBtn.style.display = 'none';
+            if (fixBtn) fixBtn.style.display = 'none';
+            if (skipBtn) skipBtn.style.display = 'none';
+
+            // Show checking state
+            if (checkingState) checkingState.style.display = 'block';
+
+            // Run the verification check
+            ajax('getcited_wizard_verify')
+                .then(function(response) {
+                    if (response.success && response.data) {
+                        verifyData = response.data;
+
+                        if (checkingState) checkingState.style.display = 'none';
+
+                        if (response.data.accessible) {
+                            // Success!
+                            if (successState) successState.style.display = 'block';
+                            if (continueBtn) continueBtn.style.display = 'inline-block';
+                        } else {
+                            // Needs fix
+                            if (needsFixState) needsFixState.style.display = 'block';
+                            if (fixBtn) fixBtn.style.display = 'inline-block';
+                            if (skipBtn) skipBtn.style.display = 'inline-block';
+
+                            // Show host-specific guidance if detected
+                            if (response.data.host && response.data.host !== 'unknown') {
+                                var hostGuidance = verifyStep.querySelector('.verify-host-guidance');
+                                if (hostGuidance) {
+                                    var hostTitle = hostGuidance.querySelector('.host-title');
+                                    var hostMessage = hostGuidance.querySelector('.host-message');
+                                    var hostDocsLink = hostGuidance.querySelector('.host-docs-link');
+
+                                    if (response.data.host_guidance) {
+                                        if (hostTitle) hostTitle.textContent = response.data.host_guidance.title || response.data.host;
+                                        if (hostMessage) hostMessage.textContent = response.data.host_guidance.message || '';
+                                        if (hostDocsLink && response.data.host_guidance.docs_url) {
+                                            hostDocsLink.href = response.data.host_guidance.docs_url;
+                                            hostDocsLink.style.display = 'inline';
+                                        } else if (hostDocsLink) {
+                                            hostDocsLink.style.display = 'none';
+                                        }
+                                        hostGuidance.style.display = 'block';
+                                    }
+                                }
+                            }
+
+                            // Update verify message with suggestion
+                            if (response.data.suggestion) {
+                                var verifyMessage = needsFixState.querySelector('.verify-message');
+                                if (verifyMessage) {
+                                    verifyMessage.textContent = response.data.suggestion;
+                                }
+                            }
+                        }
+                    } else {
+                        // Error - show needs fix state with default message
+                        if (checkingState) checkingState.style.display = 'none';
+                        if (needsFixState) needsFixState.style.display = 'block';
+                        if (fixBtn) fixBtn.style.display = 'inline-block';
+                        if (skipBtn) skipBtn.style.display = 'inline-block';
+                    }
+                })
+                .catch(function() {
+                    // On error, show needs fix state
+                    if (checkingState) checkingState.style.display = 'none';
+                    if (needsFixState) needsFixState.style.display = 'block';
+                    if (fixBtn) fixBtn.style.display = 'inline-block';
+                    if (skipBtn) skipBtn.style.display = 'inline-block';
+                });
+        }
+
+        // Handle verify step fix button
+        var verifyFixBtn = wizard.querySelector('.getcited-verify-fix-btn');
+        if (verifyFixBtn) {
+            verifyFixBtn.addEventListener('click', function() {
+                var verifyStep = stepElements['verify'];
+                var selectedOption = verifyStep.querySelector('input[name="verify_fix"]:checked');
+                var optionValue = selectedOption ? selectedOption.value : 'skip';
+
+                if (optionValue === 'skip') {
+                    // Just continue to next step
+                    showStep(currentStep + 1);
+                    return;
+                }
+
+                if (optionValue === 'download') {
+                    // Show manual state with download instructions
+                    var needsFixState = verifyStep.querySelector('.verify-needs-fix');
+                    var manualState = verifyStep.querySelector('.verify-manual');
+                    var fixBtn = verifyStep.querySelector('.getcited-verify-fix-btn');
+                    var skipBtn = verifyStep.querySelector('.getcited-verify-skip-btn');
+                    var continueBtn = verifyStep.querySelector('.verify-continue-btn');
+
+                    if (needsFixState) needsFixState.style.display = 'none';
+                    if (manualState) manualState.style.display = 'block';
+                    if (fixBtn) fixBtn.style.display = 'none';
+
+                    // Show WordPress.com note if detected
+                    if (verifyData && verifyData.host === 'wordpress_com') {
+                        var wpNote = manualState.querySelector('.wordpress-com-note');
+                        if (wpNote) wpNote.style.display = 'block';
+                    }
+
+                    // Change skip button text
+                    if (skipBtn) {
+                        skipBtn.textContent = getcitedAdmin.strings?.continue || 'Continue' + ' →';
+                        skipBtn.style.display = 'inline-block';
+                    }
+                    return;
+                }
+
+                if (optionValue === 'write_physical') {
+                    // Attempt to write physical file
+                    var needsFixState = verifyStep.querySelector('.verify-needs-fix');
+                    var fixingState = verifyStep.querySelector('.verify-fixing');
+                    var manualState = verifyStep.querySelector('.verify-manual');
+                    var successState = verifyStep.querySelector('.verify-success');
+                    var fixBtn = verifyStep.querySelector('.getcited-verify-fix-btn');
+                    var skipBtn = verifyStep.querySelector('.getcited-verify-skip-btn');
+                    var continueBtn = verifyStep.querySelector('.verify-continue-btn');
+
+                    // Show fixing state
+                    if (needsFixState) needsFixState.style.display = 'none';
+                    if (fixingState) fixingState.style.display = 'block';
+                    if (fixBtn) fixBtn.style.display = 'none';
+                    if (skipBtn) skipBtn.style.display = 'none';
+
+                    ajax('getcited_wizard_fix_llms')
+                        .then(function(response) {
+                            if (fixingState) fixingState.style.display = 'none';
+
+                            if (response.success) {
+                                // File written successfully
+                                if (successState) successState.style.display = 'block';
+                                if (continueBtn) continueBtn.style.display = 'inline-block';
+                            } else {
+                                // Writing failed - show manual upload option
+                                if (manualState) manualState.style.display = 'block';
+                                if (skipBtn) {
+                                    skipBtn.textContent = (getcitedAdmin.strings?.continue || 'Continue') + ' →';
+                                    skipBtn.style.display = 'inline-block';
+                                }
+
+                                // Show WordPress.com note if detected
+                                if (verifyData && verifyData.host === 'wordpress_com') {
+                                    var wpNote = manualState.querySelector('.wordpress-com-note');
+                                    if (wpNote) wpNote.style.display = 'block';
+                                }
+                            }
+                        })
+                        .catch(function() {
+                            // On error, show manual state
+                            if (fixingState) fixingState.style.display = 'none';
+                            if (manualState) manualState.style.display = 'block';
+                            if (skipBtn) {
+                                skipBtn.textContent = (getcitedAdmin.strings?.continue || 'Continue') + ' →';
+                                skipBtn.style.display = 'inline-block';
+                            }
+                        });
+                }
+            });
+        }
+
+        // Handle verify skip button
+        var verifySkipBtn = wizard.querySelector('.getcited-verify-skip-btn');
+        if (verifySkipBtn) {
+            verifySkipBtn.addEventListener('click', function() {
+                showStep(currentStep + 1);
+            });
+        }
+
+        // Handle download llms.txt button
+        var downloadBtns = wizard.querySelectorAll('.getcited-download-llms');
+        downloadBtns.forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Build the download URL with nonce
+                var downloadUrl = getcitedAdmin.ajaxUrl + '?action=getcited_download_llms&nonce=' + encodeURIComponent(getcitedAdmin.nonce);
+
+                // Create a temporary link and trigger download
+                var a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = 'llms.txt';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        });
+
+        // Modify showStep to trigger verification when entering verify step
+        var originalShowStep = showStep;
+        showStep = function(index) {
+            originalShowStep(index);
+
+            // If entering verify step, run verification
+            if (steps[index] === 'verify') {
+                runVerification();
+            }
+        };
 
         // Initialize first step - show it immediately
         showStep(0);

@@ -2183,6 +2183,224 @@
     height: 22px;
 }
 
+/* Verification Step */
+.getcited-verify-container {
+    max-width: 550px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.verify-state {
+    padding: var(--getcited-space-lg) 0;
+}
+
+.verify-spinner {
+    margin-bottom: var(--getcited-space-md);
+}
+
+.verify-spinner .spinner {
+    float: none;
+    margin: 0 auto;
+}
+
+.verify-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--getcited-space-lg);
+}
+
+.verify-icon.success {
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.verify-icon.success .dashicons {
+    color: var(--getcited-success);
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+}
+
+.verify-icon.warning {
+    background: rgba(234, 179, 8, 0.1);
+}
+
+.verify-icon.warning .dashicons {
+    color: var(--getcited-warning);
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+}
+
+.verify-icon.info {
+    background: rgba(107, 114, 128, 0.1);
+}
+
+.verify-icon.info .dashicons {
+    color: var(--getcited-gray-500);
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+}
+
+.verify-state h2 {
+    font-size: 24px;
+    color: var(--getcited-gray-800);
+    margin: 0 0 var(--getcited-space-md) 0;
+}
+
+.verify-url {
+    color: var(--getcited-gray-600);
+    font-size: 15px;
+    margin-bottom: var(--getcited-space-md);
+}
+
+.verify-url .llms-url-link {
+    display: block;
+    margin-top: var(--getcited-space-sm);
+    color: var(--getcited-primary);
+    word-break: break-all;
+}
+
+.verify-message {
+    color: var(--getcited-gray-600);
+    font-size: 15px;
+    margin: 0 0 var(--getcited-space-lg) 0;
+}
+
+.verify-host-guidance {
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.host-guidance-box {
+    background: var(--getcited-accent-light);
+    border: 1px solid var(--getcited-primary);
+    border-radius: var(--getcited-radius-md);
+    padding: var(--getcited-space-md);
+    text-align: left;
+}
+
+.host-guidance-box .host-title {
+    display: block;
+    color: var(--getcited-gray-800);
+    font-size: 15px;
+    margin-bottom: var(--getcited-space-xs);
+}
+
+.host-guidance-box .host-message {
+    color: var(--getcited-gray-600);
+    font-size: 14px;
+    margin: 0 0 var(--getcited-space-sm) 0;
+}
+
+.host-guidance-box .host-docs-link {
+    font-size: 13px;
+    color: var(--getcited-primary);
+}
+
+.verify-fix-options {
+    text-align: left;
+}
+
+.verify-fix-options h3 {
+    font-size: 16px;
+    color: var(--getcited-gray-700);
+    margin: 0 0 var(--getcited-space-md) 0;
+}
+
+.verify-fix-options .getcited-radio-card {
+    margin-bottom: var(--getcited-space-sm);
+}
+
+.verify-fix-options .radio-card-content {
+    padding: var(--getcited-space-md);
+}
+
+.verify-fix-options .radio-card-content .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.verify-fix-options .radio-card-content strong {
+    font-size: 15px;
+}
+
+.verify-fix-options .radio-card-content p {
+    padding-left: 0;
+    margin-top: var(--getcited-space-xs);
+    font-size: 13px;
+}
+
+.fixing-message {
+    color: var(--getcited-gray-600);
+    font-size: 16px;
+}
+
+.manual-instructions {
+    text-align: left;
+    background: var(--getcited-gray-50);
+    border-radius: var(--getcited-radius-md);
+    padding: var(--getcited-space-lg);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.manual-instructions ol {
+    margin: 0 0 var(--getcited-space-lg) var(--getcited-space-lg);
+    padding: 0;
+    color: var(--getcited-gray-700);
+}
+
+.manual-instructions li {
+    margin-bottom: var(--getcited-space-sm);
+    font-size: 15px;
+}
+
+.manual-instructions .button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+}
+
+.manual-instructions .button .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.wordpress-com-note {
+    background: var(--getcited-accent-light);
+    padding: var(--getcited-space-md);
+    border-radius: var(--getcited-radius-sm);
+    font-size: 14px;
+    margin-top: var(--getcited-space-md);
+}
+
+.wordpress-com-note a {
+    color: var(--getcited-primary);
+}
+
+/* Verify step action buttons */
+.wizard-actions .verify-continue-btn,
+.wizard-actions .getcited-verify-fix-btn,
+.wizard-actions .getcited-verify-skip-btn {
+    margin-left: var(--getcited-space-sm);
+}
+
+.wizard-actions .getcited-verify-skip-btn {
+    background: transparent;
+    border-color: var(--getcited-gray-300);
+    color: var(--getcited-gray-600);
+}
+
+.wizard-actions .getcited-verify-skip-btn:hover {
+    border-color: var(--getcited-gray-400);
+    color: var(--getcited-gray-700);
+}
+
 /* ==========================================================================
    Actions Bar
    ========================================================================== */

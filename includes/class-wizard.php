@@ -42,6 +42,8 @@ class GetCited_Wizard {
         add_action( 'wp_ajax_getcited_wizard_skip', array( $this, 'ajax_skip_wizard' ) );
         add_action( 'wp_ajax_getcited_wizard_complete', array( $this, 'ajax_complete_wizard' ) );
         add_action( 'wp_ajax_getcited_wizard_scan', array( $this, 'ajax_run_scan' ) );
+        add_action( 'wp_ajax_getcited_wizard_verify', array( $this, 'ajax_verify_llms' ) );
+        add_action( 'wp_ajax_getcited_wizard_fix_llms', array( $this, 'ajax_fix_llms' ) );
     }
 
     /**
@@ -107,6 +109,10 @@ class GetCited_Wizard {
             'crawlers' => array(
                 'title' => __( 'AI Crawler Access', 'getcited' ),
                 'description' => __( 'Choose which AI systems can access your content.', 'getcited' ),
+            ),
+            'verify' => array(
+                'title' => __( 'Verifying llms.txt', 'getcited' ),
+                'description' => __( 'Making sure AI systems can access your llms.txt file.', 'getcited' ),
             ),
             'complete' => array(
                 'title' => __( 'All Set!', 'getcited' ),
@@ -479,6 +485,116 @@ class GetCited_Wizard {
         wp_send_json_success( array(
             'redirect' => admin_url( 'admin.php?page=getcited' ),
         ) );
+    }
+
+    /**
+     * AJAX: Verify llms.txt accessibility
+     *
+     * Called when entering the verify step to check if llms.txt is accessible.
+     */
+    public function ajax_verify_llms() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        // First, flush rewrite rules to ensure they're current
+        flush_rewrite_rules();
+
+        // Small delay to let rules take effect
+        usleep( 100000 ); // 100ms
+
+        $health_check = GetCited_Health_Check::instance();
+        $result       = $health_check->verify_llms_txt_with_fallback();
+
+        // Add hosting environment info
+        $host     = $health_check->detect_hosting_environment();
+        $guidance = $health_check->get_host_specific_guidance( $host );
+
+        $result['host']          = $host;
+        $result['host_guidance'] = $guidance;
+
+        // Check if we can write a physical file
+        $result['can_write_physical'] = GetCited_Llms_Txt::instance()->can_write_physical_file();
+
+        // Generate download URL
+        $result['download_url'] = wp_nonce_url(
+            admin_url( 'admin-ajax.php?action=getcited_download_llms' ),
+            'getcited_admin',
+            'nonce'
+        );
+
+        wp_send_json_success( $result );
+    }
+
+    /**
+     * AJAX: Fix llms.txt accessibility issue
+     *
+     * Handles actions to fix llms.txt accessibility:
+     * - write_physical: Write llms.txt as a physical file
+     * - skip: Mark as skipped, continue with setup
+     */
+    public function ajax_fix_llms() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $action = isset( $_POST['fix_action'] ) ? sanitize_text_field( wp_unslash( $_POST['fix_action'] ) ) : 'write_physical';
+
+        switch ( $action ) {
+            case 'write_physical':
+                // Enable physical file writing in settings
+                $settings = GetCited_Settings::instance();
+                $settings->set( 'llms_write_physical', true );
+
+                // Write the physical file
+                $llms   = GetCited_Llms_Txt::instance();
+                $result = $llms->write_physical_file();
+
+                if ( ! $result['success'] ) {
+                    wp_send_json_error( array(
+                        'message'   => $result['message'],
+                        'details'   => $result['details'] ?? null,
+                        'need_manual' => true,
+                    ) );
+                }
+
+                // Verify it's now accessible
+                $health_check   = GetCited_Health_Check::instance();
+                $verify_result  = $health_check->verify_llms_txt_accessible();
+
+                if ( $verify_result['accessible'] ) {
+                    wp_send_json_success( array(
+                        'message'    => __( 'Physical file written and verified!', 'getcited' ),
+                        'accessible' => true,
+                    ) );
+                } else {
+                    // File written but still not accessible (unusual case)
+                    wp_send_json_success( array(
+                        'message'    => __( 'File written, but verification pending. It may take a moment to propagate.', 'getcited' ),
+                        'accessible' => false,
+                        'retry'      => true,
+                    ) );
+                }
+                break;
+
+            case 'skip':
+                // Mark as skipped for dashboard reminder
+                $settings = GetCited_Settings::instance();
+                $settings->set( 'llms_verification_skipped', true );
+
+                wp_send_json_success( array(
+                    'message' => __( 'Verification skipped. You can fix this later in settings.', 'getcited' ),
+                    'skipped' => true,
+                ) );
+                break;
+
+            default:
+                wp_send_json_error( array( 'message' => 'Invalid action' ) );
+        }
     }
 
     /**

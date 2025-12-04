@@ -56,6 +56,10 @@ class GetCited_Dashboard {
 
         // Request log handlers
         add_action( 'wp_ajax_getcited_clear_request_log', array( $this, 'ajax_clear_request_log' ) );
+
+        // llms.txt verification and download handlers
+        add_action( 'wp_ajax_getcited_verify_llms_accessible', array( $this, 'ajax_verify_llms_accessible' ) );
+        add_action( 'wp_ajax_getcited_download_llms', array( $this, 'ajax_download_llms' ) );
     }
 
     /**
@@ -505,5 +509,61 @@ class GetCited_Dashboard {
                 'message' => __( 'Failed to clear request log', 'getcited' ),
             ) );
         }
+    }
+
+    /**
+     * AJAX: Verify llms.txt is accessible
+     */
+    public function ajax_verify_llms_accessible() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $health_check = GetCited_Health_Check::instance();
+        $result       = $health_check->verify_llms_txt_with_fallback();
+
+        // Add hosting environment info
+        $host     = $health_check->detect_hosting_environment();
+        $guidance = $health_check->get_host_specific_guidance( $host );
+
+        $result['host']          = $host;
+        $result['host_guidance'] = $guidance;
+
+        // Check if we can write a physical file
+        $result['can_write_physical'] = GetCited_Llms_Txt::instance()->can_write_physical_file();
+
+        wp_send_json_success( $result );
+    }
+
+    /**
+     * AJAX: Download llms.txt file
+     */
+    public function ajax_download_llms() {
+        // Verify nonce from query string for download links
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce checked below with check_admin_referer
+        $nonce = isset( $_GET['nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['nonce'] ) ) : '';
+
+        if ( ! wp_verify_nonce( $nonce, 'getcited_admin' ) ) {
+            wp_die( esc_html__( 'Security check failed', 'getcited' ) );
+        }
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'Permission denied', 'getcited' ) );
+        }
+
+        $content = GetCited_Llms_Txt::instance()->get_content();
+
+        // Set headers for file download
+        header( 'Content-Type: text/plain; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename="llms.txt"' );
+        header( 'Content-Length: ' . strlen( $content ) );
+        header( 'Cache-Control: no-cache, must-revalidate' );
+        header( 'Pragma: no-cache' );
+
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Plain text file download
+        echo $content;
+        exit;
     }
 }

@@ -182,7 +182,148 @@ if ( empty( $org['name'] ) ) {
             </div>
         </div>
 
-        <!-- Step 5: Complete -->
+        <!-- Step 5: Verify llms.txt -->
+        <div class="getcited-wizard-step" data-step="verify" style="display: none;">
+            <div class="wizard-content">
+                <h1><?php esc_html_e( 'Verifying llms.txt', 'getcited' ); ?></h1>
+                <p class="wizard-subtitle">
+                    <?php esc_html_e( 'Making sure AI systems can access your llms.txt file.', 'getcited' ); ?>
+                </p>
+
+                <!-- Verification States -->
+                <div class="getcited-verify-container">
+
+                    <!-- Checking State -->
+                    <div class="verify-state verify-checking" style="display: none;">
+                        <div class="verify-spinner">
+                            <span class="spinner is-active"></span>
+                        </div>
+                        <p><?php esc_html_e( 'Checking if AI systems can access your llms.txt...', 'getcited' ); ?></p>
+                    </div>
+
+                    <!-- Success State -->
+                    <div class="verify-state verify-success" style="display: none;">
+                        <div class="verify-icon success">
+                            <span class="dashicons dashicons-yes-alt"></span>
+                        </div>
+                        <h2><?php esc_html_e( 'Success!', 'getcited' ); ?></h2>
+                        <p class="verify-url">
+                            <?php esc_html_e( 'Your llms.txt is live and accessible at:', 'getcited' ); ?><br>
+                            <a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" class="llms-url-link">
+                                <?php echo esc_html( home_url( '/llms.txt' ) ); ?>
+                            </a>
+                        </p>
+                        <p class="verify-message"><?php esc_html_e( 'AI crawlers can now discover and understand your site.', 'getcited' ); ?></p>
+                    </div>
+
+                    <!-- Needs Fix State -->
+                    <div class="verify-state verify-needs-fix" style="display: none;">
+                        <div class="verify-icon warning">
+                            <span class="dashicons dashicons-warning"></span>
+                        </div>
+                        <h2><?php esc_html_e( "We couldn't access your llms.txt", 'getcited' ); ?></h2>
+                        <p class="verify-message">
+                            <?php esc_html_e( "Your hosting may not route .txt files through WordPress. Don't worry - we can fix this!", 'getcited' ); ?>
+                        </p>
+
+                        <!-- Host-specific guidance (shown if detected) -->
+                        <div class="verify-host-guidance" style="display: none;">
+                            <div class="host-guidance-box">
+                                <strong class="host-title"></strong>
+                                <p class="host-message"></p>
+                                <a href="#" class="host-docs-link" target="_blank"><?php esc_html_e( 'View documentation', 'getcited' ); ?></a>
+                            </div>
+                        </div>
+
+                        <!-- Fix Options -->
+                        <div class="verify-fix-options">
+                            <h3><?php esc_html_e( 'Choose how to proceed:', 'getcited' ); ?></h3>
+
+                            <label class="getcited-radio-card verify-option" data-option="write_physical">
+                                <input type="radio" name="verify_fix" value="write_physical" checked>
+                                <div class="radio-card-content">
+                                    <span class="dashicons dashicons-media-text"></span>
+                                    <strong><?php esc_html_e( 'Write a physical file', 'getcited' ); ?></strong>
+                                    <span class="recommended-badge"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
+                                    <p><?php esc_html_e( 'Creates an actual llms.txt file on your server.', 'getcited' ); ?></p>
+                                </div>
+                            </label>
+
+                            <label class="getcited-radio-card verify-option" data-option="download">
+                                <input type="radio" name="verify_fix" value="download">
+                                <div class="radio-card-content">
+                                    <span class="dashicons dashicons-download"></span>
+                                    <strong><?php esc_html_e( 'Download and upload manually', 'getcited' ); ?></strong>
+                                    <p><?php esc_html_e( 'Download the file and upload via SFTP/cPanel.', 'getcited' ); ?></p>
+                                </div>
+                            </label>
+
+                            <label class="getcited-radio-card verify-option" data-option="skip">
+                                <input type="radio" name="verify_fix" value="skip">
+                                <div class="radio-card-content">
+                                    <span class="dashicons dashicons-clock"></span>
+                                    <strong><?php esc_html_e( 'Skip for now', 'getcited' ); ?></strong>
+                                    <p><?php esc_html_e( "I'll fix this later in settings.", 'getcited' ); ?></p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Fixing State -->
+                    <div class="verify-state verify-fixing" style="display: none;">
+                        <div class="verify-spinner">
+                            <span class="spinner is-active"></span>
+                        </div>
+                        <p class="fixing-message"><?php esc_html_e( 'Writing physical file...', 'getcited' ); ?></p>
+                    </div>
+
+                    <!-- Manual Upload State -->
+                    <div class="verify-state verify-manual" style="display: none;">
+                        <div class="verify-icon info">
+                            <span class="dashicons dashicons-download"></span>
+                        </div>
+                        <h2><?php esc_html_e( 'Manual Upload Required', 'getcited' ); ?></h2>
+                        <p class="verify-message">
+                            <?php esc_html_e( 'Your hosting does not allow automatic file creation. Please download the file and upload it to your site root via SFTP or cPanel.', 'getcited' ); ?>
+                        </p>
+                        <div class="manual-instructions">
+                            <ol>
+                                <li><?php esc_html_e( 'Click the download button below', 'getcited' ); ?></li>
+                                <li><?php esc_html_e( 'Connect to your site via SFTP or cPanel File Manager', 'getcited' ); ?></li>
+                                <li><?php esc_html_e( 'Upload llms.txt to your site root (same folder as wp-config.php)', 'getcited' ); ?></li>
+                            </ol>
+                            <a href="#" class="button button-primary getcited-download-llms">
+                                <span class="dashicons dashicons-download"></span>
+                                <?php esc_html_e( 'Download llms.txt', 'getcited' ); ?>
+                            </a>
+                        </div>
+                        <p class="wordpress-com-note" style="display: none;">
+                            <strong><?php esc_html_e( 'WordPress.com users:', 'getcited' ); ?></strong>
+                            <a href="https://wordpress.com/support/add-llms-txt-to-your-site/" target="_blank">
+                                <?php esc_html_e( 'See the official guide', 'getcited' ); ?>
+                            </a>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+            <div class="wizard-actions">
+                <button type="button" class="button getcited-wizard-back verify-back-btn">
+                    ← <?php esc_html_e( 'Back', 'getcited' ); ?>
+                </button>
+                <button type="button" class="button button-primary getcited-wizard-next verify-continue-btn" style="display: none;">
+                    <?php esc_html_e( 'Continue', 'getcited' ); ?> →
+                </button>
+                <button type="button" class="button button-primary getcited-verify-fix-btn" style="display: none;">
+                    <?php esc_html_e( 'Try Selected Option', 'getcited' ); ?> →
+                </button>
+                <button type="button" class="button getcited-verify-skip-btn" style="display: none;">
+                    <?php esc_html_e( 'Skip and finish setup', 'getcited' ); ?> →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 6: Complete -->
         <div class="getcited-wizard-step" data-step="complete" style="display: none;">
             <?php
             $wizard_scan = $wizard->get_scan_data();
