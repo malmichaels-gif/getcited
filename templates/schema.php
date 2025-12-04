@@ -72,7 +72,8 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 					'<span class="last-scan-time">' . esc_html( $last_scan_ago ) . '</span>'
 				);
 				?>
-				<button type="button" class="button button-small getcited-rescan-schema">
+				<button type="button" class="button getcited-rescan-schema">
+					<span class="dashicons dashicons-update"></span>
 					<?php esc_html_e( 'Re-scan', 'getcited' ); ?>
 				</button>
 			</p>

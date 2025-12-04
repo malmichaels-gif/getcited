@@ -158,13 +158,22 @@ class GetCited_Schema_Detector {
 			);
 		}
 
+		// HeyTC SEO.
+		if ( defined( 'HEYTC_SEO_VERSION' ) || class_exists( 'HeyTC_SEO_Settings' ) ) {
+			$detected[] = array(
+				'name' => 'HeyTC SEO',
+				'slug' => 'heytc-seo',
+			);
+		}
+
 		return $detected;
 	}
 
 	/**
-	 * Detect existing JSON-LD schema on homepage
+	 * Detect existing JSON-LD schema on homepage and a sample post
 	 *
-	 * Fetches the homepage and looks for existing schema markup.
+	 * Fetches the homepage and a recent post to look for existing schema markup.
+	 * Some SEO plugins only output schema on single posts, not the homepage.
 	 * Uses non-blocking request with short timeout to avoid deadlocks.
 	 *
 	 * @return array Detection result with 'found' boolean and 'types' array.
@@ -176,7 +185,7 @@ class GetCited_Schema_Detector {
 		);
 
 		// Skip if this is an AJAX request to prevent potential deadlock.
-		// The homepage fetch can trigger another WordPress load.
+		// The page fetch can trigger another WordPress load.
 		if ( wp_doing_ajax() ) {
 			// Return cached result if available, skip live fetch.
 			$cached = get_transient( self::TRANSIENT_NAME );
@@ -190,48 +199,26 @@ class GetCited_Schema_Detector {
 			return $result;
 		}
 
-		// Get homepage HTML with short timeout.
-		$response = wp_remote_get(
-			home_url(),
+		// URLs to scan: homepage + one recent post.
+		$urls_to_scan = array( home_url() );
+
+		// Get one recent published post to scan.
+		$recent_posts = get_posts(
 			array(
-				'timeout'    => 5,
-				'user-agent' => 'GetCited Schema Detector',
-				'sslverify'  => false,
-				'blocking'   => true,
+				'numberposts' => 1,
+				'post_status' => 'publish',
+				'post_type'   => 'post',
 			)
 		);
 
-		if ( is_wp_error( $response ) ) {
-			return $result;
+		if ( ! empty( $recent_posts ) ) {
+			$urls_to_scan[] = get_permalink( $recent_posts[0]->ID );
 		}
 
-		$body = wp_remote_retrieve_body( $response );
-		if ( empty( $body ) ) {
-			return $result;
-		}
-
-		// Find all JSON-LD script tags.
-		if ( preg_match_all( '/<script[^>]*type=["\']application\/ld\+json["\'][^>]*>(.*?)<\/script>/is', $body, $matches ) ) {
-			foreach ( $matches[1] as $json_content ) {
-				$data = json_decode( trim( $json_content ), true );
-				if ( ! $data ) {
-					continue;
-				}
-
-				// Handle @graph structure.
-				if ( isset( $data['@graph'] ) && is_array( $data['@graph'] ) ) {
-					foreach ( $data['@graph'] as $item ) {
-						if ( isset( $item['@type'] ) ) {
-							$types = (array) $item['@type'];
-							$result['types'] = array_merge( $result['types'], $types );
-						}
-					}
-				} elseif ( isset( $data['@type'] ) ) {
-					// Single schema.
-					$types = (array) $data['@type'];
-					$result['types'] = array_merge( $result['types'], $types );
-				}
-			}
+		// Scan each URL for JSON-LD.
+		foreach ( $urls_to_scan as $url ) {
+			$types_from_url = $this->scan_url_for_jsonld( $url );
+			$result['types'] = array_merge( $result['types'], $types_from_url );
 		}
 
 		// Normalize and dedupe types.
@@ -247,6 +234,62 @@ class GetCited_Schema_Detector {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Scan a single URL for JSON-LD schema types
+	 *
+	 * @since 1.5.2
+	 * @param string $url URL to scan.
+	 * @return array Array of schema types found.
+	 */
+	private function scan_url_for_jsonld( $url ) {
+		$types = array();
+
+		$response = wp_remote_get(
+			$url,
+			array(
+				'timeout'    => 5,
+				'user-agent' => 'GetCited Schema Detector',
+				'sslverify'  => false,
+				'blocking'   => true,
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return $types;
+		}
+
+		$body = wp_remote_retrieve_body( $response );
+		if ( empty( $body ) ) {
+			return $types;
+		}
+
+		// Find all JSON-LD script tags.
+		if ( preg_match_all( '/<script[^>]*type=["\']application\/ld\+json["\'][^>]*>(.*?)<\/script>/is', $body, $matches ) ) {
+			foreach ( $matches[1] as $json_content ) {
+				$data = json_decode( trim( $json_content ), true );
+				if ( ! $data ) {
+					continue;
+				}
+
+				// Handle @graph structure.
+				if ( isset( $data['@graph'] ) && is_array( $data['@graph'] ) ) {
+					foreach ( $data['@graph'] as $item ) {
+						if ( isset( $item['@type'] ) ) {
+							$item_types = (array) $item['@type'];
+							$types      = array_merge( $types, $item_types );
+						}
+					}
+				} elseif ( isset( $data['@type'] ) ) {
+					// Single schema.
+					$item_types = (array) $data['@type'];
+					$types      = array_merge( $types, $item_types );
+				}
+			}
+		}
+
+		return $types;
 	}
 
 	/**

@@ -1043,12 +1043,26 @@
                         }
                     }
 
-                    this.disabled = false;
-                    this.innerHTML = originalHTML;
+                    // Show success feedback briefly
+                    this.innerHTML = '<span class="dashicons dashicons-yes-alt"></span> ' + (getcitedAdmin.strings?.score_updated || 'Score updated!');
+                    this.classList.add('getcited-success-feedback');
+
+                    setTimeout(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+                        this.classList.remove('getcited-success-feedback');
+                    }, 2000);
                 })
                 .catch(() => {
-                    this.disabled = false;
-                    this.innerHTML = originalHTML;
+                    // Show error feedback briefly
+                    this.innerHTML = '<span class="dashicons dashicons-warning"></span> ' + (getcitedAdmin.strings?.refresh_failed || 'Refresh failed');
+                    this.classList.add('getcited-error-feedback');
+
+                    setTimeout(() => {
+                        this.disabled = false;
+                        this.innerHTML = originalHTML;
+                        this.classList.remove('getcited-error-feedback');
+                    }, 2000);
                 });
         });
     }

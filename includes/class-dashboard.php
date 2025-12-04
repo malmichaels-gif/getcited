@@ -601,10 +601,10 @@ class GetCited_Dashboard {
         ?>
         <div class="notice notice-info is-dismissible getcited-citation-nudge" data-nonce="<?php echo esc_attr( wp_create_nonce( 'getcited_admin' ) ); ?>">
             <p>
-                <strong><?php esc_html_e( 'New in GetCited:', 'getcited' ); ?></strong>
-                <?php esc_html_e( 'Add AI Citation Guidelines to tell ChatGPT, Claude, and other AI systems how to cite your content.', 'getcited' ); ?>
+                <strong><?php esc_html_e( 'Almost done!', 'getcited' ); ?></strong>
+                <?php esc_html_e( 'Review and enable your pre-configured AI Citation Guidelines to tell ChatGPT, Claude, and other AI systems how to cite your content.', 'getcited' ); ?>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>">
-                    <?php esc_html_e( 'Set up now →', 'getcited' ); ?>
+                    <?php esc_html_e( 'Review & enable →', 'getcited' ); ?>
                 </a>
             </p>
         </div>

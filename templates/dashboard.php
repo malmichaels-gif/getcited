@@ -202,6 +202,7 @@ if ( ! empty( $recent_posts ) ) {
 				<h2>
 					<?php esc_html_e( 'Health Check', 'getcited' ); ?>
 					<button type="button" class="button getcited-run-health-check">
+						<span class="dashicons dashicons-yes-alt"></span>
 						<?php esc_html_e( 'Run Check', 'getcited' ); ?>
 					</button>
 				</h2>
@@ -216,6 +217,14 @@ if ( ! empty( $recent_posts ) ) {
 						'rewrite_rules' => __( 'Rewrites', 'getcited' ),
 					);
 
+					// Link targets for each health check badge.
+					$badge_links = array(
+						'llms_txt'      => admin_url( 'admin.php?page=getcited-llms-txt' ),
+						'robots_txt'    => admin_url( 'admin.php?page=getcited-crawlers' ),
+						'schema'        => admin_url( 'admin.php?page=getcited-schema' ),
+						'rewrite_rules' => admin_url( 'options-permalink.php' ),
+					);
+
 					foreach ( $checks as $key => $label ) :
 						if ( ! isset( $health_status[ $key ] ) ) {
 							continue;
@@ -223,11 +232,12 @@ if ( ! empty( $recent_posts ) ) {
 						$check       = $health_status[ $key ];
 						$badge_class = 'badge-' . $check['status'];
 						$icon        = $check['status'] === 'ok' ? 'dashicons-yes' : ( $check['status'] === 'warning' ? 'dashicons-warning' : 'dashicons-no' );
+						$link        = $badge_links[ $key ] ?? '#';
 					?>
-					<span class="getcited-health-badge <?php echo esc_attr( $badge_class ); ?>">
+					<a href="<?php echo esc_url( $link ); ?>" class="getcited-health-badge <?php echo esc_attr( $badge_class ); ?>">
 						<span class="dashicons <?php echo esc_attr( $icon ); ?>"></span>
 						<?php echo esc_html( $label ); ?>
-					</span>
+					</a>
 					<?php endforeach; ?>
 				</div>
 

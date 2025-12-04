@@ -214,12 +214,29 @@ class GetCited_Wizard {
             $settings->set( 'llms_txt_content', $content );
         }
 
-        // Only set schema defaults if not already configured
-        $existing_schema = $settings->get( 'schema_types' );
-        if ( empty( $existing_schema ) || ! array_filter( $existing_schema ) ) {
-            $schema_types = $this->get_schema_defaults_for_site_type( $site_type );
-            $settings->set( 'schema_types', $schema_types );
+        // Run SEO plugin detection and auto-configure schema.
+        $detector      = GetCited_Schema_Detector::instance();
+        $seo_detection = $detector->refresh_detection();
+
+        // If an SEO plugin is detected, disable GetCited schema to avoid duplicates.
+        if ( ! empty( $seo_detection['should_disable'] ) ) {
+            $settings->set( 'schema_enabled', false );
+        } else {
+            // No SEO plugin - enable GetCited schema with site-type defaults.
+            $settings->set( 'schema_enabled', true );
+            $existing_schema = $settings->get( 'schema_types' );
+            if ( empty( $existing_schema ) || ! array_filter( $existing_schema ) ) {
+                $schema_types = $this->get_schema_defaults_for_site_type( $site_type );
+                $settings->set( 'schema_types', $schema_types );
+            }
         }
+
+        // Pre-fill citation guidelines with site-type defaults (v1.5.2).
+        // Keep disabled so user must consciously enable after reviewing.
+        $llms_txt          = GetCited_LLMS_Txt::instance();
+        $citation_defaults = $llms_txt->get_default_citation_guidelines( $site_type );
+        $citation_defaults['enabled'] = false; // Pre-filled but disabled.
+        $settings->set( 'citation_guidelines', $citation_defaults );
 
         return true;
     }

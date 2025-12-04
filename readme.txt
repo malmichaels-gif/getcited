@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,17 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.5.2 =
+* Improved: Larger font sizes throughout plugin for better readability
+* Improved: Dashboard "Refresh" button shows completion feedback
+* Improved: "Run Check" and "Re-scan" buttons styled consistently with orange primary color
+* Improved: Health Check badges are now clickable links to relevant settings pages
+* Improved: Schema detection now scans both homepage and a sample post
+* Improved: Setup Wizard auto-detects SEO plugins and configures schema accordingly
+* Improved: Citation Guidelines pre-filled with site-type defaults after wizard
+* Added: HeyTC SEO plugin detection for schema compatibility
+* Fixed: Schema Re-scan now detects plugins that only output JSON-LD on posts
 
 = 1.5.1 =
 * New: AI Citation Guidelines — tell AI systems how to cite your content
