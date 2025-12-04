@@ -193,7 +193,6 @@ $status = $health->get_status();
             <h2 class="getcited-collapsible-header">
                 <?php esc_html_e( 'AI Citation Guidelines', 'getcited' ); ?>
                 <span class="dashicons dashicons-arrow-down-alt2"></span>
-                <span class="getcited-badge getcited-badge-new"><?php esc_html_e( 'New', 'getcited' ); ?></span>
             </h2>
             <div class="getcited-collapsible-content" style="display: none;">
                 <p class="description">

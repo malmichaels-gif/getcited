@@ -182,6 +182,29 @@ class GetCited_Dashboard {
                 if ( isset( $data['llms_citation_format'] ) ) {
                     $settings->set( 'llms_citation_format', $data['llms_citation_format'] );
                 }
+                // Save citation guidelines (v1.5.1+).
+                if ( isset( $data['citation_guidelines'] ) && is_array( $data['citation_guidelines'] ) ) {
+                    $citation_guidelines = array(
+                        'enabled'         => filter_var( $data['citation_guidelines']['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN ),
+                        'citation_format' => $data['citation_guidelines']['citation_format'] ?? '',
+                        'accuracy_notes'  => $data['citation_guidelines']['accuracy_notes'] ?? '',
+                        'restrictions'    => $data['citation_guidelines']['restrictions'] ?? '',
+                        'freshness_note'  => $data['citation_guidelines']['freshness_note'] ?? '',
+                        'contact_email'   => sanitize_email( $data['citation_guidelines']['contact_email'] ?? '' ),
+                    );
+                    $settings->set( 'citation_guidelines', $citation_guidelines );
+                }
+
+                // Auto-regenerate llms.txt content to incorporate all settings (v1.5.3).
+                $llms      = GetCited_Llms_Txt::instance();
+                $site_type = $settings->get( 'site_type' );
+                $regenerated_content = $llms->generate_template( $site_type );
+                $settings->set( 'llms_txt_content', $regenerated_content );
+
+                // If physical file writing is enabled, write the file.
+                if ( $settings->get( 'llms_write_physical' ) ) {
+                    $llms->write_physical_file();
+                }
                 break;
 
             case 'schema':
@@ -577,6 +600,7 @@ class GetCited_Dashboard {
      * Maybe show citation guidelines nudge after wizard completion
      *
      * @since 1.5.1
+     * @since 1.5.3 Updated to show success message since guidelines are now enabled by default.
      */
     public function maybe_show_citation_nudge() {
         // Check if nudge transient exists.
@@ -590,21 +614,13 @@ class GetCited_Dashboard {
             return;
         }
 
-        // Don't show if citation guidelines are already enabled.
-        $settings = GetCited_Settings::instance();
-        $citation_guidelines = $settings->get( 'citation_guidelines' );
-        if ( ! empty( $citation_guidelines['enabled'] ) ) {
-            delete_transient( 'getcited_show_citation_nudge' );
-            return;
-        }
-
         ?>
-        <div class="notice notice-info is-dismissible getcited-citation-nudge" data-nonce="<?php echo esc_attr( wp_create_nonce( 'getcited_admin' ) ); ?>">
+        <div class="notice notice-success is-dismissible getcited-citation-nudge" data-nonce="<?php echo esc_attr( wp_create_nonce( 'getcited_admin' ) ); ?>">
             <p>
-                <strong><?php esc_html_e( 'Almost done!', 'getcited' ); ?></strong>
-                <?php esc_html_e( 'Review and enable your pre-configured AI Citation Guidelines to tell ChatGPT, Claude, and other AI systems how to cite your content.', 'getcited' ); ?>
+                <strong><?php esc_html_e( 'Setup complete!', 'getcited' ); ?></strong>
+                <?php esc_html_e( 'Your AI Citation Guidelines are now active. ChatGPT, Claude, and other AI systems will see how to properly cite your content.', 'getcited' ); ?>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>">
-                    <?php esc_html_e( 'Review & enable →', 'getcited' ); ?>
+                    <?php esc_html_e( 'Customize →', 'getcited' ); ?>
                 </a>
             </p>
         </div>

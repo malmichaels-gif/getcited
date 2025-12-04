@@ -18,10 +18,11 @@ $visibility_score = $stats['visibility_score'];
 $llms_activity    = $stats['llms_activity'];
 
 // Get component data for breakdown cards.
-$labels     = GetCited_Visibility_Score::get_component_labels();
-$max_points = GetCited_Visibility_Score::get_max_points();
-$links      = GetCited_Visibility_Score::get_component_links();
-$icons      = GetCited_Visibility_Score::get_component_icons();
+$labels        = GetCited_Visibility_Score::get_component_labels();
+$max_points    = GetCited_Visibility_Score::get_max_points();
+$links         = GetCited_Visibility_Score::get_component_links();
+$icons         = GetCited_Visibility_Score::get_component_icons();
+$schema_source = GetCited_Visibility_Score::get_schema_source();
 
 // Calculate days since last post for freshness display.
 $recent_posts = get_posts( array(
@@ -104,7 +105,14 @@ if ( ! empty( $recent_posts ) ) {
 				<?php if ( $is_perfect ) : ?>
 				<div class="card-status status-complete">
 					<span class="dashicons dashicons-yes-alt"></span>
-					<?php esc_html_e( 'Complete', 'getcited' ); ?>
+					<?php
+					if ( 'schema' === $key && $schema_source ) {
+						/* translators: %s: Plugin name like "Yoast SEO" or "HeyTC SEO" */
+						printf( esc_html__( 'via %s', 'getcited' ), esc_html( $schema_source['name'] ) );
+					} else {
+						esc_html_e( 'Complete', 'getcited' );
+					}
+					?>
 				</div>
 				<?php elseif ( $key === 'freshness' ) : ?>
 				<div class="card-meta">

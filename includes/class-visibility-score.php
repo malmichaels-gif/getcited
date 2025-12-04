@@ -217,6 +217,7 @@ class GetCited_Visibility_Score {
 	 * - Article schema on posts: 10 pts
 	 *
 	 * Detects schema from GetCited OR other sources.
+	 * If a known SEO plugin is detected, awards full points.
 	 *
 	 * @return int Points earned.
 	 */
@@ -224,25 +225,34 @@ class GetCited_Visibility_Score {
 		$score    = 0;
 		$settings = GetCited_Settings::instance();
 		$detector = GetCited_Schema_Detector::instance();
+		$detection = $detector->get_detection_status();
 
-		// Check if GetCited schema is enabled.
+		// Check if GetCited schema is enabled and active.
 		$getcited_enabled = $settings->get( 'schema_enabled' );
 		$schema_types     = $settings->get( 'schema_types' );
 
-		// Check detection for other schema sources.
-		$detection = $detector->get_detection_status();
-
-		// Organization schema - from GetCited or detected.
-		if ( $getcited_enabled && ! empty( $schema_types['organization'] ) ) {
-			$score += 10;
-		} elseif ( ! empty( $detection['json_ld_types'] ) && in_array( 'Organization', $detection['json_ld_types'], true ) ) {
-			$score += 10;
+		// If GetCited is actively handling schema (enabled and not disabled by detection).
+		if ( $getcited_enabled && ! $detector->should_disable_schema() ) {
+			if ( ! empty( $schema_types['organization'] ) ) {
+				$score += 10;
+			}
+			if ( ! empty( $schema_types['article'] ) ) {
+				$score += 10;
+			}
+			return $score;
 		}
 
-		// Article schema - from GetCited or detected.
-		if ( $getcited_enabled && ! empty( $schema_types['article'] ) ) {
-			$score += 10;
-		} elseif ( ! empty( $detection['json_ld_types'] ) ) {
+		// If a known SEO plugin is detected, give full credit.
+		// Trust that the SEO plugin is handling schema appropriately.
+		if ( ! empty( $detection['plugins'] ) ) {
+			return 20;
+		}
+
+		// Fallback: Check JSON-LD types found on pages.
+		if ( ! empty( $detection['json_ld_types'] ) ) {
+			if ( in_array( 'Organization', $detection['json_ld_types'], true ) ) {
+				$score += 10;
+			}
 			$article_types = array( 'Article', 'NewsArticle', 'BlogPosting' );
 			foreach ( $article_types as $type ) {
 				if ( in_array( $type, $detection['json_ld_types'], true ) ) {
@@ -520,5 +530,40 @@ class GetCited_Visibility_Score {
 			'citability'     => 'dashicons-edit-large',
 			'freshness'      => 'dashicons-calendar-alt',
 		);
+	}
+
+	/**
+	 * Get schema source information for dashboard display
+	 *
+	 * @since 1.5.3
+	 * @return array|null Array with 'source' and 'name' keys, or null if GetCited handles schema.
+	 */
+	public static function get_schema_source() {
+		$settings  = GetCited_Settings::instance();
+		$detector  = GetCited_Schema_Detector::instance();
+		$detection = $detector->get_detection_status();
+
+		// If GetCited is actively handling schema, return null.
+		if ( $settings->get( 'schema_enabled' ) && ! $detector->should_disable_schema() ) {
+			return null;
+		}
+
+		// If an SEO plugin is detected, return its name.
+		if ( ! empty( $detection['plugins'] ) ) {
+			return array(
+				'source' => 'plugin',
+				'name'   => $detection['plugins'][0]['name'],
+			);
+		}
+
+		// If JSON-LD was found but no plugin detected.
+		if ( ! empty( $detection['json_ld_found'] ) ) {
+			return array(
+				'source' => 'json_ld',
+				'name'   => __( 'External Source', 'getcited' ),
+			);
+		}
+
+		return null;
 	}
 }

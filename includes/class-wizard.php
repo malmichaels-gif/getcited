@@ -232,10 +232,10 @@ class GetCited_Wizard {
         }
 
         // Pre-fill citation guidelines with site-type defaults (v1.5.2).
-        // Keep disabled so user must consciously enable after reviewing.
+        // Enabled by default since v1.5.3 - users can customize later.
         $llms_txt          = GetCited_LLMS_Txt::instance();
         $citation_defaults = $llms_txt->get_default_citation_guidelines( $site_type );
-        $citation_defaults['enabled'] = false; // Pre-filled but disabled.
+        $citation_defaults['enabled'] = true; // Enabled by default.
         $settings->set( 'citation_guidelines', $citation_defaults );
 
         return true;
