@@ -512,16 +512,30 @@ class GetCited_Health_Check {
         $settings = GetCited_Settings::instance();
         $detector = GetCited_Schema_Detector::instance();
 
+        // Check for conflicts using schema detector.
+        $detection = $detector->get_detection_status();
+        $conflicts = $detection['plugins'] ?? array();
+
+        // If schema is disabled in settings, check if SEO plugin handles it.
         if ( ! $settings->get( 'schema_enabled' ) ) {
+            // If SEO plugin is handling schema, show OK status (v1.5.4).
+            if ( ! empty( $conflicts ) ) {
+                $names = array_map( function( $p ) { return $p['name']; }, $conflicts );
+                return array(
+                    'status' => 'ok',
+                    'message' => sprintf(
+                        /* translators: %s: comma-separated list of detected schema plugin names */
+                        __( 'Schema handled by %s', 'getcited' ),
+                        implode( ', ', $names )
+                    ),
+                    'conflicts' => $conflicts,
+                );
+            }
             return array(
                 'status' => 'disabled',
                 'message' => __( 'Schema output is disabled', 'getcited' ),
             );
         }
-
-        // Check for conflicts using schema detector.
-        $detection = $detector->get_detection_status();
-        $conflicts = $detection['plugins'] ?? array();
 
         if ( ! empty( $conflicts ) ) {
             $names = array_map( function( $p ) { return $p['name']; }, $conflicts );

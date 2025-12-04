@@ -220,7 +220,12 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 
 				<div class="getcited-compact-form">
 					<div class="form-row">
-						<label for="org_name"><?php esc_html_e( 'Organization Name', 'getcited' ); ?></label>
+						<label for="org_name">
+							<?php esc_html_e( 'Organization Name', 'getcited' ); ?>
+							<?php if ( ! empty( $organization['name'] ) ) : ?>
+								<span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+							<?php endif; ?>
+						</label>
 						<input type="text"
 							   name="organization[name]"
 							   id="org_name"
@@ -228,7 +233,12 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 							   placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
 					</div>
 					<div class="form-row">
-						<label for="org_logo"><?php esc_html_e( 'Logo URL', 'getcited' ); ?></label>
+						<label for="org_logo">
+							<?php esc_html_e( 'Logo URL', 'getcited' ); ?>
+							<?php if ( ! empty( $organization['logo_url'] ) ) : ?>
+								<span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+							<?php endif; ?>
+						</label>
 						<div class="input-with-button">
 							<input type="url"
 								   name="organization[logo_url]"
@@ -248,7 +258,12 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 					</p>
 
 					<div class="form-row">
-						<label for="org_linkedin_company"><?php esc_html_e( 'LinkedIn Company Page', 'getcited' ); ?></label>
+						<label for="org_linkedin_company">
+							<?php esc_html_e( 'LinkedIn Company Page', 'getcited' ); ?>
+							<?php if ( ! empty( $organization['linkedin_company'] ) ) : ?>
+								<span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+							<?php endif; ?>
+						</label>
 						<input type="url"
 							   name="organization[linkedin_company]"
 							   id="org_linkedin_company"
@@ -257,7 +272,12 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 					</div>
 
 					<div class="form-row">
-						<label for="org_wikipedia"><?php esc_html_e( 'Wikipedia / Wikidata', 'getcited' ); ?></label>
+						<label for="org_wikipedia">
+							<?php esc_html_e( 'Wikipedia / Wikidata', 'getcited' ); ?>
+							<?php if ( ! empty( $organization['wikipedia'] ) ) : ?>
+								<span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+							<?php endif; ?>
+						</label>
 						<input type="url"
 							   name="organization[wikipedia]"
 							   id="org_wikipedia"
@@ -266,7 +286,12 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 					</div>
 
 					<div class="form-row">
-						<label for="org_crunchbase"><?php esc_html_e( 'Crunchbase', 'getcited' ); ?></label>
+						<label for="org_crunchbase">
+							<?php esc_html_e( 'Crunchbase', 'getcited' ); ?>
+							<?php if ( ! empty( $organization['crunchbase'] ) ) : ?>
+								<span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+							<?php endif; ?>
+						</label>
 						<input type="url"
 							   name="organization[crunchbase]"
 							   id="org_crunchbase"
@@ -274,11 +299,19 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 							   placeholder="https://crunchbase.com/organization/yourcompany">
 					</div>
 
+					<?php
+					$social_urls       = $organization['social_urls'] ?? array();
+					$has_social_urls   = ! empty( array_filter( $social_urls ) );
+					?>
 					<div class="form-row form-row-full">
-						<label><?php esc_html_e( 'Social Profiles', 'getcited' ); ?></label>
+						<label>
+							<?php esc_html_e( 'Social Profiles', 'getcited' ); ?>
+							<?php if ( $has_social_urls ) : ?>
+								<span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+							<?php endif; ?>
+						</label>
 						<div class="getcited-social-urls">
 							<?php
-							$social_urls  = $organization['social_urls'] ?? array();
 							$placeholders = array(
 								'https://twitter.com/yourhandle',
 								'https://facebook.com/yourpage',

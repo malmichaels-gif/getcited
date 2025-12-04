@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,16 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.5.4 =
+* Improved: Schema Status message now explains which SEO plugin is handling schema
+* Improved: Organization Details fields show green checkmarks when configured
+* Improved: "Test with Google" button now uses orange primary styling
+* Improved: Citability buttons (Analyze, Load More, Join Waitlist) now use orange primary styling
+* Improved: Increased smaller font sizes throughout plugin for better readability
+* Improved: Health Check Schema now shows green status when SEO plugin handles schema
+* Improved: Health Check badges now have tooltips explaining each check
+* Improved: Rewrites badge tooltip explains Permalinks requirement
 
 = 1.5.3 =
 * Improved: Schema Presence score now gives full credit when SEO plugins are detected

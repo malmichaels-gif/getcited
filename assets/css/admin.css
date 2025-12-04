@@ -93,7 +93,7 @@
 }
 
 .getcited-wrap > p.description {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-500);
     margin-bottom: var(--getcited-space-lg);
 }
@@ -129,7 +129,7 @@
 
 .getcited-section p.description {
     color: var(--getcited-gray-500);
-    font-size: 13px;
+    font-size: 14px;
     margin: 0 0 var(--getcited-space-md) 0;
 }
 
@@ -231,7 +231,7 @@
 }
 
 .getcited-card .card-content h3 {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--getcited-gray-500);
     margin: 0;
@@ -252,7 +252,7 @@
 }
 
 .getcited-card .card-link {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--getcited-primary);
     text-decoration: none;
@@ -381,7 +381,7 @@
 
 .getcited-health-item .health-message {
     color: var(--getcited-gray-600);
-    font-size: 14px;
+    font-size: 15px;
     flex: 1;
 }
 
@@ -454,7 +454,7 @@
 .getcited-health-details .details-text {
     margin: 0 0 var(--getcited-space-md) 0;
     color: var(--getcited-gray-600);
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.5;
 }
 
@@ -462,7 +462,7 @@
     margin: 0 0 var(--getcited-space-md) 0;
     padding-left: var(--getcited-space-lg);
     color: var(--getcited-gray-600);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-health-details .details-options li {
@@ -675,7 +675,7 @@
 
 .getcited-list-info {
     margin-left: auto;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-500);
 }
 
@@ -837,7 +837,7 @@
 .getcited-badge {
     display: inline-block;
     padding: 2px 8px;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1199,6 +1199,37 @@
     max-width: 400px;
 }
 
+/* Green checkmark for active fields (v1.5.4) */
+.getcited-field-active {
+    color: var(--getcited-success);
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+
+/* Test with Google button - styled like Refresh button (v1.5.4) */
+.getcited-schema-test .button {
+    background: var(--getcited-primary);
+    border: 1px solid var(--getcited-primary);
+    color: #fff;
+}
+
+.getcited-schema-test .button:hover {
+    background: var(--getcited-primary-dark);
+    border-color: var(--getcited-primary-dark);
+    color: #fff;
+}
+
+.getcited-schema-test .button .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    vertical-align: text-bottom;
+    margin-right: 4px;
+}
+
 /* ==========================================================================
    Citability Scoring
    ========================================================================== */
@@ -1239,7 +1270,7 @@
 }
 
 .getcited-posts-table th {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1259,7 +1290,7 @@
     display: inline-block;
     padding: 4px 10px;
     border-radius: var(--getcited-radius-full);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
 }
 
@@ -1409,20 +1440,56 @@
     text-align: left;
     padding: var(--getcited-space-sm) var(--getcited-space-md);
     border-bottom: 1px solid var(--getcited-gray-200);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .getcited-rubric-table th {
     font-weight: 600;
     color: var(--getcited-gray-500);
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.5px;
 }
 
 .getcited-rubric-table tfoot td {
     font-weight: 600;
     border-top: 2px solid var(--getcited-gray-300);
+}
+
+/* Citability buttons - styled like Refresh button (v1.5.4) */
+.getcited-analyze-post,
+.getcited-load-more-posts,
+.getcited-join-waitlist {
+    background: var(--getcited-primary) !important;
+    border: 1px solid var(--getcited-primary) !important;
+    color: #fff !important;
+}
+
+.getcited-analyze-post:hover,
+.getcited-load-more-posts:hover,
+.getcited-join-waitlist:hover {
+    background: var(--getcited-primary-dark) !important;
+    border-color: var(--getcited-primary-dark) !important;
+    color: #fff !important;
+}
+
+/* Inline upsell area (v1.5.4) */
+.getcited-inline-upsell {
+    margin-top: var(--getcited-space-lg);
+    padding: var(--getcited-space-md);
+    background: var(--getcited-gray-50);
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-md);
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: var(--getcited-gray-600);
+}
+
+.getcited-inline-upsell .dashicons {
+    color: var(--getcited-gray-400);
 }
 
 /* ==========================================================================

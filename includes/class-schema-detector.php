@@ -385,6 +385,19 @@ class GetCited_Schema_Detector {
 		$detection = $this->get_detection_status();
 
 		if ( ! $settings->get( 'schema_enabled' ) ) {
+			// If SEO plugin is detected, explain who's handling schema.
+			if ( ! empty( $detection['plugins'] ) ) {
+				$plugin_names = array_column( $detection['plugins'], 'name' );
+				return array(
+					'status'  => 'disabled',
+					'message' => sprintf(
+						/* translators: %s: comma-separated list of plugin names */
+						__( 'Disabled — %s is handling schema markup.', 'getcited' ),
+						implode( ', ', $plugin_names )
+					),
+					'source'  => $detection['detected_source'],
+				);
+			}
 			return array(
 				'status'  => 'disabled',
 				'message' => __( 'Schema output is disabled in settings.', 'getcited' ),

@@ -233,6 +233,14 @@ if ( ! empty( $recent_posts ) ) {
 						'rewrite_rules' => admin_url( 'options-permalink.php' ),
 					);
 
+					// Tooltips explaining each check (v1.5.4).
+					$badge_tooltips = array(
+						'llms_txt'      => __( 'Your llms.txt file for AI discoverability', 'getcited' ),
+						'robots_txt'    => __( 'AI crawler rules in robots.txt', 'getcited' ),
+						'schema'        => __( 'JSON-LD structured data for AI understanding', 'getcited' ),
+						'rewrite_rules' => __( 'WordPress rewrite rules for /llms.txt URL. If broken, visit Settings → Permalinks and click Save.', 'getcited' ),
+					);
+
 					foreach ( $checks as $key => $label ) :
 						if ( ! isset( $health_status[ $key ] ) ) {
 							continue;
@@ -241,8 +249,9 @@ if ( ! empty( $recent_posts ) ) {
 						$badge_class = 'badge-' . $check['status'];
 						$icon        = $check['status'] === 'ok' ? 'dashicons-yes' : ( $check['status'] === 'warning' ? 'dashicons-warning' : 'dashicons-no' );
 						$link        = $badge_links[ $key ] ?? '#';
+						$tooltip     = $badge_tooltips[ $key ] ?? '';
 					?>
-					<a href="<?php echo esc_url( $link ); ?>" class="getcited-health-badge <?php echo esc_attr( $badge_class ); ?>">
+					<a href="<?php echo esc_url( $link ); ?>" class="getcited-health-badge <?php echo esc_attr( $badge_class ); ?>" title="<?php echo esc_attr( $tooltip ); ?>">
 						<span class="dashicons <?php echo esc_attr( $icon ); ?>"></span>
 						<?php echo esc_html( $label ); ?>
 					</a>
