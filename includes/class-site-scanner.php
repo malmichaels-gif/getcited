@@ -193,14 +193,17 @@ class GetCited_Site_Scanner {
 	}
 
 	/**
-	 * Get recent posts with metadata
+	 * Get recent posts with metadata (excluding noindex posts)
+	 *
+	 * @since 1.5.0 Added noindex and _getcited_exclude filtering.
 	 */
 	private function get_recent_posts() {
+		// Fetch extra posts to account for noindex filtering.
 		$posts = get_posts(
 			array(
 				'post_type'      => 'post',
 				'post_status'    => 'publish',
-				'posts_per_page' => 10,
+				'posts_per_page' => 20,
 				'orderby'        => 'date',
 				'order'          => 'DESC',
 			)
@@ -208,6 +211,16 @@ class GetCited_Site_Scanner {
 
 		$result = array();
 		foreach ( $posts as $post ) {
+			// Skip noindex posts.
+			if ( function_exists( 'getcited_is_post_noindex' ) && getcited_is_post_noindex( $post->ID ) ) {
+				continue;
+			}
+
+			// Skip posts excluded via GetCited meta.
+			if ( get_post_meta( $post->ID, '_getcited_exclude', true ) ) {
+				continue;
+			}
+
 			$result[] = array(
 				'title'      => $post->post_title,
 				'url'        => get_permalink( $post ),
@@ -215,6 +228,10 @@ class GetCited_Site_Scanner {
 				'categories' => wp_get_post_categories( $post->ID, array( 'fields' => 'names' ) ),
 				'tags'       => wp_get_post_tags( $post->ID, array( 'fields' => 'names' ) ),
 			);
+
+			if ( count( $result ) >= 10 ) {
+				break;
+			}
 		}
 
 		return $result;

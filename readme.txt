@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.4.6
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,14 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.5.0 =
+* New: Posts marked "noindex" by SEO plugins are now excluded from llms.txt
+* New: Posts with "Exclude from llms.txt" checked are now properly excluded
+* New: WP-CLI command `wp getcited crawler-log` to view, clear, and export crawler activity
+* New: Developer Tools section in Settings showing all WP-CLI commands
+* Added: Support for Yoast, RankMath, SEOPress, AIOSEO, The SEO Framework noindex detection
+* Added: Filter `getcited_is_noindex` for custom noindex logic
 
 = 1.4.6 =
 * Changed: Full UI redesign with HeyTC orange (#FFA500) branding

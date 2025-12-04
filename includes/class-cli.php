@@ -436,6 +436,146 @@ class GetCited_CLI {
         WP_CLI::line( WP_CLI::colorize( "%BAverage Score: {$average}/100%n" ) );
         WP_CLI::line( '' );
     }
+
+    /**
+     * View, clear, or export the AI crawler request log
+     *
+     * ## OPTIONS
+     *
+     * [--clear]
+     * : Clear all log entries
+     *
+     * [--export=<file>]
+     * : Export log to CSV file
+     *
+     * [--limit=<number>]
+     * : Number of entries to show (default: 20)
+     *
+     * [--format=<format>]
+     * : Output format. Options: table, json, csv. Default: table.
+     *
+     * ## EXAMPLES
+     *
+     *     wp getcited crawler-log
+     *     wp getcited crawler-log --limit=50
+     *     wp getcited crawler-log --export=/tmp/log.csv
+     *     wp getcited crawler-log --clear
+     *
+     * @subcommand crawler-log
+     */
+    public function crawler_log( $args, $assoc_args ) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'getcited_llms_requests';
+
+        // Handle --clear flag.
+        if ( isset( $assoc_args['clear'] ) ) {
+            WP_CLI::confirm( 'Are you sure you want to clear all crawler log entries?' );
+
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $wpdb->query( "TRUNCATE TABLE {$table_name}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+            WP_CLI::success( 'Crawler log cleared.' );
+            return;
+        }
+
+        // Get log entries.
+        $limit = isset( $assoc_args['limit'] ) ? absint( $assoc_args['limit'] ) : 20;
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $entries = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT request_time, bot_name, category, user_agent
+                 FROM {$table_name}
+                 ORDER BY request_time DESC
+                 LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                $limit
+            ),
+            ARRAY_A
+        );
+
+        if ( empty( $entries ) ) {
+            WP_CLI::warning( 'No crawler log entries found.' );
+            return;
+        }
+
+        // Handle --export flag.
+        if ( isset( $assoc_args['export'] ) ) {
+            $file = $assoc_args['export'];
+
+            // Get ALL entries for export (not limited).
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $all_entries = $wpdb->get_results(
+                "SELECT request_time, bot_name, category, user_agent
+                 FROM {$table_name}
+                 ORDER BY request_time DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                ARRAY_A
+            );
+
+            $this->export_log_to_csv( $all_entries, $file );
+            return;
+        }
+
+        // Format output.
+        $format = $assoc_args['format'] ?? 'table';
+
+        // Prepare items for display.
+        $items = array();
+        foreach ( $entries as $entry ) {
+            $items[] = array(
+                'time'       => $entry['request_time'],
+                'bot'        => $entry['bot_name'] ?: 'Unknown',
+                'category'   => $entry['category'] ?: 'unknown',
+                'user_agent' => mb_substr( $entry['user_agent'], 0, 50 ) .
+                               ( mb_strlen( $entry['user_agent'] ) > 50 ? '...' : '' ),
+            );
+        }
+
+        if ( 'json' === $format ) {
+            WP_CLI::line( wp_json_encode( $entries, JSON_PRETTY_PRINT ) );
+        } else {
+            WP_CLI\Utils\format_items( $format, $items, array( 'time', 'bot', 'category', 'user_agent' ) );
+        }
+
+        // Show summary.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $total = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+        WP_CLI::line( '' );
+        WP_CLI::line( sprintf( 'Showing %d of %d total entries.', count( $entries ), $total ) );
+    }
+
+    /**
+     * Export log entries to CSV file
+     *
+     * @param array  $entries Log entries.
+     * @param string $file    Output file path.
+     */
+    private function export_log_to_csv( $entries, $file ) {
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+        $handle = fopen( $file, 'w' );
+
+        if ( false === $handle ) {
+            WP_CLI::error( "Cannot write to file: {$file}" );
+        }
+
+        // Write header row.
+        fputcsv( $handle, array( 'Timestamp', 'Bot Name', 'Category', 'User Agent' ) );
+
+        // Write data rows.
+        foreach ( $entries as $entry ) {
+            fputcsv( $handle, array(
+                $entry['request_time'],
+                $entry['bot_name'] ?: 'Unknown',
+                $entry['category'] ?: 'unknown',
+                $entry['user_agent'],
+            ) );
+        }
+
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+        fclose( $handle );
+
+        WP_CLI::success( sprintf( 'Exported %d entries to %s', count( $entries ), $file ) );
+    }
 }
 
 // Register commands

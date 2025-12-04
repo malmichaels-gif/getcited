@@ -201,6 +201,58 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
             </div>
         </div>
 
+        <!-- Developer Tools (Collapsible) -->
+        <div class="getcited-section getcited-collapsible" data-collapsed="true">
+            <h2 class="getcited-collapsible-header">
+                <?php esc_html_e( 'Developer Tools', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
+            </h2>
+            <div class="getcited-collapsible-content" style="display: none;">
+                <p class="description">
+                    <?php esc_html_e( 'GetCited includes WP-CLI commands for developers and automation.', 'getcited' ); ?>
+                </p>
+
+                <div class="getcited-cli-commands">
+                    <h3 style="margin-top: 0; margin-bottom: var(--getcited-space-sm);"><?php esc_html_e( 'Available Commands', 'getcited' ); ?></h3>
+
+                    <table class="widefat striped">
+                        <thead>
+                            <tr>
+                                <th><?php esc_html_e( 'Command', 'getcited' ); ?></th>
+                                <th><?php esc_html_e( 'Description', 'getcited' ); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>wp getcited status</code></td><td><?php esc_html_e( 'View configuration and health status', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited check</code></td><td><?php esc_html_e( 'Run health checks', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited crawlers</code></td><td><?php esc_html_e( 'List all AI crawlers and status', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited crawler &lt;name&gt; &lt;allow|block&gt;</code></td><td><?php esc_html_e( 'Set crawler access', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited crawler-log</code></td><td><?php esc_html_e( 'View AI crawler visits', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited crawler-log --clear</code></td><td><?php esc_html_e( 'Clear all log entries', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited crawler-log --export=file.csv</code></td><td><?php esc_html_e( 'Export log to CSV', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited llms-txt</code></td><td><?php esc_html_e( 'Output llms.txt content', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited robots-txt</code></td><td><?php esc_html_e( 'Output robots.txt rules', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited citability &lt;post_id&gt;</code></td><td><?php esc_html_e( 'Analyze post citability', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited audit</code></td><td><?php esc_html_e( 'Audit recent posts', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited export</code></td><td><?php esc_html_e( 'Export settings to JSON', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited import &lt;file&gt;</code></td><td><?php esc_html_e( 'Import settings from JSON', 'getcited' ); ?></td></tr>
+                            <tr><td><code>wp getcited flush</code></td><td><?php esc_html_e( 'Clear caches and flush rewrites', 'getcited' ); ?></td></tr>
+                        </tbody>
+                    </table>
+
+                    <p class="description" style="margin-top: 16px;">
+                        <?php
+                        printf(
+                            /* translators: %s: WP-CLI command example */
+                            esc_html__( 'Run %s for detailed help on any command.', 'getcited' ),
+                            '<code>wp getcited &lt;command&gt; --help</code>'
+                        );
+                        ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- System Info (Collapsible) -->
         <div class="getcited-section getcited-collapsible" data-collapsed="true">
             <h2 class="getcited-collapsible-header">

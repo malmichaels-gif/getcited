@@ -623,26 +623,43 @@ class GetCited_Llms_Txt {
     }
 
     /**
-     * Get recent posts for template
+     * Get recent posts for template (excluding noindex posts)
+     *
+     * @since 1.5.0 Added noindex and _getcited_exclude filtering.
      *
      * @param int $count Number of posts to retrieve.
      * @return array Array of post data with title, url, and date.
      */
     private function get_recent_posts( $count = 5 ) {
+        // Fetch extra posts to account for noindex filtering.
         $posts = get_posts(
             array(
-                'numberposts' => $count,
+                'numberposts' => $count * 2,
                 'post_status' => 'publish',
             )
         );
 
         $result = array();
         foreach ( $posts as $post ) {
+            // Skip noindex posts.
+            if ( getcited_is_post_noindex( $post->ID ) ) {
+                continue;
+            }
+
+            // Skip posts excluded via GetCited meta.
+            if ( get_post_meta( $post->ID, '_getcited_exclude', true ) ) {
+                continue;
+            }
+
             $result[] = array(
                 'title' => $post->post_title,
                 'url'   => get_permalink( $post->ID ),
                 'date'  => get_the_date( 'M j', $post->ID ),
             );
+
+            if ( count( $result ) >= $count ) {
+                break;
+            }
         }
 
         return $result;
