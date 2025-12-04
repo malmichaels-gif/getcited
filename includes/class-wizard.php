@@ -479,6 +479,9 @@ class GetCited_Wizard {
 
         $settings->set( 'wizard_completed', true );
 
+        // Set transient to show citation guidelines nudge (v1.5.1).
+        set_transient( 'getcited_show_citation_nudge', true, WEEK_IN_SECONDS );
+
         // Flush rewrite rules to ensure llms.txt works
         flush_rewrite_rules();
 

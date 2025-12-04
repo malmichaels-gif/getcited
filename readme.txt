@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.5.1 =
+* New: AI Citation Guidelines — tell AI systems how to cite your content
+* New: Enhanced templates with suggested citation formats for each site type
+* New: Post-setup prompt to configure citation guidelines
+* Improved: llms.txt editor with collapsible Citation Guidelines section
 
 = 1.5.0 =
 * New: Posts marked "noindex" by SEO plugins are now excluded from llms.txt

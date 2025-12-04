@@ -408,7 +408,15 @@
                     llms_founder_title: document.getElementById('llms_founder_title')?.value || '',
                     llms_site_expertise: document.getElementById('llms_site_expertise')?.value || '',
                     llms_update_frequency: document.getElementById('llms_update_frequency')?.value || '',
-                    llms_citation_format: document.getElementById('llms_citation_format')?.value || ''
+                    llms_citation_format: document.getElementById('llms_citation_format')?.value || '',
+                    citation_guidelines: {
+                        enabled: document.getElementById('getcited-citation-enabled')?.checked || false,
+                        citation_format: document.getElementById('getcited-citation-format')?.value || '',
+                        accuracy_notes: document.getElementById('getcited-accuracy-notes')?.value || '',
+                        restrictions: document.getElementById('getcited-restrictions')?.value || '',
+                        freshness_note: document.getElementById('getcited-freshness-note')?.value || '',
+                        contact_email: document.getElementById('getcited-contact-email')?.value || ''
+                    }
                 };
 
                 ajax('getcited_save_settings', {

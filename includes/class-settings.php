@@ -96,6 +96,16 @@ class GetCited_Settings {
 
         // Version tracking
         'db_version' => '1.0',
+
+        // Citation guidelines (v1.5.1)
+        'citation_guidelines' => array(
+            'enabled'         => false,
+            'citation_format' => '',
+            'accuracy_notes'  => '',
+            'restrictions'    => '',
+            'freshness_note'  => '',
+            'contact_email'   => '',
+        ),
     );
 
     /**
@@ -376,6 +386,19 @@ class GetCited_Settings {
 
             case 'db_version':
                 return sanitize_text_field( $value );
+
+            case 'citation_guidelines':
+                if ( is_array( $value ) ) {
+                    return array(
+                        'enabled'         => (bool) ( $value['enabled'] ?? false ),
+                        'citation_format' => sanitize_text_field( $value['citation_format'] ?? '' ),
+                        'accuracy_notes'  => sanitize_textarea_field( $value['accuracy_notes'] ?? '' ),
+                        'restrictions'    => sanitize_textarea_field( $value['restrictions'] ?? '' ),
+                        'freshness_note'  => sanitize_text_field( $value['freshness_note'] ?? '' ),
+                        'contact_email'   => sanitize_email( $value['contact_email'] ?? '' ),
+                    );
+                }
+                return $this->defaults['citation_guidelines'];
 
             default:
                 return $value;

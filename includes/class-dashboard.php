@@ -60,6 +60,12 @@ class GetCited_Dashboard {
         // llms.txt verification and download handlers
         add_action( 'wp_ajax_getcited_verify_llms_accessible', array( $this, 'ajax_verify_llms_accessible' ) );
         add_action( 'wp_ajax_getcited_download_llms', array( $this, 'ajax_download_llms' ) );
+
+        // Citation nudge dismiss handler (v1.5.1)
+        add_action( 'wp_ajax_getcited_dismiss_citation_nudge', array( $this, 'ajax_dismiss_citation_nudge' ) );
+
+        // Admin notices for citation nudge (v1.5.1)
+        add_action( 'admin_notices', array( $this, 'maybe_show_citation_nudge' ) );
     }
 
     /**
@@ -565,5 +571,77 @@ class GetCited_Dashboard {
         // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Plain text file download
         echo $content;
         exit;
+    }
+
+    /**
+     * Maybe show citation guidelines nudge after wizard completion
+     *
+     * @since 1.5.1
+     */
+    public function maybe_show_citation_nudge() {
+        // Check if nudge transient exists.
+        if ( ! get_transient( 'getcited_show_citation_nudge' ) ) {
+            return;
+        }
+
+        // Only show on GetCited admin pages.
+        $screen = get_current_screen();
+        if ( ! $screen || strpos( $screen->id, 'getcited' ) === false ) {
+            return;
+        }
+
+        // Don't show if citation guidelines are already enabled.
+        $settings = GetCited_Settings::instance();
+        $citation_guidelines = $settings->get( 'citation_guidelines' );
+        if ( ! empty( $citation_guidelines['enabled'] ) ) {
+            delete_transient( 'getcited_show_citation_nudge' );
+            return;
+        }
+
+        ?>
+        <div class="notice notice-info is-dismissible getcited-citation-nudge" data-nonce="<?php echo esc_attr( wp_create_nonce( 'getcited_admin' ) ); ?>">
+            <p>
+                <strong><?php esc_html_e( 'New in GetCited:', 'getcited' ); ?></strong>
+                <?php esc_html_e( 'Add AI Citation Guidelines to tell ChatGPT, Claude, and other AI systems how to cite your content.', 'getcited' ); ?>
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>">
+                    <?php esc_html_e( 'Set up now →', 'getcited' ); ?>
+                </a>
+            </p>
+        </div>
+        <script>
+        (function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                var notice = document.querySelector('.getcited-citation-nudge');
+                if (!notice) return;
+
+                notice.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('notice-dismiss')) {
+                        fetch(ajaxurl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'action=getcited_dismiss_citation_nudge&nonce=' + notice.dataset.nonce
+                        });
+                    }
+                });
+            });
+        })();
+        </script>
+        <?php
+    }
+
+    /**
+     * AJAX: Dismiss citation guidelines nudge
+     *
+     * @since 1.5.1
+     */
+    public function ajax_dismiss_citation_nudge() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Permission denied' );
+        }
+
+        delete_transient( 'getcited_show_citation_nudge' );
+        wp_send_json_success();
     }
 }

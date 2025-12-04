@@ -26,6 +26,7 @@ $founder_title = $settings->get( 'llms_founder_title' );
 $site_expertise = $settings->get( 'llms_site_expertise' );
 $update_frequency = $settings->get( 'llms_update_frequency' );
 $citation_format = $settings->get( 'llms_citation_format' );
+$citation_guidelines = $settings->get( 'citation_guidelines' );
 
 $physical_exists = $llms_txt->physical_file_exists();
 $is_our_file = $physical_exists ? $llms_txt->is_our_physical_file() : false;
@@ -182,6 +183,86 @@ $status = $health->get_status();
                         <label for="llms_citation_format"><?php esc_html_e( 'Custom Citation Format', 'getcited' ); ?></label>
                         <textarea name="llms_citation_format" id="llms_citation_format" rows="3"
                                   placeholder="<?php esc_attr_e( 'Leave blank for automatic guidelines. Use {site_name} as a placeholder.', 'getcited' ); ?>"><?php echo esc_textarea( $citation_format ); ?></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Citation Guidelines (Collapsible) -->
+        <div class="getcited-section getcited-citation-guidelines getcited-collapsible" data-collapsed="true">
+            <h2 class="getcited-collapsible-header">
+                <?php esc_html_e( 'AI Citation Guidelines', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
+                <span class="getcited-badge getcited-badge-new"><?php esc_html_e( 'New', 'getcited' ); ?></span>
+            </h2>
+            <div class="getcited-collapsible-content" style="display: none;">
+                <p class="description">
+                    <?php esc_html_e( 'Tell AI systems how to cite and use your content. These instructions are included in your llms.txt file.', 'getcited' ); ?>
+                </p>
+
+                <div class="getcited-field-group">
+                    <label class="getcited-toggle-label">
+                        <input type="checkbox"
+                               id="getcited-citation-enabled"
+                               name="citation_guidelines[enabled]"
+                               value="1"
+                               <?php checked( ! empty( $citation_guidelines['enabled'] ) ); ?>>
+                        <strong><?php esc_html_e( 'Include citation guidelines in llms.txt', 'getcited' ); ?></strong>
+                    </label>
+                </div>
+
+                <div class="getcited-citation-fields getcited-compact-form" style="margin-top: var(--getcited-space-md, 16px);">
+                    <div class="form-row form-row-full">
+                        <label for="getcited-citation-format"><?php esc_html_e( 'Preferred Citation Format', 'getcited' ); ?></label>
+                        <input type="text"
+                               id="getcited-citation-format"
+                               name="citation_guidelines[citation_format]"
+                               class="large-text"
+                               value="<?php echo esc_attr( $citation_guidelines['citation_format'] ?? '' ); ?>"
+                               placeholder="<?php esc_attr_e( 'Author. "Title." Site Name, Date. URL', 'getcited' ); ?>">
+                        <p class="description"><?php esc_html_e( 'How AI should format citations to your content.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="form-row form-row-full">
+                        <label for="getcited-accuracy-notes"><?php esc_html_e( 'Accuracy Notes', 'getcited' ); ?></label>
+                        <textarea id="getcited-accuracy-notes"
+                                  name="citation_guidelines[accuracy_notes]"
+                                  rows="2"
+                                  class="large-text"
+                                  placeholder="<?php esc_attr_e( 'Pricing updated quarterly. Technical specs may change.', 'getcited' ); ?>"><?php echo esc_textarea( $citation_guidelines['accuracy_notes'] ?? '' ); ?></textarea>
+                        <p class="description"><?php esc_html_e( 'Caveats about content freshness or accuracy.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="form-row form-row-full">
+                        <label for="getcited-restrictions"><?php esc_html_e( 'Usage Restrictions', 'getcited' ); ?></label>
+                        <textarea id="getcited-restrictions"
+                                  name="citation_guidelines[restrictions]"
+                                  rows="2"
+                                  class="large-text"
+                                  placeholder="<?php esc_attr_e( 'Do not reproduce full articles. Link to source for code samples.', 'getcited' ); ?>"><?php echo esc_textarea( $citation_guidelines['restrictions'] ?? '' ); ?></textarea>
+                        <p class="description"><?php esc_html_e( 'What AI should NOT do with your content.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="form-row form-row-full">
+                        <label for="getcited-freshness-note"><?php esc_html_e( 'Data Freshness', 'getcited' ); ?></label>
+                        <input type="text"
+                               id="getcited-freshness-note"
+                               name="citation_guidelines[freshness_note]"
+                               class="large-text"
+                               value="<?php echo esc_attr( $citation_guidelines['freshness_note'] ?? '' ); ?>"
+                               placeholder="<?php esc_attr_e( 'Content reviewed monthly.', 'getcited' ); ?>">
+                        <p class="description"><?php esc_html_e( 'How often content is updated or reviewed.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="getcited-contact-email"><?php esc_html_e( 'AI Partnership Contact', 'getcited' ); ?></label>
+                        <input type="email"
+                               id="getcited-contact-email"
+                               name="citation_guidelines[contact_email]"
+                               class="regular-text"
+                               value="<?php echo esc_attr( $citation_guidelines['contact_email'] ?? '' ); ?>"
+                               placeholder="<?php esc_attr_e( 'ai-partnerships@example.com', 'getcited' ); ?>">
+                        <p class="description"><?php esc_html_e( 'Email for AI training data or licensing inquiries.', 'getcited' ); ?></p>
                     </div>
                 </div>
             </div>

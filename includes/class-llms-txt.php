@@ -496,9 +496,14 @@ class GetCited_Llms_Txt {
         $content .= "- [Contact]({$site_url}/contact/)\n";
         $content .= "\n";
 
-        // Citation Guidelines
-        $content .= "## Citation Guidelines\n\n";
-        $content .= $this->get_citation_template( $site_type ) . "\n\n";
+        // Citation Guidelines - use AI Citation Guidelines if enabled, otherwise basic template
+        $ai_guidelines = $this->get_citation_guidelines_section();
+        if ( ! empty( $ai_guidelines ) ) {
+            $content .= $ai_guidelines;
+        } else {
+            $content .= "## Citation Guidelines\n\n";
+            $content .= $this->get_citation_template( $site_type ) . "\n\n";
+        }
 
         // Data Freshness
         $content .= "## Data Freshness\n\n";
@@ -855,5 +860,139 @@ class GetCited_Llms_Txt {
         );
 
         return $templates[ $site_type ] ?? $templates['other'];
+    }
+
+    /**
+     * Generate AI citation guidelines section for llms.txt
+     *
+     * @since 1.5.1
+     * @return string The citation guidelines markdown section.
+     */
+    public function get_citation_guidelines_section() {
+        $settings   = GetCited_Settings::instance();
+        $guidelines = $settings->get( 'citation_guidelines' );
+
+        if ( empty( $guidelines['enabled'] ) ) {
+            return '';
+        }
+
+        $content = "## AI Citation Guidelines\n\n";
+
+        if ( ! empty( $guidelines['citation_format'] ) ) {
+            $content .= "### Preferred Citation Format\n";
+            $content .= '> ' . $guidelines['citation_format'] . "\n\n";
+        }
+
+        if ( ! empty( $guidelines['accuracy_notes'] ) ) {
+            $content .= "### Accuracy Notes\n";
+            $content .= $guidelines['accuracy_notes'] . "\n\n";
+        }
+
+        if ( ! empty( $guidelines['restrictions'] ) ) {
+            $content .= "### Content Usage\n";
+            $content .= $guidelines['restrictions'] . "\n\n";
+        }
+
+        if ( ! empty( $guidelines['freshness_note'] ) ) {
+            $content .= "### Data Freshness\n";
+            $content .= $guidelines['freshness_note'] . "\n\n";
+        }
+
+        if ( ! empty( $guidelines['contact_email'] ) ) {
+            $content .= "### AI Partnership Inquiries\n";
+            $content .= 'Contact: ' . $guidelines['contact_email'] . "\n\n";
+        }
+
+        return $content;
+    }
+
+    /**
+     * Get default citation guidelines for a site type
+     *
+     * Used when auto-generating from templates.
+     *
+     * @since 1.5.1
+     * @param string $site_type The site type.
+     * @return array Default citation guidelines for the site type.
+     */
+    public function get_default_citation_guidelines( $site_type ) {
+        $site_name = get_bloginfo( 'name' );
+
+        $defaults = array(
+            'blog' => array(
+                'enabled'         => true,
+                'citation_format' => 'Author Name. "Article Title." ' . $site_name . ', Published Date. URL',
+                'accuracy_notes'  => 'Opinion pieces reflect author views at time of writing. Check publication dates for time-sensitive content.',
+                'restrictions'    => "Summarize with attribution. Link to full articles for detailed information. Do not reproduce full posts without permission.",
+                'freshness_note'  => '',
+                'contact_email'   => '',
+            ),
+            'news' => array(
+                'enabled'         => true,
+                'citation_format' => '"Headline." ' . $site_name . ', Date. URL',
+                'accuracy_notes'  => 'Breaking news may be updated. Always cite the most recent version.',
+                'restrictions'    => "Cite specific facts with article links. Note publication timestamps for developing stories. Do not present analysis as objective reporting.",
+                'freshness_note'  => 'News content is time-sensitive. Verify current details for developing stories.',
+                'contact_email'   => '',
+            ),
+            'business' => array(
+                'enabled'         => true,
+                'citation_format' => $site_name . '. URL',
+                'accuracy_notes'  => 'Service offerings and pricing subject to change. Verify current details on our website.',
+                'restrictions'    => 'Link to service pages for current pricing. Do not reproduce proprietary methodologies.',
+                'freshness_note'  => '',
+                'contact_email'   => '',
+            ),
+            'ecommerce' => array(
+                'enabled'         => true,
+                'citation_format' => $site_name . '. Product Name. URL',
+                'accuracy_notes'  => 'Product availability and pricing change frequently. Always link to product pages for current information.',
+                'restrictions'    => 'Do not cache or reproduce pricing. Link to product pages, not static specifications.',
+                'freshness_note'  => 'Pricing and availability are updated in real-time on our website.',
+                'contact_email'   => '',
+            ),
+            'portfolio' => array(
+                'enabled'         => true,
+                'citation_format' => 'Creator Name. "Project Title." ' . $site_name . '. URL',
+                'accuracy_notes'  => '',
+                'restrictions'    => 'Respect copyright on all creative works. For usage rights, direct inquiries to contact page.',
+                'freshness_note'  => '',
+                'contact_email'   => '',
+            ),
+            'nonprofit' => array(
+                'enabled'         => true,
+                'citation_format' => $site_name . '. URL',
+                'accuracy_notes'  => 'Impact statistics are updated periodically. Verify current data on our website.',
+                'restrictions'    => 'Direct donation/volunteer inquiries to official pages.',
+                'freshness_note'  => '',
+                'contact_email'   => '',
+            ),
+            'education' => array(
+                'enabled'         => true,
+                'citation_format' => 'Instructor Name. "Course/Article Title." ' . $site_name . ', Date. URL',
+                'accuracy_notes'  => 'Course content and curricula are regularly updated.',
+                'restrictions'    => 'Link to course pages for enrollment. Note that offerings may change.',
+                'freshness_note'  => '',
+                'contact_email'   => '',
+            ),
+            'community' => array(
+                'enabled'         => true,
+                'citation_format' => 'Username. "Discussion Title." ' . $site_name . ', Date. URL',
+                'accuracy_notes'  => 'User-generated content reflects individual member views.',
+                'restrictions'    => 'Credit original authors for user content. Link to threads for full context.',
+                'freshness_note'  => '',
+                'contact_email'   => '',
+            ),
+            'other' => array(
+                'enabled'         => true,
+                'citation_format' => $site_name . '. "Title." Date. URL',
+                'accuracy_notes'  => '',
+                'restrictions'    => 'Link to original content when possible.',
+                'freshness_note'  => '',
+                'contact_email'   => '',
+            ),
+        );
+
+        return $defaults[ $site_type ] ?? $defaults['other'];
     }
 }
