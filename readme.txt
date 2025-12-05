@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.6.6
+Stable tag: 1.6.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,10 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.6.7 =
+* Added: Admin notice on Permalinks page when rewrite rules need flushing
+* Improved: Users now see clear instruction "Click Save Changes" when visiting Permalinks to fix llms.txt URL
 
 = 1.6.6 =
 * Improved: Schema page now shows positive "All set!" message when SEO plugin handles schema

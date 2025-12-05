@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.6.6
+ * Version: 1.6.7
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.6.6' );
+define( 'GETCITED_VERSION', '1.6.7' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -124,6 +124,9 @@ final class GetCited {
 
         // REST API
         add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+
+        // Admin notice on Permalinks page when rewrite rules need flushing
+        add_action( 'admin_notices', array( $this, 'maybe_show_permalinks_notice' ) );
     }
 
     /**
@@ -382,6 +385,37 @@ final class GetCited {
                 'rescan_failed' => __( 'Scan failed. Please try again.', 'getcited' ),
             ),
         ) );
+    }
+
+    /**
+     * Show admin notice on Permalinks page when rewrite rules need flushing
+     *
+     * @since 1.6.7
+     */
+    public function maybe_show_permalinks_notice() {
+        // Only show on Permalinks page.
+        $screen = get_current_screen();
+        if ( ! $screen || 'options-permalink' !== $screen->id ) {
+            return;
+        }
+
+        // Check if llms.txt rewrite rule exists.
+        global $wp_rewrite;
+        $rules = $wp_rewrite->wp_rewrite_rules();
+
+        if ( isset( $rules['^llms\.txt$'] ) ) {
+            return; // Rules are OK.
+        }
+
+        // Show the notice.
+        ?>
+        <div class="notice notice-warning">
+            <p>
+                <strong><?php esc_html_e( 'GetCited:', 'getcited' ); ?></strong>
+                <?php esc_html_e( 'Click "Save Changes" below to enable the /llms.txt URL for AI crawlers.', 'getcited' ); ?>
+            </p>
+        </div>
+        <?php
     }
 
     /**
