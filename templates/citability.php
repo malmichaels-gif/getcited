@@ -37,7 +37,19 @@ $crawler_stats = $request_logger->get_request_stats();
             <!-- Left Column: Average Score -->
             <div class="getcited-section getcited-average-score">
                 <h2><?php esc_html_e( 'Average Score', 'getcited' ); ?></h2>
-                <div class="getcited-score-display large">
+                <?php
+                $score_class = '';
+                if ( $average_score ) {
+                    if ( $average_score >= 70 ) {
+                        $score_class = 'score-high';
+                    } elseif ( $average_score >= 40 ) {
+                        $score_class = 'score-medium';
+                    } else {
+                        $score_class = 'score-low';
+                    }
+                }
+                ?>
+                <div class="getcited-score-display large circular <?php echo esc_attr( $score_class ); ?>">
                     <span class="score"><?php echo esc_html( $average_score ?: '—' ); ?></span>
                     <span class="max">/100</span>
                 </div>

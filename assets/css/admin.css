@@ -1275,6 +1275,51 @@
     color: var(--getcited-gray-400);
 }
 
+/* Circular score display */
+.getcited-score-display.circular {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    height: 160px;
+    margin: var(--getcited-space-md) auto;
+    border-radius: 50%;
+    border: 6px solid var(--getcited-primary, #F97316);
+    background: var(--getcited-gray-50, #f9fafb);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+}
+
+.getcited-score-display.circular .score {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--getcited-gray-900);
+    line-height: 1;
+}
+
+.getcited-score-display.circular .max {
+    font-size: 18px;
+    color: var(--getcited-gray-500);
+    margin-top: 4px;
+}
+
+/* Score-based fill colors (harmonizing with orange) */
+.getcited-score-display.circular.score-high {
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    border-color: var(--getcited-primary, #F97316);
+}
+
+.getcited-score-display.circular.score-medium {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
+    border-color: var(--getcited-primary, #F97316);
+}
+
+.getcited-score-display.circular.score-low {
+    background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+    border-color: var(--getcited-primary, #F97316);
+}
+
 .getcited-posts-table {
     width: 100%;
     border-collapse: collapse;
