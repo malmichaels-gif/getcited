@@ -64,6 +64,9 @@ class GetCited_Dashboard {
         // Citation nudge dismiss handler (v1.5.1)
         add_action( 'wp_ajax_getcited_dismiss_citation_nudge', array( $this, 'ajax_dismiss_citation_nudge' ) );
 
+        // llms.txt regeneration handler (v1.6.12)
+        add_action( 'wp_ajax_getcited_regenerate_llms', array( $this, 'ajax_regenerate_llms' ) );
+
         // Admin notices for citation nudge (v1.5.1)
         add_action( 'admin_notices', array( $this, 'maybe_show_citation_nudge' ) );
     }
@@ -360,6 +363,34 @@ class GetCited_Dashboard {
         } else {
             wp_send_json_error( $result );
         }
+    }
+
+    /**
+     * AJAX: Regenerate llms.txt content from Settings page
+     *
+     * @since 1.6.12
+     */
+    public function ajax_regenerate_llms() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => 'Permission denied' ) );
+        }
+
+        $settings  = GetCited_Settings::instance();
+        $llms      = GetCited_Llms_Txt::instance();
+        $site_type = $settings->get( 'site_type' );
+
+        // Regenerate content using current site type.
+        $content = $llms->generate_template( $site_type );
+        $settings->set( 'llms_txt_content', $content );
+
+        // Write physical file if enabled.
+        if ( $settings->get( 'llms_write_physical' ) ) {
+            $llms->write_physical_file();
+        }
+
+        wp_send_json_success( array( 'message' => __( 'llms.txt regenerated!', 'getcited' ) ) );
     }
 
     /**

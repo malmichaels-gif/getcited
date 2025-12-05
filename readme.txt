@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.6.9
+Stable tag: 1.6.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,17 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.6.12 =
+* Improved: "Regenerate" link under Site Type now triggers inline AJAX regeneration with feedback, no page navigation
+
+= 1.6.11 =
+* Improved: Site Type description now clarifies that changing it does not auto-update llms.txt, with link to regenerate
+
+= 1.6.10 =
+* Fixed: "Add Another" button under Social Profiles now matches input field width
+* Fixed: Eye icon in View Full Analysis button now vertically centered with text
+* Improved: Increased all font sizes by 1px for better readability
 
 = 1.6.9 =
 * Removed: Logo URL field from setup wizard (can be configured in Schema > Organization Details)

@@ -72,7 +72,11 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                             </option>
                         </select>
                         <p class="description" style="margin-top: 4px;">
-                            <?php esc_html_e( 'Optimizes llms.txt templates and schema output.', 'getcited' ); ?>
+                            <?php esc_html_e( 'Changing this does not auto-update llms.txt.', 'getcited' ); ?>
+                            <a href="#" class="getcited-regenerate-llms">
+                                <?php esc_html_e( 'Regenerate', 'getcited' ); ?>
+                            </a>
+                            <span class="getcited-regenerate-status" style="margin-left: 8px;"></span>
                         </p>
                     </div>
                     <div class="form-row form-row-full" style="margin-top: var(--getcited-space-md);">

@@ -86,14 +86,14 @@
 }
 
 .getcited-wrap h1 {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 600;
     color: var(--getcited-gray-900);
     margin-bottom: 8px;
 }
 
 .getcited-wrap > p.description {
-    font-size: 15px;
+    font-size: 16px;
     color: var(--getcited-gray-500);
     margin-bottom: var(--getcited-space-lg);
 }
@@ -112,7 +112,7 @@
 }
 
 .getcited-section h2 {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     color: var(--getcited-gray-800);
     margin: 0 0 var(--getcited-space-md) 0;
@@ -124,12 +124,12 @@
 }
 
 .getcited-section h2 .button {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-section p.description {
     color: var(--getcited-gray-500);
-    font-size: 14px;
+    font-size: 15px;
     margin: 0 0 var(--getcited-space-md) 0;
 }
 
@@ -239,13 +239,13 @@
 
 .getcited-card .card-icon .dashicons {
     color: #fff;
-    font-size: 20px;
+    font-size: 22px;
     width: 20px;
     height: 20px;
 }
 
 .getcited-card .card-content h3 {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     color: var(--getcited-gray-500);
     margin: 0;
@@ -254,19 +254,19 @@
 }
 
 .getcited-card .card-stat {
-    font-size: 15px;
+    font-size: 16px;
     color: var(--getcited-gray-800);
     margin: 4px 0 0 0;
 }
 
 .getcited-card .card-stat strong {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 600;
     color: var(--getcited-gray-900);
 }
 
 .getcited-card .card-link {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     color: var(--getcited-primary);
     text-decoration: none;
@@ -296,7 +296,7 @@
 }
 
 .getcited-health-section h2 .button .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
     vertical-align: text-bottom;
@@ -351,7 +351,7 @@
 .getcited-status-ok .health-icon::after {
     content: '✓';
     color: #fff;
-    font-size: 13px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -365,7 +365,7 @@
 .getcited-status-warning .health-icon::after {
     content: '!';
     color: #fff;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -380,7 +380,7 @@
 .getcited-status-error .health-icon::after {
     content: '✕';
     color: #fff;
-    font-size: 13px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -395,7 +395,7 @@
 
 .getcited-health-item .health-message {
     color: var(--getcited-gray-600);
-    font-size: 15px;
+    font-size: 16px;
     flex: 1;
 }
 
@@ -437,7 +437,7 @@
 }
 
 .getcited-health-section .getcited-health-expand .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
     transition: transform 0.2s ease;
@@ -468,7 +468,7 @@
 .getcited-health-details .details-text {
     margin: 0 0 var(--getcited-space-md) 0;
     color: var(--getcited-gray-600);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.5;
 }
 
@@ -476,7 +476,7 @@
     margin: 0 0 var(--getcited-space-md) 0;
     padding-left: var(--getcited-space-lg);
     color: var(--getcited-gray-600);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .getcited-health-details .details-options li {
@@ -501,7 +501,7 @@
     background: transparent;
     color: var(--getcited-gray-100);
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.5;
     white-space: pre-wrap;
     max-height: 200px;
@@ -526,7 +526,7 @@
 }
 
 .getcited-rules-preview .getcited-copy-rules .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
     vertical-align: middle;
@@ -535,7 +535,7 @@
 
 .getcited-health-details .file-path {
     margin: var(--getcited-space-sm) 0 0 0;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-500);
 }
 
@@ -543,7 +543,7 @@
     background: var(--getcited-gray-200);
     padding: 2px 6px;
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 /* Auto-add button styles */
@@ -554,14 +554,14 @@
 }
 
 .getcited-add-robots-rules .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
 }
 
 .getcited-action-status {
     margin-left: var(--getcited-space-md);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .getcited-action-status.success {
@@ -576,7 +576,7 @@
 .paste-location,
 .detected-plugins {
     margin: var(--getcited-space-sm) 0 0 0;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-500);
 }
 
@@ -606,7 +606,7 @@
 .current-content-label,
 .getcited-content-label,
 .preview-label {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--getcited-gray-600);
     margin: var(--getcited-space-md) 0 var(--getcited-space-sm) 0;
@@ -618,7 +618,7 @@
     border-radius: var(--getcited-radius-sm);
     padding: var(--getcited-space-md);
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.5;
     white-space: pre-wrap;
     max-height: 150px;
@@ -661,7 +661,7 @@
     border-radius: var(--getcited-radius-sm);
     color: var(--getcited-gray-700);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 14px;
     transition: background var(--getcited-transition), color var(--getcited-transition);
 }
 
@@ -671,7 +671,7 @@
 }
 
 .getcited-link .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
 }
@@ -689,7 +689,7 @@
 
 .getcited-list-info {
     margin-left: auto;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-500);
 }
 
@@ -716,7 +716,7 @@
 }
 
 .getcited-crawler-item .crawler-info h4 {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--getcited-gray-800);
     margin: 0;
@@ -726,13 +726,13 @@
 }
 
 .getcited-crawler-item .crawler-purpose {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-600);
     margin: 4px 0 0 0;
 }
 
 .getcited-crawler-item .crawler-ua {
-    font-size: 13px;
+    font-size: 14px;
     margin: 4px 0 0 0;
 }
 
@@ -740,14 +740,14 @@
     background: var(--getcited-gray-200);
     padding: 2px 6px;
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .getcited-crawler-item .crawler-status .status-label {
     display: inline-block;
     padding: 4px 10px;
     border-radius: var(--getcited-radius-full);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
 }
 
@@ -772,7 +772,7 @@
 }
 
 .getcited-custom-actions .getcited-save-status {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-600);
 }
 
@@ -851,7 +851,7 @@
 .getcited-badge {
     display: inline-block;
     padding: 2px 8px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -916,7 +916,7 @@
     display: flex;
     align-items: center;
     gap: var(--getcited-space-sm);
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-500);
 }
 
@@ -936,7 +936,7 @@
     width: 100%;
     min-height: 400px;
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.6;
     padding: var(--getcited-space-md);
     border: 1px solid var(--getcited-gray-300);
@@ -956,20 +956,20 @@
     align-items: center;
     gap: var(--getcited-space-xs);
     margin-bottom: var(--getcited-space-sm);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--getcited-gray-700);
 }
 
 .getcited-editor-label .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
     color: var(--getcited-primary);
 }
 
 .getcited-preview h3 {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     margin: 0 0 var(--getcited-space-sm) 0;
     color: var(--getcited-gray-700);
@@ -994,7 +994,7 @@
 }
 
 .getcited-copy-content .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
 }
@@ -1006,7 +1006,7 @@
 
 .getcited-copy-hint {
     margin-top: var(--getcited-space-sm);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-500);
     font-style: italic;
 }
@@ -1017,7 +1017,7 @@
     padding: var(--getcited-space-md);
     border-radius: var(--getcited-radius-sm);
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.6;
     overflow-x: auto;
     max-height: 400px;
@@ -1034,7 +1034,7 @@
     padding: var(--getcited-space-sm) var(--getcited-space-md);
     border-radius: var(--getcited-radius-sm);
     margin-top: var(--getcited-space-sm);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-validation-error {
@@ -1092,13 +1092,13 @@
     display: flex;
     align-items: center;
     gap: var(--getcited-space-sm);
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 500;
     margin-bottom: var(--getcited-space-sm);
 }
 
 .getcited-status-indicator .dashicons {
-    font-size: 20px;
+    font-size: 22px;
     width: 20px;
     height: 20px;
 }
@@ -1107,7 +1107,7 @@
     display: flex;
     align-items: center;
     gap: var(--getcited-space-sm);
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-500);
     margin: var(--getcited-space-sm) 0;
 }
@@ -1126,7 +1126,7 @@
 }
 
 .getcited-rescan-schema .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
     vertical-align: text-bottom;
@@ -1143,7 +1143,7 @@
     padding: var(--getcited-space-sm) var(--getcited-space-md);
     border-radius: var(--getcited-radius-md);
     margin-bottom: var(--getcited-space-md);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-advanced-notice .dashicons {
@@ -1176,7 +1176,7 @@
 
 .getcited-detected-types {
     margin-top: var(--getcited-space-md);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-detected-types summary {
@@ -1198,12 +1198,12 @@
     background: var(--getcited-gray-100);
     padding: 2px 6px;
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 /* Organization sameAs subsection */
 .getcited-subsection-title {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--getcited-gray-700);
     margin: var(--getcited-space-lg) 0 var(--getcited-space-sm);
@@ -1244,7 +1244,7 @@
 
 .getcited-checkbox .description {
     display: block;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-500);
     margin-top: 2px;
 }
@@ -1260,10 +1260,14 @@
     max-width: 400px;
 }
 
+.getcited-add-social {
+    max-width: 400px;
+}
+
 /* Green checkmark for active fields (v1.5.4) */
 .getcited-field-active {
     color: var(--getcited-success);
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
     vertical-align: middle;
@@ -1284,7 +1288,7 @@
 }
 
 .getcited-schema-test .button .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
     vertical-align: text-bottom;
@@ -1307,14 +1311,14 @@
 }
 
 .getcited-score-display.large .score {
-    font-size: 64px;
+    font-size: 66px;
     font-weight: 700;
     color: var(--getcited-gray-900);
     line-height: 1;
 }
 
 .getcited-score-display.large .max {
-    font-size: 24px;
+    font-size: 26px;
     color: var(--getcited-gray-400);
 }
 
@@ -1335,14 +1339,14 @@
 }
 
 .getcited-score-display.circular .score {
-    font-size: 48px;
+    font-size: 50px;
     font-weight: 700;
     color: var(--getcited-gray-900);
     line-height: 1;
 }
 
 .getcited-score-display.circular .max {
-    font-size: 18px;
+    font-size: 20px;
     color: var(--getcited-gray-500);
     margin-top: 4px;
 }
@@ -1376,7 +1380,7 @@
 }
 
 .getcited-posts-table th {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1396,7 +1400,7 @@
     display: inline-block;
     padding: 4px 10px;
     border-radius: var(--getcited-radius-full);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
 }
 
@@ -1441,14 +1445,14 @@
 .getcited-recommendations-brief strong {
     display: block;
     margin-bottom: var(--getcited-space-xs);
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-700);
 }
 
 .getcited-recommendations-brief ol {
     margin: 0;
     padding-left: var(--getcited-space-lg);
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-600);
 }
 
@@ -1473,13 +1477,6 @@
     color: #fff !important;
 }
 
-.getcited-expand-details .dashicons {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-    color: #fff;
-}
-
 .getcited-full-details {
     margin-top: var(--getcited-space-md);
     padding-top: var(--getcited-space-md);
@@ -1499,7 +1496,7 @@
     padding: var(--getcited-space-sm);
     background: #fff;
     border-radius: var(--getcited-radius-sm);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .getcited-factors-grid .factor-item.passed {
@@ -1529,7 +1526,7 @@
 
 .getcited-factors-grid .factor-score {
     color: var(--getcited-gray-500);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-factors-grid .factor-message {
@@ -1557,14 +1554,14 @@
     text-align: left;
     padding: var(--getcited-space-sm) var(--getcited-space-md);
     border-bottom: 1px solid var(--getcited-gray-200);
-    font-size: 15px;
+    font-size: 16px;
 }
 
 .getcited-rubric-table th {
     font-weight: 600;
     color: var(--getcited-gray-500);
     text-transform: uppercase;
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: 0.5px;
 }
 
@@ -1601,7 +1598,7 @@
     align-items: center;
     gap: var(--getcited-space-md);
     flex-wrap: wrap;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-600);
 }
 
@@ -1698,7 +1695,7 @@
 .getcited-import-settings .dashicons,
 .getcited-copy-system-info .dashicons,
 .getcited-add-custom .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
     vertical-align: text-bottom;
@@ -1732,7 +1729,7 @@
 }
 
 .getcited-pro-header h3 {
-    font-size: 20px;
+    font-size: 22px;
     color: #fff;
     margin: 0 0 var(--getcited-space-sm) 0;
 }
@@ -1772,19 +1769,19 @@
 
 .getcited-pro-feature .feature-icon .dashicons {
     color: #fff;
-    font-size: 20px;
+    font-size: 22px;
     width: 20px;
     height: 20px;
 }
 
 .getcited-pro-feature .feature-content h4 {
-    font-size: 14px;
+    font-size: 15px;
     color: #fff;
     margin: 0 0 4px 0;
 }
 
 .getcited-pro-feature .feature-content p {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-dark-muted);
     margin: 0;
     line-height: 1.4;
@@ -1798,7 +1795,7 @@
 }
 
 .getcited-pro-feature .feature-locked .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
 }
@@ -1829,7 +1826,7 @@
     border-radius: var(--getcited-radius-sm);
     background: var(--getcited-dark-card);
     color: var(--getcited-dark-text);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .getcited-waitlist-form input[type="email"]::placeholder {
@@ -1853,7 +1850,7 @@
 }
 
 .getcited-waitlist-count {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-dark-muted);
 }
 
@@ -1905,7 +1902,7 @@
 
 .getcited-modal-header h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: 20px;
     color: #fff;
 }
 
@@ -1913,7 +1910,7 @@
     background: none;
     border: none;
     color: var(--getcited-dark-muted);
-    font-size: 24px;
+    font-size: 26px;
     cursor: pointer;
     padding: 0;
     line-height: 1;
@@ -1934,7 +1931,7 @@
     padding: var(--getcited-space-md);
     text-align: center;
     color: var(--getcited-dark-muted);
-    font-size: 13px;
+    font-size: 14px;
     margin-bottom: var(--getcited-space-lg);
 }
 
@@ -1943,7 +1940,7 @@
 }
 
 .getcited-sample-section h3 {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-dark-muted);
     margin: 0 0 var(--getcited-space-md) 0;
     text-transform: uppercase;
@@ -1958,7 +1955,7 @@
 }
 
 .getcited-sample-stat .stat-number {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 700;
     color: #fff;
 }
@@ -1970,7 +1967,7 @@
 .getcited-sample-stat .stat-change {
     padding: 4px 8px;
     border-radius: var(--getcited-radius-full);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
 }
 
@@ -1990,7 +1987,7 @@
     grid-template-columns: 100px 1fr 60px;
     align-items: center;
     gap: var(--getcited-space-md);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .sample-bar .bar-label {
@@ -2026,14 +2023,14 @@
     background: var(--getcited-dark-card);
     padding: 4px 10px;
     border-radius: var(--getcited-radius-full);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-dark-muted);
 }
 
 .getcited-sample-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-sample-table th,
@@ -2097,7 +2094,7 @@
     flex: 1;
     padding: var(--getcited-space-md) var(--getcited-space-sm);
     text-align: center;
-    font-size: 14px; /* Increased from 12px */
+    font-size: 15px; /* Increased from 12px */
     color: var(--getcited-gray-400);
     border-bottom: 3px solid transparent; /* Thicker border */
     transition: all var(--getcited-transition);
@@ -2121,7 +2118,7 @@
     background: var(--getcited-gray-200);
     border-radius: 50%;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 15px;
     margin-right: 8px;
 }
 
@@ -2180,7 +2177,7 @@
 }
 
 .wizard-icon .dashicons {
-    font-size: 50px;
+    font-size: 52px;
     width: 50px;
     height: 50px;
     color: #fff;
@@ -2191,13 +2188,13 @@
 }
 
 .wizard-content h1 {
-    font-size: 32px;
+    font-size: 34px;
     color: var(--getcited-gray-900);
     margin: 0 0 var(--getcited-space-md) 0;
 }
 
 .wizard-subtitle {
-    font-size: 18px;
+    font-size: 20px;
     color: var(--getcited-gray-600);
     margin: 0 0 var(--getcited-space-lg) 0;
 }
@@ -2212,7 +2209,7 @@
 }
 
 .wizard-actions .button-hero {
-    font-size: 18px;
+    font-size: 20px;
     padding: 14px 40px;
     height: auto;
 }
@@ -2224,7 +2221,7 @@
 .wizard-actions a {
     color: var(--getcited-gray-500);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .wizard-actions a:hover {
@@ -2241,7 +2238,7 @@
 
 .wizard-secondary-action {
     margin: 0;
-    font-size: 15px;
+    font-size: 16px;
 }
 
 .wizard-secondary-action a {
@@ -2283,7 +2280,7 @@
 
 .scan-status-text {
     color: var(--getcited-gray-600);
-    font-size: 16px;
+    font-size: 18px;
     margin: 0;
 }
 
@@ -2291,7 +2288,7 @@
     display: inline-block;
     margin-left: var(--getcited-space-md);
     color: var(--getcited-gray-500);
-    font-size: 14px;
+    font-size: 15px;
     text-decoration: none;
 }
 
@@ -2356,7 +2353,7 @@
 }
 
 .site-type-card .dashicons {
-    font-size: 40px;
+    font-size: 42px;
     width: 40px;
     height: 40px;
     color: var(--getcited-primary);
@@ -2366,12 +2363,12 @@
 .site-type-card strong {
     display: block;
     color: var(--getcited-gray-800);
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 6px;
 }
 
 .site-type-card .description {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-500);
 }
 
@@ -2415,7 +2412,7 @@
 }
 
 .radio-card-content .dashicons {
-    font-size: 32px;
+    font-size: 34px;
     width: 32px;
     height: 32px;
     color: var(--getcited-primary);
@@ -2423,13 +2420,13 @@
 
 .radio-card-content strong {
     color: var(--getcited-gray-800);
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .radio-card-content .recommended-badge {
     background: var(--getcited-success);
     color: #fff;
-    font-size: 11px;
+    font-size: 12px;
     padding: 2px 8px;
     border-radius: var(--getcited-radius-full);
     text-transform: uppercase;
@@ -2440,7 +2437,7 @@
     width: 100%;
     margin: var(--getcited-space-sm) 0 0 0;
     color: var(--getcited-gray-500);
-    font-size: 15px;
+    font-size: 16px;
     padding-left: 40px;
 }
 
@@ -2458,7 +2455,7 @@
 .getcited-org-form label {
     display: block;
     font-weight: 500;
-    font-size: 15px;
+    font-size: 16px;
     margin-bottom: var(--getcited-space-sm);
     color: var(--getcited-gray-700);
 }
@@ -2473,7 +2470,7 @@
     padding: 12px 16px;
     border: 1px solid var(--getcited-gray-300);
     border-radius: var(--getcited-radius-sm);
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .getcited-org-form input:focus {
@@ -2500,7 +2497,7 @@
     background: rgba(16, 185, 129, 0.1);
     border-radius: var(--getcited-radius-sm);
     color: var(--getcited-success);
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .summary-item .dashicons {
@@ -2545,7 +2542,7 @@
 
 .verify-icon.success .dashicons {
     color: var(--getcited-success);
-    font-size: 40px;
+    font-size: 42px;
     width: 40px;
     height: 40px;
 }
@@ -2556,7 +2553,7 @@
 
 .verify-icon.warning .dashicons {
     color: var(--getcited-warning);
-    font-size: 40px;
+    font-size: 42px;
     width: 40px;
     height: 40px;
 }
@@ -2567,20 +2564,20 @@
 
 .verify-icon.info .dashicons {
     color: var(--getcited-gray-500);
-    font-size: 40px;
+    font-size: 42px;
     width: 40px;
     height: 40px;
 }
 
 .verify-state h2 {
-    font-size: 24px;
+    font-size: 26px;
     color: var(--getcited-gray-800);
     margin: 0 0 var(--getcited-space-md) 0;
 }
 
 .verify-url {
     color: var(--getcited-gray-600);
-    font-size: 15px;
+    font-size: 16px;
     margin-bottom: var(--getcited-space-md);
 }
 
@@ -2593,7 +2590,7 @@
 
 .verify-message {
     color: var(--getcited-gray-600);
-    font-size: 15px;
+    font-size: 16px;
     margin: 0 0 var(--getcited-space-lg) 0;
 }
 
@@ -2612,18 +2609,18 @@
 .host-guidance-box .host-title {
     display: block;
     color: var(--getcited-gray-800);
-    font-size: 15px;
+    font-size: 16px;
     margin-bottom: var(--getcited-space-xs);
 }
 
 .host-guidance-box .host-message {
     color: var(--getcited-gray-600);
-    font-size: 14px;
+    font-size: 15px;
     margin: 0 0 var(--getcited-space-sm) 0;
 }
 
 .host-guidance-box .host-docs-link {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-primary);
 }
 
@@ -2632,7 +2629,7 @@
 }
 
 .verify-fix-options h3 {
-    font-size: 16px;
+    font-size: 18px;
     color: var(--getcited-gray-700);
     margin: 0 0 var(--getcited-space-md) 0;
 }
@@ -2646,24 +2643,24 @@
 }
 
 .verify-fix-options .radio-card-content .dashicons {
-    font-size: 24px;
+    font-size: 26px;
     width: 24px;
     height: 24px;
 }
 
 .verify-fix-options .radio-card-content strong {
-    font-size: 15px;
+    font-size: 16px;
 }
 
 .verify-fix-options .radio-card-content p {
     padding-left: 0;
     margin-top: var(--getcited-space-xs);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .fixing-message {
     color: var(--getcited-gray-600);
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .manual-instructions {
@@ -2682,7 +2679,7 @@
 
 .manual-instructions li {
     margin-bottom: var(--getcited-space-sm);
-    font-size: 15px;
+    font-size: 16px;
 }
 
 .manual-instructions .button {
@@ -2692,7 +2689,7 @@
 }
 
 .manual-instructions .button .dashicons {
-    font-size: 18px;
+    font-size: 20px;
     width: 18px;
     height: 18px;
 }
@@ -2701,7 +2698,7 @@
     background: var(--getcited-accent-light);
     padding: var(--getcited-space-md);
     border-radius: var(--getcited-radius-sm);
-    font-size: 14px;
+    font-size: 15px;
     margin-top: var(--getcited-space-md);
 }
 
@@ -2753,7 +2750,7 @@
 }
 
 .getcited-save-status {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-500);
 }
 
@@ -2780,7 +2777,7 @@
 
 #getcited-system-info {
     font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 12px;
+    font-size: 13px;
     background: var(--getcited-gray-800);
     color: var(--getcited-gray-100);
     border: none;
@@ -2806,18 +2803,18 @@
 }
 
 .getcited-meta-box .getcited-score-number .score {
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 700;
     color: var(--getcited-gray-900);
 }
 
 .getcited-meta-box .getcited-score-number .max {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-400);
 }
 
 .getcited-meta-box .getcited-last-audit {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-500);
 }
 
@@ -2845,7 +2842,7 @@
     display: flex;
     align-items: center;
     gap: var(--getcited-space-sm);
-    font-size: 13px;
+    font-size: 14px;
     cursor: pointer;
 }
 
@@ -2858,14 +2855,14 @@
 .getcited-meta-recommendations strong {
     display: block;
     margin-bottom: var(--getcited-space-xs);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-700);
 }
 
 .getcited-meta-recommendations ol {
     margin: 0;
     padding-left: var(--getcited-space-lg);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-600);
 }
 
@@ -2898,7 +2895,7 @@
     background: var(--getcited-gray-200);
     padding: 2px 6px;
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 /* ==========================================================================
@@ -2990,7 +2987,7 @@
 }
 
 .getcited-scan-site .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
 }
@@ -3000,7 +2997,7 @@
 }
 
 .getcited-scan-status {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
 }
 
@@ -3036,7 +3033,7 @@
 }
 
 .getcited-scan-summary .summary-header .dashicons {
-    font-size: 20px;
+    font-size: 22px;
     width: 20px;
     height: 20px;
 }
@@ -3084,7 +3081,7 @@
     align-items: center;
     gap: var(--getcited-space-xs);
     color: var(--getcited-gray-300);
-    font-size: 13px;
+    font-size: 14px;
     position: sticky;
     top: 0;
 }
@@ -3094,7 +3091,7 @@
     margin: 0;
     color: var(--getcited-gray-100);
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.6;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -3117,7 +3114,7 @@
 
 .getcited-scan-stats .stat-number {
     display: block;
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
     color: var(--getcited-primary);
     line-height: 1;
@@ -3125,7 +3122,7 @@
 }
 
 .getcited-scan-stats .stat-label {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-500);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -3204,7 +3201,7 @@
 }
 
 .getcited-compact-form label {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--getcited-gray-700);
 }
@@ -3215,7 +3212,7 @@
     padding: var(--getcited-space-sm) var(--getcited-space-md);
     border: 1px solid var(--getcited-gray-300);
     border-radius: var(--getcited-radius-sm);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .getcited-compact-form input:focus,
@@ -3236,7 +3233,7 @@
 }
 
 .getcited-source-toggle h3 {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--getcited-gray-700);
     margin: 0 0 var(--getcited-space-sm) 0;
@@ -3248,7 +3245,7 @@
     gap: var(--getcited-space-sm);
     padding: var(--getcited-space-sm) 0;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-700);
 }
 
@@ -3277,7 +3274,7 @@
 }
 
 .getcited-stat-row .stat-number {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 700;
     line-height: 1;
 }
@@ -3291,7 +3288,7 @@
 }
 
 .getcited-stat-row .stat-label {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-600);
 }
 
@@ -3304,7 +3301,7 @@
 
 .getcited-crawler-stats .getcited-list-info {
     margin-top: var(--getcited-space-md);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-400);
 }
 
@@ -3342,14 +3339,14 @@
 }
 
 .getcited-page-teaser .teaser-content .dashicons {
-    font-size: 20px;
+    font-size: 22px;
     width: 20px;
     height: 20px;
     color: var(--getcited-accent);
 }
 
 .getcited-page-teaser .teaser-text {
-    font-size: 14px;
+    font-size: 15px;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -3361,7 +3358,7 @@
 
 .getcited-page-teaser .teaser-text .teaser-message {
     color: var(--getcited-dark-text);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 /* Inline form in page teaser */
@@ -3377,7 +3374,7 @@
     border-radius: var(--getcited-radius-sm);
     background: var(--getcited-dark-card);
     color: var(--getcited-dark-text);
-    font-size: 13px;
+    font-size: 14px;
     width: 180px;
 }
 
@@ -3414,12 +3411,12 @@
     align-items: center;
     gap: var(--getcited-space-xs);
     color: var(--getcited-success);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
 }
 
 .getcited-page-teaser .teaser-joined .dashicons {
-    font-size: 18px;
+    font-size: 20px;
     width: 18px;
     height: 18px;
 }
@@ -3464,7 +3461,7 @@
 }
 
 .getcited-waitlist-confirmed .dashicons {
-    font-size: 32px;
+    font-size: 34px;
     width: 32px;
     height: 32px;
     color: var(--getcited-success);
@@ -3487,7 +3484,7 @@
 }
 
 .getcited-sample-report .button-hero {
-    font-size: 16px;
+    font-size: 18px;
     padding: var(--getcited-space-md) var(--getcited-space-xl);
     height: auto;
     display: inline-flex;
@@ -3505,14 +3502,14 @@
 }
 
 .getcited-sample-report .button-hero .dashicons {
-    font-size: 20px;
+    font-size: 22px;
     width: 20px;
     height: 20px;
 }
 
 .getcited-sample-report .sample-hint {
     margin-top: var(--getcited-space-sm);
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-dark-muted);
 }
 
@@ -3524,12 +3521,12 @@
     display: flex;
     align-items: center;
     gap: var(--getcited-space-xs);
-    font-size: 13px;
+    font-size: 14px;
     margin: var(--getcited-space-sm) 0;
 }
 
 .getcited-file-status .dashicons {
-    font-size: 18px;
+    font-size: 20px;
     width: 18px;
     height: 18px;
 }
@@ -3542,7 +3539,7 @@
 }
 
 .getcited-manual-write .button .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
     vertical-align: text-bottom;
@@ -3559,7 +3556,7 @@
     gap: var(--getcited-space-sm);
     padding: var(--getcited-space-sm) var(--getcited-space-md);
     border-radius: var(--getcited-radius-sm);
-    font-size: 13px;
+    font-size: 14px;
     margin: var(--getcited-space-sm) 0;
 }
 
@@ -3569,7 +3566,7 @@
 }
 
 .getcited-notice .dashicons {
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
 }
@@ -3594,7 +3591,7 @@
 
 .getcited-stat-items .stat-value {
     display: block;
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 700;
     color: var(--getcited-gray-900);
     line-height: 1;
@@ -3602,7 +3599,7 @@
 }
 
 .getcited-stat-items .stat-label {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-500);
 }
 
@@ -3621,7 +3618,7 @@
 }
 
 .getcited-stat-items-enhanced .stat-item-large .dashicons {
-    font-size: 24px;
+    font-size: 26px;
     width: 24px;
     height: 24px;
     margin-bottom: var(--getcited-space-xs);
@@ -3637,7 +3634,7 @@
 
 .getcited-stat-items-enhanced .stat-sublabel {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--getcited-gray-400);
     margin-top: 2px;
 }
@@ -3648,7 +3645,7 @@
     justify-content: center;
     gap: var(--getcited-space-xs);
     margin-top: var(--getcited-space-md);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
 }
 
@@ -3664,13 +3661,13 @@
     background: var(--getcited-gray-100);
     border-radius: var(--getcited-radius-sm);
     margin-top: var(--getcited-space-md);
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-600);
 }
 
 .getcited-inline-upsell .dashicons {
     color: var(--getcited-gray-400);
-    font-size: 16px;
+    font-size: 18px;
     width: 16px;
     height: 16px;
 }
@@ -3716,12 +3713,12 @@
 }
 
 .getcited-checkbox-compact .checkbox-label strong {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-800);
 }
 
 .getcited-checkbox-compact .checkbox-label .description {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-500);
 }
 
@@ -3737,7 +3734,7 @@
 }
 
 .getcited-schema-test .button .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
 }
@@ -3778,11 +3775,11 @@
 }
 
 .visibility-score-container .getcited-score-display.circular .score {
-    font-size: 36px;
+    font-size: 38px;
 }
 
 .visibility-score-container .getcited-score-display.circular .max {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .visibility-score-circle {
@@ -3827,7 +3824,7 @@
 }
 
 .visibility-score-circle .score-number {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 700;
     line-height: 1;
     display: block;
@@ -3835,7 +3832,7 @@
 }
 
 .visibility-score-circle .score-max {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-500);
 }
 
@@ -3856,13 +3853,13 @@
 
 .visibility-score-info h2 {
     margin: 0 0 var(--getcited-space-xs) 0;
-    font-size: 18px;
+    font-size: 20px;
     color: var(--getcited-gray-900);
 }
 
 .visibility-score-info .tier-label {
     margin: 0 0 var(--getcited-space-md) 0;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
 }
 
@@ -3885,7 +3882,7 @@
 }
 
 .visibility-score-info .button .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
     vertical-align: text-bottom;
@@ -3907,7 +3904,7 @@
 
 .visibility-score-info .score-recommendation {
     margin: 0 0 var(--getcited-space-md) 0;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-600);
     line-height: 1.5;
 }
@@ -3963,13 +3960,13 @@
 
 .getcited-breakdown-card .card-icon .dashicons {
     color: var(--getcited-primary);
-    font-size: 18px;
+    font-size: 20px;
     width: 18px;
     height: 18px;
 }
 
 .getcited-breakdown-card .card-label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--getcited-gray-500);
     text-transform: uppercase;
@@ -3978,7 +3975,7 @@
 }
 
 .getcited-breakdown-card .card-score {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--getcited-gray-900);
     display: flex;
@@ -3987,7 +3984,7 @@
 }
 
 .getcited-breakdown-card .card-score .score-max {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     color: var(--getcited-gray-400);
 }
@@ -3995,7 +3992,7 @@
 .getcited-breakdown-card .card-status {
     display: inline-flex;
     align-items: center;
-    font-size: 12px;
+    font-size: 13px;
     margin-top: var(--getcited-space-xs);
 }
 
@@ -4008,21 +4005,21 @@
 }
 
 .getcited-breakdown-card .card-status .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
     margin-right: 2px;
 }
 
 .getcited-breakdown-card .card-action {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-primary);
     margin-top: var(--getcited-space-sm);
     font-weight: 500;
 }
 
 .getcited-breakdown-card .card-meta {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-500);
     margin-top: var(--getcited-space-sm);
 }
@@ -4074,7 +4071,7 @@
     padding: 4px 10px;
     background: var(--getcited-gray-100);
     border-radius: var(--getcited-radius-full);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--getcited-gray-600);
     text-decoration: none;
@@ -4115,7 +4112,7 @@
 }
 
 .getcited-health-badge .dashicons {
-    font-size: 14px;
+    font-size: 15px;
     width: 14px;
     height: 14px;
 }
@@ -4142,7 +4139,7 @@
 
 .getcited-activity-empty .description {
     color: var(--getcited-gray-400);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-activity-content {
@@ -4169,14 +4166,14 @@
 .activity-list th,
 .activity-list td {
     padding: var(--getcited-space-sm) var(--getcited-space-md);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .activity-list th {
     font-weight: 600;
     color: var(--getcited-gray-600);
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.5px;
 }
 
@@ -4196,12 +4193,12 @@
     gap: 4px;
     padding: 2px 8px;
     border-radius: 12px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
 }
 
 .category-badge .category-icon {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .category-badge.category-ai-crawler {
@@ -4234,12 +4231,12 @@
 
 .stats-summary p {
     margin: 0 0 var(--getcited-space-sm) 0;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--getcited-gray-700);
 }
 
 .stats-summary .stats-period {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-400);
 }
 
@@ -4252,20 +4249,20 @@
     padding: var(--getcited-space-sm);
     background: rgba(34, 197, 94, 0.1);
     color: #15803d;
-    font-size: 13px;
+    font-size: 14px;
     border-radius: var(--getcited-radius-sm);
 }
 
 .activity-note {
     margin: var(--getcited-space-sm) 0 0 0;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--getcited-gray-500);
 }
 
 /* Clear Log Button Status */
 .getcited-clear-log-status {
     margin-left: var(--getcited-space-sm);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-clear-log-status.success {

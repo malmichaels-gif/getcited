@@ -902,8 +902,7 @@
                                             <ol>${top3}</ol>
                                         </div>
                                         <button type="button" class="button getcited-expand-details">
-                                            <span class="dashicons dashicons-visibility"></span>
-                                            <span class="button-text">${getcitedAdmin.strings?.view_full_analysis || 'View Full Analysis'}</span>
+                                            ${getcitedAdmin.strings?.view_full_analysis || 'View Full Analysis'}
                                         </button>
                                         <div class="getcited-full-details" style="display: none;">
                                             ${factorsHtml}
@@ -919,10 +918,7 @@
                             toggleBtn.addEventListener('click', function() {
                                 const isHidden = fullDetails.style.display === 'none';
                                 fullDetails.style.display = isHidden ? 'block' : 'none';
-                                this.querySelector('.dashicons').className = isHidden
-                                    ? 'dashicons dashicons-hidden'
-                                    : 'dashicons dashicons-visibility';
-                                this.querySelector('.button-text').textContent = isHidden
+                                this.textContent = isHidden
                                     ? (getcitedAdmin.strings?.hide_details || 'Hide Details')
                                     : (getcitedAdmin.strings?.view_full_analysis || 'View Full Analysis');
                             });
@@ -2088,6 +2084,35 @@
                     });
             });
         }
+
+        // Inline llms.txt regeneration (v1.6.12)
+        const regenerateLinks = document.querySelectorAll('.getcited-regenerate-llms');
+        regenerateLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const statusEl = this.nextElementSibling;
+
+                statusEl.textContent = getcitedAdmin.strings?.regenerating || 'Regenerating...';
+                statusEl.style.color = '#666';
+
+                ajax('getcited_regenerate_llms', {})
+                    .then(response => {
+                        if (response.success) {
+                            statusEl.textContent = getcitedAdmin.strings?.regenerated || 'Regenerated!';
+                            statusEl.style.color = '#46b450';
+                        } else {
+                            statusEl.textContent = getcitedAdmin.strings?.error || 'Error';
+                            statusEl.style.color = '#dc3232';
+                        }
+                        setTimeout(() => { statusEl.textContent = ''; }, 3000);
+                    })
+                    .catch(() => {
+                        statusEl.textContent = getcitedAdmin.strings?.error || 'Error';
+                        statusEl.style.color = '#dc3232';
+                        setTimeout(() => { statusEl.textContent = ''; }, 3000);
+                    });
+            });
+        });
     }
 
     // ==========================================================================
