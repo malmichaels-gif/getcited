@@ -116,20 +116,11 @@ if ( empty( $org['name'] ) ) {
                 <div class="getcited-org-form">
                     <div class="form-field">
                         <label for="wizard_org_name"><?php esc_html_e( 'Organization Name', 'getcited' ); ?></label>
-                        <input type="text" 
-                               id="wizard_org_name" 
+                        <input type="text"
+                               id="wizard_org_name"
                                name="organization[name]"
                                value="<?php echo esc_attr( $org['name'] ); ?>"
                                placeholder="<?php esc_attr_e( 'Your Site or Company Name', 'getcited' ); ?>">
-                    </div>
-                    
-                    <div class="form-field">
-                        <label for="wizard_org_logo"><?php esc_html_e( 'Logo URL', 'getcited' ); ?> <span class="optional"><?php esc_html_e( '(optional)', 'getcited' ); ?></span></label>
-                        <input type="url" 
-                               id="wizard_org_logo" 
-                               name="organization[logo_url]"
-                               value="<?php echo esc_url( $org['logo_url'] ); ?>"
-                               placeholder="https://example.com/logo.png">
                     </div>
                 </div>
             </div>

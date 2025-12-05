@@ -158,6 +158,20 @@
     color: var(--getcited-primary);
 }
 
+/* Upload button - orange to match primary buttons */
+.getcited-upload-logo {
+    background: var(--getcited-primary) !important;
+    border-color: var(--getcited-primary) !important;
+    color: #fff !important;
+}
+
+.getcited-upload-logo:hover,
+.getcited-upload-logo:focus {
+    background: var(--getcited-primary-dark) !important;
+    border-color: var(--getcited-primary-dark) !important;
+    color: #fff !important;
+}
+
 /* ==========================================================================
    Global Form Element Styles
    ========================================================================== */
