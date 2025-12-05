@@ -513,7 +513,7 @@ class GetCited_Citability {
             return array(
                 'score' => round( $max * 0.7 ),
                 'passed' => true,
-                'message' => __( 'Adequate heading structure', 'getcited' ),
+                'message' => __( 'Adequate structure — need 2+ H2s and 1+ H3 for full score', 'getcited' ),
             );
         } elseif ( count( $headings ) > 0 ) {
             return array(
@@ -712,7 +712,7 @@ class GetCited_Citability {
             return array(
                 'score' => round( $max * 0.7 ),
                 'passed' => true,
-                'message' => __( 'Some structured content', 'getcited' ),
+                'message' => __( '1 list type found — add another list or table for full score', 'getcited' ),
             );
         } else {
             return array(

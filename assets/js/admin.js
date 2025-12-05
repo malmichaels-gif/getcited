@@ -901,8 +901,8 @@
                                             <ol>${top3}</ol>
                                         </div>
                                         <button type="button" class="button getcited-expand-details">
-                                            <span class="dashicons dashicons-arrow-down-alt2"></span>
-                                            ${getcitedAdmin.strings?.view_full_analysis || 'View Full Analysis'}
+                                            <span class="dashicons dashicons-visibility"></span>
+                                            <span class="button-text">${getcitedAdmin.strings?.view_full_analysis || 'View Full Analysis'}</span>
                                         </button>
                                         <div class="getcited-full-details" style="display: none;">
                                             ${factorsHtml}
@@ -919,11 +919,11 @@
                                 const isHidden = fullDetails.style.display === 'none';
                                 fullDetails.style.display = isHidden ? 'block' : 'none';
                                 this.querySelector('.dashicons').className = isHidden
-                                    ? 'dashicons dashicons-arrow-up-alt2'
-                                    : 'dashicons dashicons-arrow-down-alt2';
-                                this.childNodes[1].textContent = isHidden
-                                    ? (getcitedAdmin.strings?.hide_details || ' Hide Details')
-                                    : (getcitedAdmin.strings?.view_full_analysis || ' View Full Analysis');
+                                    ? 'dashicons dashicons-hidden'
+                                    : 'dashicons dashicons-visibility';
+                                this.querySelector('.button-text').textContent = isHidden
+                                    ? (getcitedAdmin.strings?.hide_details || 'Hide Details')
+                                    : (getcitedAdmin.strings?.view_full_analysis || 'View Full Analysis');
                             });
                         }
                     }

@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.6.3
+Stable tag: 1.6.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.6.4 =
+* Fixed: View Full Analysis / Hide Details button overlap issue
+* Improved: Toggle button now uses eye icons instead of arrows
+* Improved: Heading structure partial score shows what's needed (2+ H2s and 1+ H3)
+* Improved: Lists structure partial score shows what's needed (add another list or table)
 
 = 1.6.3 =
 * Improved: Citability analysis UI with larger fonts for recommendations and results
