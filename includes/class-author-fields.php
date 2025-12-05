@@ -202,9 +202,8 @@ class GetCited_Author_Fields {
 		);
 
 		foreach ( $fields as $key => $sanitize_callback ) {
-			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Value is sanitized via $sanitize_callback.
 			if ( isset( $_POST[ $key ] ) ) {
-				$value = call_user_func( $sanitize_callback, wp_unslash( $_POST[ $key ] ) );
+				$value = call_user_func( $sanitize_callback, wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via $sanitize_callback.
 				update_user_meta( $user_id, $key, $value );
 			}
 		}

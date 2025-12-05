@@ -465,7 +465,7 @@ class GetCited_CLI {
      */
     public function crawler_log( $args, $assoc_args ) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'getcited_llms_requests';
+        $table_name = esc_sql( $wpdb->prefix . 'getcited_llms_requests' );
 
         // Handle --clear flag.
         if ( isset( $assoc_args['clear'] ) ) {

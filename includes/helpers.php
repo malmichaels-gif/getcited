@@ -66,7 +66,7 @@ function getcited_is_post_noindex( $post_id ) {
 	// All in One SEO (uses custom table).
 	if ( defined( 'AIOSEO_VERSION' ) || class_exists( 'AIOSEO' ) ) {
 		global $wpdb;
-		$table = $wpdb->prefix . 'aioseo_posts';
+		$table = esc_sql( $wpdb->prefix . 'aioseo_posts' );
 
 		// Check table exists first.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching

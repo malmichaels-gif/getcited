@@ -57,7 +57,7 @@ class GetCited_Request_Logger {
 	 */
 	private function get_table_name() {
 		global $wpdb;
-		return $wpdb->prefix . self::TABLE_NAME;
+		return esc_sql( $wpdb->prefix . self::TABLE_NAME );
 	}
 
 	/**

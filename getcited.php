@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.6.0
+ * Version: 1.6.1
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.6.0' );
+define( 'GETCITED_VERSION', '1.6.1' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -641,7 +641,7 @@ final class GetCited {
     private function add_category_index() {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'getcited_llms_requests';
+        $table_name = esc_sql( $wpdb->prefix . 'getcited_llms_requests' );
 
         // Check if index already exists
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Migration requires direct query
