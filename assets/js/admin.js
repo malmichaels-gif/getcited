@@ -708,9 +708,10 @@
                 }
             });
 
+            const schemaEnabled = document.getElementById('schema_enabled')?.checked ?? true;
             const data = {
-                schema_enabled: document.getElementById('schema_enabled')?.checked ?? true,
-                schema_force_enabled: document.getElementById('schema_force_enabled')?.checked ?? false,
+                schema_enabled: schemaEnabled,
+                schema_force_enabled: schemaEnabled, // Auto-set force when enabling (handles conflict override)
                 schema_types: schemaTypes,
                 organization: {
                     name: document.getElementById('org_name')?.value || '',

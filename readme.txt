@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,11 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.6.5 =
+* Improved: Simplified Schema Settings page - renamed "Schema Status" to "Schema Detection"
+* Improved: Consolidated schema controls into single checkbox (removed confusing duplicate)
+* Improved: Warning now shows in Schema Output section when another plugin handles schema
 
 = 1.6.4 =
 * Fixed: View Full Analysis / Hide Details button overlap issue

@@ -53,7 +53,7 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 
 		<!-- Detection Status Section -->
 		<div class="getcited-section getcited-detection-status <?php echo esc_attr( $status_info['status'] ); ?>">
-			<h2><?php esc_html_e( 'Schema Status', 'getcited' ); ?></h2>
+			<h2><?php esc_html_e( 'Schema Detection', 'getcited' ); ?></h2>
 
 			<div class="getcited-status-indicator">
 				<?php if ( 'active' === $status_info['status'] ) : ?>
@@ -77,24 +77,6 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 					<?php esc_html_e( 'Re-scan', 'getcited' ); ?>
 				</button>
 			</p>
-
-			<?php if ( $detection['should_disable'] ) : ?>
-				<!-- Force Enable Option -->
-				<div class="getcited-force-enable">
-					<label class="getcited-toggle-label">
-						<input type="checkbox"
-							   name="schema_force_enabled"
-							   id="schema_force_enabled"
-							   value="1"
-							   <?php checked( $force_enabled ); ?>>
-						<strong><?php esc_html_e( 'Enable GetCited schema anyway', 'getcited' ); ?></strong>
-					</label>
-					<p class="description getcited-warning-text">
-						<span class="dashicons dashicons-warning"></span>
-						<?php esc_html_e( 'Warning: May create duplicate markup. Only enable if you know the detected source is not outputting the schema types you need.', 'getcited' ); ?>
-					</p>
-				</div>
-			<?php endif; ?>
 
 			<?php if ( ! empty( $detection['json_ld_types'] ) ) : ?>
 				<details class="getcited-detected-types">
@@ -124,6 +106,13 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 				<p class="description">
 					<?php esc_html_e( 'Output structured data in page headers.', 'getcited' ); ?>
 				</p>
+
+				<?php if ( $detection['should_disable'] ) : ?>
+					<p class="description getcited-warning-text" style="margin-top: 8px;">
+						<span class="dashicons dashicons-info"></span>
+						<?php esc_html_e( 'Another plugin is handling schema. Enabling may create duplicate markup.', 'getcited' ); ?>
+					</p>
+				<?php endif; ?>
 
 				<?php if ( $is_active && $active_count > 0 ) : ?>
 					<p class="getcited-file-status">
