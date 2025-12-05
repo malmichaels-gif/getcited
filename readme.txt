@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.5.5
+Stable tag: 1.5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.5.6 =
+* Added: Green checkmarks for configured fields in Content Settings and AI Citation Guidelines
+* Added: Enhanced Quick Stats with AI Crawler Visits and Unique AI Bots metrics
+* Fixed: Removed blockquote character (>) that caused &gt; display issues in llms.txt
+* Improved: Quick Stats section now shows real AI crawler activity data
 
 = 1.5.5 =
 * Improved: All action buttons now use consistent orange primary styling (Allow All, Block All, Write Now, Scan My Site, etc.)

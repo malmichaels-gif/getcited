@@ -13,10 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 ( function() {
 $citability = GetCited_Citability::instance();
 $pro_teaser = GetCited_Pro_Teaser::instance();
+$request_logger = GetCited_Request_Logger::instance();
 
 $rubric = $citability->get_rubric();
 $recent_posts = $citability->get_analyzable_posts( 5 );
 $average_score = $citability->get_average_score();
+$crawler_stats = $request_logger->get_request_stats();
 ?>
 
 <div class="wrap getcited-wrap">
@@ -68,8 +70,22 @@ $average_score = $citability->get_average_score();
                         $analyzed_count++;
                     }
                 }
+                $ai_visits = $crawler_stats['ai_crawlers'] ?? 0;
+                $unique_bots = $crawler_stats['unique_bots'] ?? 0;
                 ?>
-                <div class="getcited-stat-items">
+                <div class="getcited-stat-items getcited-stat-items-enhanced">
+                    <div class="stat-item stat-item-large">
+                        <span class="dashicons dashicons-visibility" style="color: var(--getcited-primary);"></span>
+                        <span class="stat-value"><?php echo esc_html( number_format_i18n( $ai_visits ) ); ?></span>
+                        <span class="stat-label"><?php esc_html_e( 'AI Crawler Visits', 'getcited' ); ?></span>
+                        <span class="stat-sublabel"><?php esc_html_e( 'Last 30 days', 'getcited' ); ?></span>
+                    </div>
+                    <div class="stat-item stat-item-large">
+                        <span class="dashicons dashicons-groups" style="color: var(--getcited-success);"></span>
+                        <span class="stat-value"><?php echo esc_html( $unique_bots ); ?></span>
+                        <span class="stat-label"><?php esc_html_e( 'Unique AI Bots', 'getcited' ); ?></span>
+                        <span class="stat-sublabel"><?php esc_html_e( 'Visiting your llms.txt', 'getcited' ); ?></span>
+                    </div>
                     <div class="stat-item">
                         <span class="stat-value"><?php echo esc_html( number_format_i18n( $total_posts ) ); ?></span>
                         <span class="stat-label"><?php esc_html_e( 'Published Posts', 'getcited' ); ?></span>

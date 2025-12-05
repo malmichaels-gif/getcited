@@ -442,7 +442,7 @@ class GetCited_Llms_Txt {
         $content = "# {$site_name}\n\n";
 
         if ( ! empty( $site_desc ) ) {
-            $content .= "> {$site_desc}\n\n";
+            $content .= "{$site_desc}\n\n";
         }
 
         $content .= "This file helps AI systems understand and properly cite content from this website.\n\n";
@@ -880,7 +880,7 @@ class GetCited_Llms_Txt {
 
         if ( ! empty( $guidelines['citation_format'] ) ) {
             $content .= "### Preferred Citation Format\n";
-            $content .= '> ' . $guidelines['citation_format'] . "\n\n";
+            $content .= $guidelines['citation_format'] . "\n\n";
         }
 
         if ( ! empty( $guidelines['accuracy_notes'] ) ) {

@@ -156,31 +156,56 @@ $status = $health->get_status();
 
                 <div class="getcited-compact-form">
                     <div class="form-row">
-                        <label for="llms_founder_name"><?php esc_html_e( 'Author Name', 'getcited' ); ?></label>
+                        <label for="llms_founder_name">
+                            <?php esc_html_e( 'Author Name', 'getcited' ); ?>
+                            <?php if ( ! empty( $founder_name ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <input type="text" name="llms_founder_name" id="llms_founder_name"
                                value="<?php echo esc_attr( $founder_name ); ?>"
                                placeholder="<?php esc_attr_e( 'e.g., John Smith', 'getcited' ); ?>">
                     </div>
                     <div class="form-row">
-                        <label for="llms_founder_title"><?php esc_html_e( 'Title/Role', 'getcited' ); ?></label>
+                        <label for="llms_founder_title">
+                            <?php esc_html_e( 'Title/Role', 'getcited' ); ?>
+                            <?php if ( ! empty( $founder_title ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <input type="text" name="llms_founder_title" id="llms_founder_title"
                                value="<?php echo esc_attr( $founder_title ); ?>"
                                placeholder="<?php esc_attr_e( 'e.g., Founder & Lead Analyst', 'getcited' ); ?>">
                     </div>
                     <div class="form-row">
-                        <label for="llms_site_expertise"><?php esc_html_e( 'Expertise', 'getcited' ); ?></label>
+                        <label for="llms_site_expertise">
+                            <?php esc_html_e( 'Expertise', 'getcited' ); ?>
+                            <?php if ( ! empty( $site_expertise ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <input type="text" name="llms_site_expertise" id="llms_site_expertise"
                                value="<?php echo esc_attr( $site_expertise ); ?>"
                                placeholder="<?php esc_attr_e( 'e.g., 10+ years in web development', 'getcited' ); ?>">
                     </div>
                     <div class="form-row">
-                        <label for="llms_update_frequency"><?php esc_html_e( 'Update Frequency', 'getcited' ); ?></label>
+                        <label for="llms_update_frequency">
+                            <?php esc_html_e( 'Update Frequency', 'getcited' ); ?>
+                            <?php if ( ! empty( $update_frequency ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <input type="text" name="llms_update_frequency" id="llms_update_frequency"
                                value="<?php echo esc_attr( $update_frequency ); ?>"
                                placeholder="<?php esc_attr_e( 'e.g., 2-3 times per week', 'getcited' ); ?>">
                     </div>
                     <div class="form-row form-row-full">
-                        <label for="llms_citation_format"><?php esc_html_e( 'Custom Citation Format', 'getcited' ); ?></label>
+                        <label for="llms_citation_format">
+                            <?php esc_html_e( 'Custom Citation Format', 'getcited' ); ?>
+                            <?php if ( ! empty( $citation_format ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <textarea name="llms_citation_format" id="llms_citation_format" rows="3"
                                   placeholder="<?php esc_attr_e( 'Leave blank for automatic guidelines. Use {site_name} as a placeholder.', 'getcited' ); ?>"><?php echo esc_textarea( $citation_format ); ?></textarea>
                     </div>
@@ -212,7 +237,12 @@ $status = $health->get_status();
 
                 <div class="getcited-citation-fields getcited-compact-form" style="margin-top: var(--getcited-space-md, 16px);">
                     <div class="form-row form-row-full">
-                        <label for="getcited-citation-format"><?php esc_html_e( 'Preferred Citation Format', 'getcited' ); ?></label>
+                        <label for="getcited-citation-format">
+                            <?php esc_html_e( 'Preferred Citation Format', 'getcited' ); ?>
+                            <?php if ( ! empty( $citation_guidelines['citation_format'] ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <input type="text"
                                id="getcited-citation-format"
                                name="citation_guidelines[citation_format]"
@@ -223,7 +253,12 @@ $status = $health->get_status();
                     </div>
 
                     <div class="form-row form-row-full">
-                        <label for="getcited-accuracy-notes"><?php esc_html_e( 'Accuracy Notes', 'getcited' ); ?></label>
+                        <label for="getcited-accuracy-notes">
+                            <?php esc_html_e( 'Accuracy Notes', 'getcited' ); ?>
+                            <?php if ( ! empty( $citation_guidelines['accuracy_notes'] ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <textarea id="getcited-accuracy-notes"
                                   name="citation_guidelines[accuracy_notes]"
                                   rows="2"
@@ -233,7 +268,12 @@ $status = $health->get_status();
                     </div>
 
                     <div class="form-row form-row-full">
-                        <label for="getcited-restrictions"><?php esc_html_e( 'Usage Restrictions', 'getcited' ); ?></label>
+                        <label for="getcited-restrictions">
+                            <?php esc_html_e( 'Usage Restrictions', 'getcited' ); ?>
+                            <?php if ( ! empty( $citation_guidelines['restrictions'] ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <textarea id="getcited-restrictions"
                                   name="citation_guidelines[restrictions]"
                                   rows="2"
@@ -243,7 +283,12 @@ $status = $health->get_status();
                     </div>
 
                     <div class="form-row form-row-full">
-                        <label for="getcited-freshness-note"><?php esc_html_e( 'Data Freshness', 'getcited' ); ?></label>
+                        <label for="getcited-freshness-note">
+                            <?php esc_html_e( 'Data Freshness', 'getcited' ); ?>
+                            <?php if ( ! empty( $citation_guidelines['freshness_note'] ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <input type="text"
                                id="getcited-freshness-note"
                                name="citation_guidelines[freshness_note]"
@@ -254,7 +299,12 @@ $status = $health->get_status();
                     </div>
 
                     <div class="form-row">
-                        <label for="getcited-contact-email"><?php esc_html_e( 'AI Partnership Contact', 'getcited' ); ?></label>
+                        <label for="getcited-contact-email">
+                            <?php esc_html_e( 'AI Partnership Contact', 'getcited' ); ?>
+                            <?php if ( ! empty( $citation_guidelines['contact_email'] ) ) : ?>
+                                <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                            <?php endif; ?>
+                        </label>
                         <input type="email"
                                id="getcited-contact-email"
                                name="citation_guidelines[contact_email]"

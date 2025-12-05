@@ -911,7 +911,7 @@ class GetCited_Site_Scanner {
 
 		// Add tagline/description if exists
 		if ( ! empty( $site['description'] ) ) {
-			$content .= '> ' . $this->escape_markdown( $site['description'] ) . "\n\n";
+			$content .= $this->escape_markdown( $site['description'] ) . "\n\n";
 		}
 
 		// Introduction paragraph
