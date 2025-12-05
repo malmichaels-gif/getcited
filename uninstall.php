@@ -27,10 +27,15 @@ function getcited_uninstall() {
         delete_transient( 'getcited_crawler_list' );
         delete_transient( 'getcited_health_status' );
         delete_transient( 'getcited_llms_txt_status' );
-        
+        delete_transient( 'getcited_show_citation_nudge' );
+        delete_transient( 'getcited_activation_redirect' );
+        delete_transient( 'getcited_scan_throttle' );
+        delete_transient( 'getcited_wizard_scan' );
+
         // Remove cron jobs
         wp_clear_scheduled_hook( 'getcited_daily_cron' );
-        
+        wp_clear_scheduled_hook( 'getcited_weekly_schema_scan' );
+
         return;
     }
 
@@ -63,6 +68,10 @@ function getcited_uninstall() {
 
     // Delete visibility score transient
     delete_transient( 'getcited_visibility_score' );
+    delete_transient( 'getcited_show_citation_nudge' );
+    delete_transient( 'getcited_activation_redirect' );
+    delete_transient( 'getcited_scan_throttle' );
+    delete_transient( 'getcited_wizard_scan' );
 
     // Drop llms.txt request log table
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Uninstall cleanup requires table drop
@@ -81,15 +90,23 @@ function getcited_uninstall() {
          )"
     );
 
-    // 4. Delete user meta (dismissed notices)
+    // 4. Delete user meta (dismissed notices + author fields)
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires pattern delete of plugin user meta
     $wpdb->query(
         "DELETE FROM {$wpdb->usermeta}
-         WHERE meta_key LIKE 'getcited_dismissed_%'"
+         WHERE meta_key LIKE 'getcited_dismissed_%'
+         OR meta_key IN (
+             'getcited_linkedin',
+             'getcited_twitter',
+             'getcited_job_title',
+             'getcited_expertise',
+             'getcited_orcid'
+         )"
     );
 
     // 5. Remove cron jobs
     wp_clear_scheduled_hook( 'getcited_daily_cron' );
+    wp_clear_scheduled_hook( 'getcited_weekly_schema_scan' );
 
     // 6. Remove GetCited rules from physical robots.txt if present
     getcited_cleanup_robots_txt();

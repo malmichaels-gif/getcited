@@ -3,8 +3,8 @@ Contributors: malcolmmichaels
 Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
-Requires PHP: 8.0
-Stable tag: 1.6.12
+Requires PHP: 7.4
+Stable tag: 1.6.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.6.13 =
+* Changed: Lowered PHP requirement from 8.0 to 7.4 for broader compatibility
+* Fixed: Uninstall cleanup now removes weekly schema scan cron job
+* Fixed: Uninstall cleanup now removes author profile user meta fields
+* Fixed: Uninstall cleanup now removes all transients (wizard, nudge, throttle)
 
 = 1.6.12 =
 * Improved: "Regenerate" link under Site Type now triggers inline AJAX regeneration with feedback, no page navigation
