@@ -66,19 +66,18 @@ function getcited_is_post_noindex( $post_id ) {
 	// All in One SEO (uses custom table).
 	if ( defined( 'AIOSEO_VERSION' ) || class_exists( 'AIOSEO' ) ) {
 		global $wpdb;
-		$table = esc_sql( $wpdb->prefix . 'aioseo_posts' );
 
 		// Check table exists first.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$table_exists = $wpdb->get_var(
-			$wpdb->prepare( 'SHOW TABLES LIKE %s', $table )
+			$wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->prefix . 'aioseo_posts' )
 		);
 
 		if ( $table_exists ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe from $wpdb->prefix
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Third-party table query
 			$noindex = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT robots_noindex FROM {$table} WHERE post_id = %d",
+					"SELECT robots_noindex FROM {$wpdb->prefix}aioseo_posts WHERE post_id = %d",
 					$post_id
 				)
 			);

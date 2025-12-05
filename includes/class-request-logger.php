@@ -57,7 +57,7 @@ class GetCited_Request_Logger {
 	 */
 	private function get_table_name() {
 		global $wpdb;
-		return esc_sql( $wpdb->prefix . self::TABLE_NAME );
+		return $wpdb->getcited_llms_requests;
 	}
 
 	/**
@@ -282,14 +282,13 @@ class GetCited_Request_Logger {
 	public function get_recent_requests( $days = 30, $limit = 50 ) {
 		global $wpdb;
 
-		$table = $this->get_table_name();
 		$since = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT request_time, bot_name, category
-				FROM {$table}
+				FROM {$wpdb->getcited_llms_requests}
 				WHERE request_time > %s
 				ORDER BY request_time DESC
 				LIMIT %d",
@@ -310,39 +309,38 @@ class GetCited_Request_Logger {
 	public function get_request_stats( $days = 30 ) {
 		global $wpdb;
 
-		$table = $this->get_table_name();
 		$since = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
 		$total = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table} WHERE request_time > %s",
+				"SELECT COUNT(*) FROM {$wpdb->getcited_llms_requests} WHERE request_time > %s",
 				$since
 			)
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
 		$unique_bots = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(DISTINCT bot_name) FROM {$table} WHERE request_time > %s",
+				"SELECT COUNT(DISTINCT bot_name) FROM {$wpdb->getcited_llms_requests} WHERE request_time > %s",
 				$since
 			)
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
 		$ai_crawlers = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$table} WHERE request_time > %s AND category = 'ai_crawler'",
+				"SELECT COUNT(*) FROM {$wpdb->getcited_llms_requests} WHERE request_time > %s AND category = 'ai_crawler'",
 				$since
 			)
 		);
 
 		// Get category breakdown.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
 		$categories = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT category, COUNT(*) as count
-				FROM {$table}
+				FROM {$wpdb->getcited_llms_requests}
 				WHERE request_time > %s
 				GROUP BY category",
 				$since
@@ -373,13 +371,12 @@ class GetCited_Request_Logger {
 			$retention = 90; // Default 90 days.
 		}
 
-		$table    = $this->get_table_name();
-		$cutoff   = gmdate( 'Y-m-d H:i:s', strtotime( "-{$retention} days" ) );
+		$cutoff = gmdate( 'Y-m-d H:i:s', strtotime( "-{$retention} days" ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table cleanup requires direct query, table name is safe from $wpdb->prefix
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table cleanup requires direct query
 		$wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$table} WHERE request_time < %s",
+				"DELETE FROM {$wpdb->getcited_llms_requests} WHERE request_time < %s",
 				$cutoff
 			)
 		);
@@ -395,10 +392,8 @@ class GetCited_Request_Logger {
 	public function clear_all_requests() {
 		global $wpdb;
 
-		$table = $this->get_table_name();
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table truncate requires direct query, table name is safe from $wpdb->prefix
-		$result = $wpdb->query( "TRUNCATE TABLE {$table}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table truncate requires direct query
+		$result = $wpdb->query( "TRUNCATE TABLE {$wpdb->getcited_llms_requests}" );
 
 		return $result !== false;
 	}

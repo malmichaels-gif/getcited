@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.6.1
+ * Version: 1.6.2
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.6.1' );
+define( 'GETCITED_VERSION', '1.6.2' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -54,8 +54,20 @@ final class GetCited {
      * Constructor
      */
     private function __construct() {
+        $this->register_tables();
         $this->load_dependencies();
         $this->init_hooks();
+    }
+
+    /**
+     * Register custom database tables as $wpdb properties
+     *
+     * This allows using $wpdb->getcited_llms_requests in queries,
+     * which is recognized as safe by WordPress coding standards sniffers.
+     */
+    private function register_tables() {
+        global $wpdb;
+        $wpdb->getcited_llms_requests = $wpdb->prefix . 'getcited_llms_requests';
     }
 
     /**
@@ -641,21 +653,19 @@ final class GetCited {
     private function add_category_index() {
         global $wpdb;
 
-        $table_name = esc_sql( $wpdb->prefix . 'getcited_llms_requests' );
-
         // Check if index already exists
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Migration requires direct query
         $index_exists = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = %s AND table_name = %s AND index_name = 'idx_category'",
                 DB_NAME,
-                $table_name
+                $wpdb->getcited_llms_requests
             )
         );
 
         if ( ! $index_exists ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Migration requires direct DDL, table name is safe from $wpdb->prefix
-            $wpdb->query( "ALTER TABLE {$table_name} ADD INDEX idx_category (category)" );
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Migration requires direct DDL
+            $wpdb->query( "ALTER TABLE {$wpdb->getcited_llms_requests} ADD INDEX idx_category (category)" );
         }
     }
 

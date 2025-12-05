@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,11 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.6.2 =
+* Fixed: SQL interpolation warnings for WordPress Plugin Check compliance
+* Improved: Registered custom table as $wpdb property for proper PHPCS recognition
+* Improved: Removed all intermediate variables for table names in SQL queries
 
 = 1.6.1 =
 * Fixed: Added esc_sql() escaping to all database table names for Plugin Check compliance
