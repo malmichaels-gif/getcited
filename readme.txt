@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.6.5
+Stable tag: 1.6.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,12 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.6.6 =
+* Improved: Schema page now shows positive "All set!" message when SEO plugin handles schema
+* Improved: Schema settings hidden behind "Advanced Options" when another plugin handles schema
+* Improved: Green checkmark for both "handled by plugin" and "GetCited active" states
+* Improved: Renamed "Enable JSON-LD" to "Enable GetCited Schema" for clarity
 
 = 1.6.5 =
 * Improved: Simplified Schema Settings page - renamed "Schema Status" to "Schema Detection"

@@ -56,10 +56,12 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 			<h2><?php esc_html_e( 'Schema Detection', 'getcited' ); ?></h2>
 
 			<div class="getcited-status-indicator">
-				<?php if ( 'active' === $status_info['status'] ) : ?>
+				<?php if ( 'active' === $status_info['status'] || 'handled' === $status_info['status'] ) : ?>
 					<span class="dashicons dashicons-yes-alt" style="color: #46b450;"></span>
-				<?php else : ?>
+				<?php elseif ( 'none' === $status_info['status'] ) : ?>
 					<span class="dashicons dashicons-warning" style="color: #f0b849;"></span>
+				<?php else : ?>
+					<span class="dashicons dashicons-info" style="color: #72aee6;"></span>
 				<?php endif; ?>
 				<span class="status-message"><?php echo esc_html( $status_info['message'] ); ?></span>
 			</div>
@@ -90,6 +92,22 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 			<?php endif; ?>
 		</div>
 
+		<?php if ( $detection['should_disable'] ) : ?>
+			<!-- Advanced Options (collapsed by default when plugin handles schema) -->
+			<details class="getcited-section getcited-advanced-options">
+				<summary class="getcited-advanced-toggle">
+					<span class="dashicons dashicons-admin-tools"></span>
+					<?php esc_html_e( 'Advanced Options', 'getcited' ); ?>
+				</summary>
+				<div class="getcited-advanced-content">
+					<p class="description getcited-advanced-notice">
+						<span class="dashicons dashicons-info"></span>
+						<?php esc_html_e( 'Your SEO plugin is already handling schema. Only enable GetCited schema if you need additional schema types not provided by your plugin.', 'getcited' ); ?>
+					</p>
+		<?php else : ?>
+			<!-- Show settings directly when no plugin handles schema -->
+		<?php endif; ?>
+
 		<!-- Two-Column Settings Grid -->
 		<div class="getcited-settings-grid">
 			<!-- Left Column: Enable + Status -->
@@ -101,18 +119,11 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 						   id="schema_enabled"
 						   value="1"
 						   <?php checked( $enabled ); ?>>
-					<strong><?php esc_html_e( 'Enable JSON-LD', 'getcited' ); ?></strong>
+					<strong><?php esc_html_e( 'Enable GetCited Schema', 'getcited' ); ?></strong>
 				</label>
 				<p class="description">
 					<?php esc_html_e( 'Output structured data in page headers.', 'getcited' ); ?>
 				</p>
-
-				<?php if ( $detection['should_disable'] ) : ?>
-					<p class="description getcited-warning-text" style="margin-top: 8px;">
-						<span class="dashicons dashicons-info"></span>
-						<?php esc_html_e( 'Another plugin is handling schema. Enabling may create duplicate markup.', 'getcited' ); ?>
-					</p>
-				<?php endif; ?>
 
 				<?php if ( $is_active && $active_count > 0 ) : ?>
 					<p class="getcited-file-status">
@@ -195,6 +206,11 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 				</p>
 			</div>
 		</div>
+
+		<?php if ( $detection['should_disable'] ) : ?>
+				</div><!-- .getcited-advanced-content -->
+			</details><!-- .getcited-advanced-options -->
+		<?php endif; ?>
 
 		<!-- Organization Details (Collapsible) -->
 		<div class="getcited-section getcited-organization getcited-collapsible" data-collapsed="true">

@@ -1059,9 +1059,19 @@
     border-left-color: var(--getcited-success);
 }
 
-.getcited-detection-status.disabled {
+.getcited-detection-status.handled {
+    border-left-color: var(--getcited-success);
+    background: rgba(34, 197, 94, 0.03);
+}
+
+.getcited-detection-status.none {
     border-left-color: var(--getcited-warning);
     background: rgba(245, 158, 11, 0.03);
+}
+
+.getcited-detection-status.disabled {
+    border-left-color: var(--getcited-gray-400);
+    background: rgba(156, 163, 175, 0.03);
 }
 
 .getcited-status-indicator {
@@ -1109,6 +1119,62 @@
     margin-right: 4px;
 }
 
+/* Advanced Options (replaces force-enable) */
+.getcited-advanced-options {
+    margin-top: var(--getcited-space-md);
+}
+
+.getcited-advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--getcited-gray-600);
+    cursor: pointer;
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    background: var(--getcited-gray-50);
+    border-radius: var(--getcited-radius-md);
+    list-style: none;
+}
+
+.getcited-advanced-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.getcited-advanced-toggle:hover {
+    background: var(--getcited-gray-100);
+    color: var(--getcited-gray-700);
+}
+
+.getcited-advanced-toggle .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.getcited-advanced-content {
+    padding: var(--getcited-space-md) 0;
+}
+
+.getcited-advanced-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--getcited-space-xs);
+    color: var(--getcited-gray-600);
+    background: var(--getcited-gray-50);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    border-radius: var(--getcited-radius-md);
+    margin-bottom: var(--getcited-space-md);
+    font-size: 13px;
+}
+
+.getcited-advanced-notice .dashicons {
+    color: var(--getcited-gray-400);
+    flex-shrink: 0;
+}
+
+/* Legacy force-enable (keep for backwards compat) */
 .getcited-force-enable {
     margin-top: var(--getcited-space-md);
     padding-top: var(--getcited-space-md);

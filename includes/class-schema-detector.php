@@ -378,65 +378,58 @@ class GetCited_Schema_Detector {
 	/**
 	 * Get human-readable status message
 	 *
-	 * @return array Status with 'status' (active|disabled), 'message', and 'source'.
+	 * @return array Status with 'status' (active|handled|none), 'message', and 'source'.
 	 */
 	public function get_status_message() {
 		$settings  = GetCited_Settings::instance();
 		$detection = $this->get_detection_status();
 
-		if ( ! $settings->get( 'schema_enabled' ) ) {
-			// If SEO plugin is detected, explain who's handling schema.
-			if ( ! empty( $detection['plugins'] ) ) {
-				$plugin_names = array_column( $detection['plugins'], 'name' );
-				return array(
-					'status'  => 'disabled',
-					'message' => sprintf(
-						/* translators: %s: comma-separated list of plugin names */
-						__( 'Disabled — %s is handling schema markup.', 'getcited' ),
-						implode( ', ', $plugin_names )
-					),
-					'source'  => $detection['detected_source'],
-				);
-			}
-			return array(
-				'status'  => 'disabled',
-				'message' => __( 'Schema output is disabled in settings.', 'getcited' ),
-				'source'  => 'user',
-			);
-		}
-
-		if ( $settings->get( 'schema_force_enabled' ) ) {
+		// Check if user has force-enabled GetCited schema.
+		if ( $settings->get( 'schema_enabled' ) && $settings->get( 'schema_force_enabled' ) ) {
 			return array(
 				'status'  => 'active',
-				'message' => __( 'Schema output is force-enabled (override active).', 'getcited' ),
+				'message' => __( 'GetCited schema is active (alongside your SEO plugin).', 'getcited' ),
 				'source'  => 'force',
 			);
 		}
 
+		// Check if another plugin is handling schema (positive framing!).
 		if ( $detection['should_disable'] ) {
-			// Build message based on what was detected.
 			if ( ! empty( $detection['plugins'] ) ) {
 				$plugin_names = array_column( $detection['plugins'], 'name' );
-				$message      = sprintf(
-					/* translators: %s: comma-separated list of plugin names */
-					__( 'Disabled — %s is handling schema markup.', 'getcited' ),
-					implode( ', ', $plugin_names )
+				return array(
+					'status'  => 'handled',
+					'message' => sprintf(
+						/* translators: %s: plugin name handling schema */
+						__( 'All set! %s is handling your schema markup.', 'getcited' ),
+						implode( ', ', $plugin_names )
+					),
+					'source'  => $detection['detected_source'],
 				);
 			} else {
-				$message = __( 'Disabled — Existing JSON-LD schema detected on homepage.', 'getcited' );
+				// JSON-LD detected but no known plugin.
+				return array(
+					'status'  => 'handled',
+					'message' => __( 'All set! Schema markup detected on your site.', 'getcited' ),
+					'source'  => 'json_ld',
+				);
 			}
+		}
 
+		// Check if GetCited schema is enabled.
+		if ( $settings->get( 'schema_enabled' ) ) {
 			return array(
-				'status'  => 'disabled',
-				'message' => $message,
-				'source'  => $detection['detected_source'],
+				'status'  => 'active',
+				'message' => __( 'GetCited schema is active.', 'getcited' ),
+				'source'  => 'getcited',
 			);
 		}
 
+		// Nothing is handling schema - prompt user to enable.
 		return array(
-			'status'  => 'active',
-			'message' => __( 'Active — No other schema sources detected.', 'getcited' ),
-			'source'  => 'getcited',
+			'status'  => 'none',
+			'message' => __( 'No schema markup detected. Enable GetCited schema below.', 'getcited' ),
+			'source'  => 'none',
 		);
 	}
 
