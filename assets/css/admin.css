@@ -1304,7 +1304,7 @@
     margin-top: 4px;
 }
 
-/* Score-based fill colors (harmonizing with orange) */
+/* Score-based fill colors: 80+ green, 51-79 yellow, <50 red */
 .getcited-score-display.circular.score-high {
     background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
     border-color: var(--getcited-primary, #F97316);
@@ -3767,6 +3767,21 @@
 .visibility-score-circle .score-max {
     font-size: 14px;
     color: var(--getcited-gray-500);
+}
+
+/* Tier-based fill colors for Dashboard score circle */
+.visibility-score-circle.tier-excellent .score-bg,
+.visibility-score-circle.tier-good .score-bg {
+    fill: #E8F5E9;
+}
+
+.visibility-score-circle.tier-fair .score-bg {
+    fill: #FFF8E1;
+}
+
+.visibility-score-circle.tier-needs-work .score-bg,
+.visibility-score-circle.tier-poor .score-bg {
+    fill: #FFEBEE;
 }
 
 .visibility-score-info h2 {

@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.5.7
+Stable tag: 1.5.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,9 +103,13 @@ The free version runs entirely on your server. The only external request is to f
 
 == Changelog ==
 
+= 1.5.8 =
+* Added: Dashboard AI Visibility Score circle now has color-coded fills matching Citability
+* Improved: Score thresholds updated to 80+ (green), 51-79 (yellow), <50 (red)
+
 = 1.5.7 =
 * Improved: Average Score display now uses circular design with solid orange ring
-* Improved: Score circle fill color changes based on score (green for 70+, yellow for 40-69, red for below 40)
+* Improved: Score circle fill color changes based on score
 * Improved: Colors harmonize with orange theme for visual consistency
 
 = 1.5.6 =

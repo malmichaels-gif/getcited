@@ -40,9 +40,9 @@ $crawler_stats = $request_logger->get_request_stats();
                 <?php
                 $score_class = '';
                 if ( $average_score ) {
-                    if ( $average_score >= 70 ) {
+                    if ( $average_score >= 80 ) {
                         $score_class = 'score-high';
-                    } elseif ( $average_score >= 40 ) {
+                    } elseif ( $average_score >= 51 ) {
                         $score_class = 'score-medium';
                     } else {
                         $score_class = 'score-low';
