@@ -471,8 +471,8 @@ class GetCited_CLI {
         if ( isset( $assoc_args['clear'] ) ) {
             WP_CLI::confirm( 'Are you sure you want to clear all crawler log entries?' );
 
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-            $wpdb->query( "TRUNCATE TABLE {$table_name}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe from $wpdb->prefix
+            $wpdb->query( "TRUNCATE TABLE {$table_name}" );
 
             WP_CLI::success( 'Crawler log cleared.' );
             return;
@@ -481,13 +481,13 @@ class GetCited_CLI {
         // Get log entries.
         $limit = isset( $assoc_args['limit'] ) ? absint( $assoc_args['limit'] ) : 20;
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe from $wpdb->prefix
         $entries = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT request_time, bot_name, category, user_agent
                  FROM {$table_name}
                  ORDER BY request_time DESC
-                 LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                 LIMIT %d",
                 $limit
             ),
             ARRAY_A
@@ -503,11 +503,11 @@ class GetCited_CLI {
             $file = $assoc_args['export'];
 
             // Get ALL entries for export (not limited).
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe from $wpdb->prefix
             $all_entries = $wpdb->get_results(
                 "SELECT request_time, bot_name, category, user_agent
                  FROM {$table_name}
-                 ORDER BY request_time DESC", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+                 ORDER BY request_time DESC",
                 ARRAY_A
             );
 
@@ -537,8 +537,8 @@ class GetCited_CLI {
         }
 
         // Show summary.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        $total = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe from $wpdb->prefix
+        $total = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" );
 
         WP_CLI::line( '' );
         WP_CLI::line( sprintf( 'Showing %d of %d total entries.', count( $entries ), $total ) );

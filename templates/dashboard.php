@@ -306,6 +306,7 @@ if ( ! empty( $recent_posts ) ) {
 								<span class="health-message"><?php echo esc_html( $check['message'] ); ?></span>
 
 								<?php if ( $has_details ) : ?>
+									<?php /* translators: %s: health check label */ ?>
 									<button type="button" class="getcited-health-expand" aria-expanded="false" aria-controls="<?php echo esc_attr( $details_id ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Show details for %s', 'getcited' ), $label ) ); ?>">
 										<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
 									</button>

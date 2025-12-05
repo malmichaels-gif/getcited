@@ -285,7 +285,7 @@ class GetCited_Request_Logger {
 		$table = $this->get_table_name();
 		$since = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT request_time, bot_name, category
@@ -313,7 +313,7 @@ class GetCited_Request_Logger {
 		$table = $this->get_table_name();
 		$since = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
 		$total = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$table} WHERE request_time > %s",
@@ -321,7 +321,7 @@ class GetCited_Request_Logger {
 			)
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
 		$unique_bots = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(DISTINCT bot_name) FROM {$table} WHERE request_time > %s",
@@ -329,7 +329,7 @@ class GetCited_Request_Logger {
 			)
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
 		$ai_crawlers = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$table} WHERE request_time > %s AND category = 'ai_crawler'",
@@ -338,7 +338,7 @@ class GetCited_Request_Logger {
 		);
 
 		// Get category breakdown.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table requires direct query
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table requires direct query, table name is safe from $wpdb->prefix
 		$categories = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT category, COUNT(*) as count
@@ -376,7 +376,7 @@ class GetCited_Request_Logger {
 		$table    = $this->get_table_name();
 		$cutoff   = gmdate( 'Y-m-d H:i:s', strtotime( "-{$retention} days" ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table cleanup requires direct query
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table cleanup requires direct query, table name is safe from $wpdb->prefix
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM {$table} WHERE request_time < %s",
@@ -397,7 +397,7 @@ class GetCited_Request_Logger {
 
 		$table = $this->get_table_name();
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table truncate requires direct query
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Custom table truncate requires direct query, table name is safe from $wpdb->prefix
 		$result = $wpdb->query( "TRUNCATE TABLE {$table}" );
 
 		return $result !== false;

@@ -643,9 +643,9 @@ class GetCited_Site_Scanner {
 	 * @return array Updated social links.
 	 */
 	private function scan_widgets_for_social( $social, $social_patterns ) {
-		// Get all active widgets
-		$sidebars = wp_get_sidebars_widgets();
-		if ( ! $sidebars ) {
+		// Get all active widgets (using get_option instead of wp_get_sidebars_widgets for plugin compatibility).
+		$sidebars = get_option( 'sidebars_widgets', array() );
+		if ( ! $sidebars || ! is_array( $sidebars ) ) {
 			return $social;
 		}
 

@@ -188,7 +188,7 @@ class GetCited_Author_Fields {
 		}
 
 		// Verify nonce (WordPress adds this automatically for profile updates).
-		if ( ! isset( $_POST['_wpnonce'] ) ) {
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'update-user_' . $user_id ) ) {
 			return;
 		}
 
@@ -202,6 +202,7 @@ class GetCited_Author_Fields {
 		);
 
 		foreach ( $fields as $key => $sanitize_callback ) {
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Value is sanitized via $sanitize_callback.
 			if ( isset( $_POST[ $key ] ) ) {
 				$value = call_user_func( $sanitize_callback, wp_unslash( $_POST[ $key ] ) );
 				update_user_meta( $user_id, $key, $value );

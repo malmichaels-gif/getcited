@@ -132,7 +132,7 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 						printf(
 							/* translators: %d: number of active schema types */
 							esc_html( _n( '%d type active', '%d types active', $active_count, 'getcited' ) ),
-							$active_count
+							esc_html( $active_count )
 						);
 						?>
 					</p>

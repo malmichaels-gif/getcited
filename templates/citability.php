@@ -186,7 +186,7 @@ $crawler_stats = $request_logger->get_request_stats();
                 printf(
                     /* translators: %d: number of published posts */
                     esc_html__( 'Upgrade to Pro to audit all %d posts with detailed recommendations.', 'getcited' ),
-                    $total_posts
+                    esc_html( $total_posts )
                 );
                 ?>
                 <button type="button" class="button getcited-join-waitlist">

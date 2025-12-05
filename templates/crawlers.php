@@ -160,6 +160,7 @@ foreach ( $grouped_crawlers as $crawlers ) {
                                                data-crawler="<?php echo esc_attr( $name ); ?>"
                                                role="switch"
                                                aria-checked="<?php echo $is_allowed ? 'true' : 'false'; ?>"
+                                               <?php /* translators: %s: crawler name */ ?>
                                                aria-label="<?php echo esc_attr( sprintf( __( 'Allow %s crawler', 'getcited' ), $name ) ); ?>">
                                         <span class="toggle-slider" aria-hidden="true"></span>
                                     </label>

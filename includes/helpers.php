@@ -75,10 +75,10 @@ function getcited_is_post_noindex( $post_id ) {
 		);
 
 		if ( $table_exists ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is safe from $wpdb->prefix
 			$noindex = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT robots_noindex FROM {$table} WHERE post_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT robots_noindex FROM {$table} WHERE post_id = %d",
 					$post_id
 				)
 			);
