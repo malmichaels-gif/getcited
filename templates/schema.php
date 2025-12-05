@@ -94,12 +94,12 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 
 		<?php if ( $detection['should_disable'] ) : ?>
 			<!-- Advanced Options (collapsed by default when plugin handles schema) -->
-			<details class="getcited-section getcited-advanced-options">
-				<summary class="getcited-advanced-toggle">
-					<span class="dashicons dashicons-admin-tools"></span>
+			<div class="getcited-section getcited-advanced-options getcited-collapsible" data-collapsed="true">
+				<h2 class="getcited-collapsible-header">
 					<?php esc_html_e( 'Advanced Options', 'getcited' ); ?>
-				</summary>
-				<div class="getcited-advanced-content">
+					<span class="dashicons dashicons-arrow-down-alt2"></span>
+				</h2>
+				<div class="getcited-collapsible-content" style="display: none;">
 					<p class="description getcited-advanced-notice">
 						<span class="dashicons dashicons-info"></span>
 						<?php esc_html_e( 'Your SEO plugin is already handling schema. Only enable GetCited schema if you need additional schema types not provided by your plugin.', 'getcited' ); ?>
@@ -208,8 +208,8 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 		</div>
 
 		<?php if ( $detection['should_disable'] ) : ?>
-				</div><!-- .getcited-advanced-content -->
-			</details><!-- .getcited-advanced-options -->
+				</div><!-- .getcited-collapsible-content -->
+			</div><!-- .getcited-advanced-options -->
 		<?php endif; ?>
 
 		<!-- Organization Details (Collapsible) -->

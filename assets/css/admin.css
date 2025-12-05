@@ -1119,44 +1119,7 @@
     margin-right: 4px;
 }
 
-/* Advanced Options (replaces force-enable) */
-.getcited-advanced-options {
-    margin-top: var(--getcited-space-md);
-}
-
-.getcited-advanced-toggle {
-    display: flex;
-    align-items: center;
-    gap: var(--getcited-space-xs);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--getcited-gray-600);
-    cursor: pointer;
-    padding: var(--getcited-space-sm) var(--getcited-space-md);
-    background: var(--getcited-gray-50);
-    border-radius: var(--getcited-radius-md);
-    list-style: none;
-}
-
-.getcited-advanced-toggle::-webkit-details-marker {
-    display: none;
-}
-
-.getcited-advanced-toggle:hover {
-    background: var(--getcited-gray-100);
-    color: var(--getcited-gray-700);
-}
-
-.getcited-advanced-toggle .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-}
-
-.getcited-advanced-content {
-    padding: var(--getcited-space-md) 0;
-}
-
+/* Advanced Options - uses standard collapsible pattern */
 .getcited-advanced-notice {
     display: flex;
     align-items: flex-start;
