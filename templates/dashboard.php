@@ -67,16 +67,20 @@ if ( ! empty( $recent_posts ) ) {
 						<?php esc_html_e( 'Refresh', 'getcited' ); ?>
 					</button>
 				</div>
-				<div class="visibility-score-circle tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
-					<svg viewBox="0 0 100 100" class="score-svg">
-						<circle class="score-bg" cx="50" cy="50" r="45" />
-						<circle class="score-progress" cx="50" cy="50" r="45"
-							stroke-dasharray="<?php echo esc_attr( ( $visibility_score['total'] / 100 ) * 283 ); ?> 283" />
-					</svg>
-					<div class="score-value">
-						<span class="score-number"><?php echo esc_html( $visibility_score['total'] ); ?></span>
-						<span class="score-max">/100</span>
-					</div>
+				<?php
+				$score_class = '';
+				$total = $visibility_score['total'];
+				if ( $total >= 80 ) {
+					$score_class = 'score-high';
+				} elseif ( $total >= 51 ) {
+					$score_class = 'score-medium';
+				} else {
+					$score_class = 'score-low';
+				}
+				?>
+				<div class="getcited-score-display large circular <?php echo esc_attr( $score_class ); ?>">
+					<span class="score"><?php echo esc_html( $total ); ?></span>
+					<span class="max">/100</span>
 				</div>
 			</div>
 		</div>
