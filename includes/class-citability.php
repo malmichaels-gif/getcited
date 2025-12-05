@@ -731,9 +731,24 @@ class GetCited_Citability {
         $max = $this->rubric['schema_markup']['max_points'];
 
         $settings = GetCited_Settings::instance();
-        
+
         // Check if GetCited schema is enabled
         if ( ! $settings->get( 'schema_enabled' ) ) {
+            // Check if an SEO plugin is handling schema (use existing detector).
+            $detector  = GetCited_Schema_Detector::instance();
+            $detection = $detector->get_detection_status();
+
+            if ( ! empty( $detection['plugins'] ) ) {
+                $plugin_name = $detection['plugins'][0]['name'];
+                return array(
+                    'score'  => $max,
+                    'passed' => true,
+                    /* translators: %s: SEO plugin name handling schema */
+                    'message' => sprintf( __( 'Schema handled by %s', 'getcited' ), $plugin_name ),
+                );
+            }
+
+            // No SEO plugin detected, schema truly disabled.
             return array(
                 'score' => 0,
                 'passed' => false,
@@ -884,11 +899,12 @@ class GetCited_Citability {
                 'message' => sprintf( __( '%d internal links', 'getcited' ), $internal_links ),
             );
         } elseif ( $internal_links >= 1 ) {
+            $needed = 3 - $internal_links;
             return array(
                 'score' => round( $max * 0.6 ),
                 'passed' => true,
-                /* translators: %d: number of internal links */
-                'message' => sprintf( __( '%d internal link(s)', 'getcited' ), $internal_links ),
+                /* translators: 1: number of internal links, 2: number of additional links needed */
+                'message' => sprintf( __( '%1$d internal link(s) — add %2$d more for full score', 'getcited' ), $internal_links, $needed ),
                 'recommendation' => __( 'Add more internal links to related content', 'getcited' ),
             );
         } else {
@@ -927,11 +943,13 @@ class GetCited_Citability {
                 'message' => sprintf( __( '%d external citations', 'getcited' ), $external_links ),
             );
         } elseif ( $external_links >= 1 ) {
+            $needed = 3 - $external_links;
             return array(
                 'score' => round( $max * 0.6 ),
                 'passed' => true,
-                /* translators: %d: number of external citations/links */
-                'message' => sprintf( __( '%d external citation(s)', 'getcited' ), $external_links ),
+                /* translators: 1: number of external citations, 2: number of additional citations needed */
+                'message' => sprintf( __( '%1$d external citation(s) — add %2$d more for full score', 'getcited' ), $external_links, $needed ),
+                'recommendation' => __( 'Reference authoritative external sources to build credibility', 'getcited' ),
             );
         } else {
             return array(

@@ -1398,14 +1398,14 @@
 .getcited-recommendations-brief strong {
     display: block;
     margin-bottom: var(--getcited-space-xs);
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-700);
 }
 
 .getcited-recommendations-brief ol {
     margin: 0;
     padding-left: var(--getcited-space-lg);
-    font-size: 13px;
+    font-size: 14px;
     color: var(--getcited-gray-600);
 }
 
@@ -1418,12 +1418,23 @@
     display: inline-flex;
     align-items: center;
     gap: var(--getcited-space-xs);
+    margin-top: var(--getcited-space-sm);
+    background: var(--getcited-primary) !important;
+    border: 1px solid var(--getcited-primary) !important;
+    color: #fff !important;
+}
+
+.getcited-expand-details:hover {
+    background: var(--getcited-primary-dark) !important;
+    border-color: var(--getcited-primary-dark) !important;
+    color: #fff !important;
 }
 
 .getcited-expand-details .dashicons {
     font-size: 14px;
     width: 14px;
     height: 14px;
+    color: #fff;
 }
 
 .getcited-full-details {
@@ -1439,13 +1450,13 @@
 
 .getcited-factors-grid .factor-item {
     display: grid;
-    grid-template-columns: 20px 120px 60px 1fr;
+    grid-template-columns: 20px 140px 60px 1fr;
     gap: var(--getcited-space-sm);
     align-items: start;
     padding: var(--getcited-space-sm);
     background: #fff;
     border-radius: var(--getcited-radius-sm);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .getcited-factors-grid .factor-item.passed {
@@ -1475,7 +1486,7 @@
 
 .getcited-factors-grid .factor-score {
     color: var(--getcited-gray-500);
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .getcited-factors-grid .factor-message {
