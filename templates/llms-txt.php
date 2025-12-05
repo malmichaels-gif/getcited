@@ -289,21 +289,6 @@ $status = $health->get_status();
             <div class="getcited-editor-header">
                 <h2><?php esc_html_e( 'Content', 'getcited' ); ?></h2>
                 <div class="getcited-llms-actions">
-                    <div class="getcited-template-buttons">
-                        <span><?php esc_html_e( 'Load template:', 'getcited' ); ?></span>
-                        <button type="button" class="button getcited-load-template" data-type="blog">
-                            <?php esc_html_e( 'Blog', 'getcited' ); ?>
-                        </button>
-                        <button type="button" class="button getcited-load-template" data-type="business">
-                            <?php esc_html_e( 'Business', 'getcited' ); ?>
-                        </button>
-                        <button type="button" class="button getcited-load-template" data-type="news">
-                            <?php esc_html_e( 'News', 'getcited' ); ?>
-                        </button>
-                        <button type="button" class="button getcited-load-template" data-type="ecommerce">
-                            <?php esc_html_e( 'E-commerce', 'getcited' ); ?>
-                        </button>
-                    </div>
                     <div class="getcited-scan-section">
                         <button type="button" class="button button-primary getcited-scan-site">
                             <span class="dashicons dashicons-search"></span>
@@ -319,8 +304,12 @@ $status = $health->get_status();
 
             <div class="getcited-editor-wrapper">
                 <div class="getcited-editor">
-                    <textarea name="llms_txt_content" 
-                              id="llms_txt_content" 
+                    <div class="getcited-editor-label">
+                        <span class="dashicons dashicons-edit"></span>
+                        <?php esc_html_e( 'Edit', 'getcited' ); ?>
+                    </div>
+                    <textarea name="llms_txt_content"
+                              id="llms_txt_content"
                               rows="25"
                               placeholder="<?php esc_attr_e( '# Your Site Name', 'getcited' ); ?>"><?php echo esc_textarea( $content ); ?></textarea>
                 </div>
@@ -333,7 +322,7 @@ $status = $health->get_status();
                             <?php esc_html_e( 'Copy', 'getcited' ); ?>
                         </button>
                     </div>
-                    <pre class="getcited-preview-code" id="llms_txt_preview"><?php echo esc_html( $content ); ?></pre>
+                    <pre class="getcited-preview-code" id="llms_txt_preview"><?php echo esc_html( html_entity_decode( $content, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ); ?></pre>
                     <p class="description getcited-copy-hint">
                         <?php esc_html_e( 'Copy and paste into llms.txt in your site root if auto-write is unavailable.', 'getcited' ); ?>
                     </p>

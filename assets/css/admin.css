@@ -936,6 +936,24 @@
     box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
 }
 
+/* Editor label for editable content (v1.5.5) */
+.getcited-editor-label {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-xs);
+    margin-bottom: var(--getcited-space-sm);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--getcited-gray-700);
+}
+
+.getcited-editor-label .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--getcited-primary);
+}
+
 .getcited-preview h3 {
     font-size: 14px;
     font-weight: 600;
@@ -1490,6 +1508,111 @@
 
 .getcited-inline-upsell .dashicons {
     color: var(--getcited-gray-400);
+}
+
+/* ==========================================================================
+   Global Action Buttons - Orange Primary Style (v1.5.5)
+   ========================================================================== */
+
+/* AI Crawlers page buttons */
+.getcited-allow-all,
+.getcited-block-all,
+.getcited-write-robots-file,
+.getcited-remove-robots-rules,
+.getcited-add-custom,
+.getcited-robots-preview .getcited-copy-content,
+.getcited-preview-actions .button {
+    background: var(--getcited-primary) !important;
+    border: 1px solid var(--getcited-primary) !important;
+    color: #fff !important;
+}
+
+.getcited-allow-all:hover,
+.getcited-block-all:hover,
+.getcited-write-robots-file:hover,
+.getcited-remove-robots-rules:hover,
+.getcited-add-custom:hover,
+.getcited-robots-preview .getcited-copy-content:hover,
+.getcited-preview-actions .button:hover {
+    background: var(--getcited-primary-dark) !important;
+    border-color: var(--getcited-primary-dark) !important;
+    color: #fff !important;
+}
+
+/* llms.txt page buttons */
+.getcited-write-llms-file,
+.getcited-scan-site,
+.getcited-llms-editor-section .getcited-copy-content {
+    background: var(--getcited-primary) !important;
+    border: 1px solid var(--getcited-primary) !important;
+    color: #fff !important;
+}
+
+.getcited-write-llms-file:hover,
+.getcited-scan-site:hover,
+.getcited-llms-editor-section .getcited-copy-content:hover {
+    background: var(--getcited-primary-dark) !important;
+    border-color: var(--getcited-primary-dark) !important;
+    color: #fff !important;
+}
+
+/* Schema page buttons */
+.getcited-add-social {
+    background: var(--getcited-primary) !important;
+    border: 1px solid var(--getcited-primary) !important;
+    color: #fff !important;
+}
+
+.getcited-add-social:hover {
+    background: var(--getcited-primary-dark) !important;
+    border-color: var(--getcited-primary-dark) !important;
+    color: #fff !important;
+}
+
+/* Settings page buttons */
+.getcited-clear-request-log,
+.getcited-export-settings,
+.getcited-import-settings,
+.getcited-copy-system-info,
+.getcited-settings-page .form-row .button:not(.button-primary) {
+    background: var(--getcited-primary) !important;
+    border: 1px solid var(--getcited-primary) !important;
+    color: #fff !important;
+}
+
+.getcited-clear-request-log:hover,
+.getcited-export-settings:hover,
+.getcited-import-settings:hover,
+.getcited-copy-system-info:hover,
+.getcited-settings-page .form-row .button:not(.button-primary):hover {
+    background: var(--getcited-primary-dark) !important;
+    border-color: var(--getcited-primary-dark) !important;
+    color: #fff !important;
+}
+
+/* Fix button icon alignment (v1.5.5) */
+.getcited-write-llms-file .dashicons,
+.getcited-scan-site .dashicons,
+.getcited-copy-content .dashicons,
+.getcited-clear-request-log .dashicons,
+.getcited-export-settings .dashicons,
+.getcited-import-settings .dashicons,
+.getcited-copy-system-info .dashicons,
+.getcited-add-custom .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
+    margin-right: 4px;
+}
+
+/* Buttons with inline flex for proper icon alignment */
+.getcited-write-llms-file,
+.getcited-scan-site,
+.getcited-copy-content {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 4px;
 }
 
 /* ==========================================================================

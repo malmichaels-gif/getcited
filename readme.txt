@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.5.4
+Stable tag: 1.5.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,13 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.5.5 =
+* Improved: All action buttons now use consistent orange primary styling (Allow All, Block All, Write Now, Scan My Site, etc.)
+* Improved: llms.txt Content section now shows clear "Edit" label with pencil icon
+* Improved: Removed redundant "Load Template" buttons from Content header for cleaner UX
+* Fixed: Preview now properly displays special characters (>, <, &) instead of HTML entities
+* Fixed: Button icons now properly aligned across all pages
 
 = 1.5.4 =
 * Improved: Schema Status message now explains which SEO plugin is handling schema

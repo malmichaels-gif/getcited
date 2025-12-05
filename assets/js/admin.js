@@ -123,6 +123,16 @@
         };
     }
 
+    /**
+     * Decode HTML entities (v1.5.5)
+     * Converts &gt; to >, &lt; to <, etc.
+     */
+    function decodeHtmlEntities(text) {
+        const textarea = document.createElement('textarea');
+        textarea.innerHTML = text;
+        return textarea.value;
+    }
+
     // ==========================================================================
     // Copy to Clipboard
     // ==========================================================================
@@ -388,7 +398,9 @@
         // Live preview
         if (preview) {
             textarea.addEventListener('input', debounce(() => {
-                preview.textContent = textarea.value;
+                // Decode HTML entities for proper display (v1.5.5)
+                const decoded = decodeHtmlEntities(textarea.value);
+                preview.textContent = decoded;
             }, 300));
         }
 
@@ -529,9 +541,9 @@
                             // Populate textarea
                             textarea.value = response.data.content;
 
-                            // Update live preview if exists
+                            // Update live preview if exists (decode HTML entities v1.5.5)
                             if (preview) {
-                                preview.textContent = response.data.content;
+                                preview.textContent = decodeHtmlEntities(response.data.content);
                             }
                         } else {
                             console.error('Failed to load template:', response);
@@ -573,9 +585,9 @@
                             // Update the editor with generated content
                             textarea.value = response.data.llms_txt;
 
-                            // Update live preview if exists
+                            // Update live preview if exists (decode HTML entities v1.5.5)
                             if (preview) {
-                                preview.textContent = response.data.llms_txt;
+                                preview.textContent = decodeHtmlEntities(response.data.llms_txt);
                             }
 
                             // Mark as having unsaved changes
