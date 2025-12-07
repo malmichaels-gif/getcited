@@ -413,6 +413,12 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 		<!-- Pro Features Section -->
 		<?php $pro_teaser->render_dashboard_teasers(); ?>
 
+		<!-- Footer Attribution -->
+		<p class="getcited-footer-attribution">
+			<?php esc_html_e( 'Built by Malcolm at HeyTC', 'getcited' ); ?>
+			<span class="getcited-version">v<?php echo esc_html( GETCITED_VERSION ); ?></span>
+		</p>
+
 	</div>
 
 	<?php $pro_teaser->render_sample_modal(); ?>

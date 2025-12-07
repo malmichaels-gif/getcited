@@ -88,6 +88,138 @@
     
     /* Transitions */
     --getcited-transition: 150ms ease;
+    --getcited-transition-smooth: 0.25s ease;
+    --getcited-transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ==========================================================================
+   Keyframe Animations
+   ========================================================================== */
+
+/* Section entrance animation */
+@keyframes getcited-section-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Score circle fill animation */
+@keyframes getcited-score-fill {
+    from {
+        stroke-dasharray: 0 999;
+    }
+}
+
+/* Fade in animation */
+@keyframes getcited-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Pulse animation for warnings */
+@keyframes getcited-pulse-warning {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(234, 179, 8, 0);
+    }
+}
+
+/* Pulse animation for errors */
+@keyframes getcited-pulse-error {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================================================
+   Refined Focus States (Accessibility + Polish)
+   ========================================================================== */
+
+.getcited-wrap :focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 2px #fff,
+        0 0 0 4px var(--getcited-primary);
+}
+
+/* Buttons keep their specific focus styles */
+.getcited-wrap .button:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 2px #fff,
+        0 0 0 4px var(--getcited-primary),
+        0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   Empty States
+   ========================================================================== */
+
+.getcited-empty-state {
+    padding: 48px 24px;
+    text-align: center;
+    background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+    border: 2px dashed var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-lg);
+}
+
+.getcited-empty-state .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--getcited-gray-300);
+    margin-bottom: var(--getcited-space-md);
+}
+
+.getcited-empty-state p {
+    color: var(--getcited-gray-500);
+    font-size: 16px;
+    margin: 0;
+}
+
+/* ==========================================================================
+   Footer Attribution
+   ========================================================================== */
+
+.getcited-footer-attribution {
+    text-align: center;
+    font-size: 13px;
+    color: var(--getcited-gray-400);
+    margin: var(--getcited-space-xl) 0 0 0;
+    padding-top: var(--getcited-space-md);
+    border-top: 1px solid var(--getcited-border-light);
+}
+
+.getcited-footer-attribution .getcited-version {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--getcited-gray-300);
 }
 
 /* ==========================================================================
@@ -118,12 +250,22 @@
 
 .getcited-section {
     background: #fff;
-    border: 1px solid var(--getcited-gray-200);
+    border: 1px solid var(--getcited-border);
     border-radius: var(--getcited-radius-md);
     padding: var(--getcited-space-lg);
     margin-bottom: var(--getcited-space-lg);
-    box-shadow: var(--getcited-shadow-sm);
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 4px 12px rgba(0, 0, 0, 0.03);
+    animation: getcited-section-enter 0.4s ease-out both;
 }
+
+/* Staggered entrance for multiple sections */
+.getcited-section:nth-child(2) { animation-delay: 0.08s; }
+.getcited-section:nth-child(3) { animation-delay: 0.16s; }
+.getcited-section:nth-child(4) { animation-delay: 0.24s; }
+.getcited-section:nth-child(5) { animation-delay: 0.32s; }
+.getcited-section:nth-child(6) { animation-delay: 0.40s; }
 
 .getcited-section h2 {
     font-size: 18px;
@@ -135,6 +277,21 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--getcited-space-md);
+    letter-spacing: -0.01em;
+    position: relative;
+}
+
+/* Section header accent line */
+.getcited-section h2::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--getcited-space-lg));
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 20px;
+    background: linear-gradient(180deg, var(--getcited-primary) 0%, var(--getcited-primary-light) 100%);
+    border-radius: 2px;
 }
 
 .getcited-section h2 .button {
@@ -153,23 +310,49 @@
 
 .getcited-wrap .button-primary,
 .getcited-wrap .button.button-primary {
-    background: var(--getcited-primary);
-    border-color: var(--getcited-primary);
+    background: linear-gradient(180deg, var(--getcited-primary) 0%, var(--getcited-primary-dark) 100%);
+    border-color: var(--getcited-primary-dark);
     color: #fff;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: all 0.2s ease;
 }
 
 .getcited-wrap .button-primary:hover,
 .getcited-wrap .button-primary:focus,
 .getcited-wrap .button.button-primary:hover,
 .getcited-wrap .button.button-primary:focus {
-    background: var(--getcited-primary-dark);
+    background: linear-gradient(180deg, var(--getcited-primary-light) 0%, var(--getcited-primary) 100%);
     border-color: var(--getcited-primary-dark);
     color: #fff;
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 8px rgba(249, 115, 22, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.getcited-wrap .button-primary:active,
+.getcited-wrap .button.button-primary:active {
+    transform: translateY(0);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.getcited-wrap .button:not(.button-primary) {
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .getcited-wrap .button:not(.button-primary):hover {
     border-color: var(--getcited-neutral);
     color: var(--getcited-gray-700);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.getcited-wrap .button:not(.button-primary):active {
+    transform: translateY(0);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 /* Upload button - orange to match primary buttons */
@@ -226,29 +409,34 @@
 
 .getcited-card {
     background: var(--getcited-gray-50);
-    border: 1px solid var(--getcited-gray-200);
+    border: 1px solid var(--getcited-border);
     border-radius: var(--getcited-radius-md);
     padding: var(--getcited-space-lg);
     display: flex;
     flex-direction: column;
     gap: var(--getcited-space-sm);
     position: relative;
-    transition: border-color var(--getcited-transition), box-shadow var(--getcited-transition);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: transform var(--getcited-transition-smooth), box-shadow var(--getcited-transition-smooth), border-color var(--getcited-transition);
 }
 
 .getcited-card:hover {
-    border-color: var(--getcited-gray-300);
-    box-shadow: var(--getcited-shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--getcited-border);
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.08),
+        0 8px 24px rgba(0, 0, 0, 0.04);
 }
 
 .getcited-card .card-icon {
     width: 40px;
     height: 40px;
-    background: var(--getcited-bg-muted);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     border-radius: var(--getcited-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .getcited-card .card-icon .dashicons {
@@ -374,6 +562,7 @@
 
 .getcited-status-warning .health-icon {
     background: var(--getcited-warning);
+    animation: getcited-pulse-warning 2s ease-in-out infinite;
 }
 
 .getcited-status-warning .health-icon::after {
@@ -389,6 +578,7 @@
 
 .getcited-status-error .health-icon {
     background: var(--getcited-error);
+    animation: getcited-pulse-error 2s ease-in-out infinite;
 }
 
 .getcited-status-error .health-icon::after {
@@ -820,7 +1010,7 @@
     right: 0;
     bottom: 0;
     background-color: var(--getcited-gray-300);
-    transition: var(--getcited-transition);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
     border-radius: var(--getcited-radius-full);
 }
 
@@ -832,13 +1022,14 @@
     left: 3px;
     bottom: 3px;
     background-color: white;
-    transition: var(--getcited-transition);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     border-radius: 50%;
     box-shadow: var(--getcited-shadow-sm);
 }
 
 .getcited-toggle input:checked + .toggle-slider {
     background-color: var(--getcited-success);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
 }
 
 .getcited-toggle input:checked + .toggle-slider::before {
@@ -3607,7 +3798,10 @@
     display: block;
     font-size: 34px;
     font-weight: 700;
-    color: var(--getcited-gray-900);
+    background: linear-gradient(135deg, var(--getcited-gray-800) 0%, var(--getcited-gray-600) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     line-height: 1;
     margin-bottom: var(--getcited-space-xs);
 }
@@ -3803,7 +3997,8 @@
     min-width: 140px;
     max-width: 140px;
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
+    filter: drop-shadow(0 0 20px rgba(249, 115, 22, 0.12));
 }
 
 .visibility-score-circle .score-svg {
@@ -3826,7 +4021,7 @@
     stroke: var(--getcited-primary);
     stroke-width: 8;
     stroke-linecap: round;
-    transition: stroke-dasharray 0.5s ease;
+    animation: getcited-score-fill 1.2s ease-out forwards;
 }
 
 .visibility-score-circle .score-value {
@@ -3843,6 +4038,7 @@
     line-height: 1;
     display: block;
     color: var(--getcited-gray-900);
+    animation: getcited-fade-in 0.6s ease-out 0.4s both;
 }
 
 .visibility-score-circle .score-max {
@@ -4048,17 +4244,21 @@
     min-width: 160px;
     max-width: 220px;
     background: #fff;
-    border: 1px solid var(--getcited-gray-200);
+    border: 1px solid var(--getcited-border);
     border-radius: var(--getcited-radius-md);
     padding: var(--getcited-space-md);
     text-decoration: none;
     color: inherit;
-    transition: border-color var(--getcited-transition), box-shadow var(--getcited-transition);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: transform var(--getcited-transition-smooth), box-shadow var(--getcited-transition-smooth), border-color var(--getcited-transition);
 }
 
 .getcited-breakdown-card:hover {
-    border-color: var(--getcited-neutral-light);
-    box-shadow: var(--getcited-shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--getcited-border);
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.08),
+        0 8px 24px rgba(0, 0, 0, 0.04);
 }
 
 .getcited-breakdown-card.card-info-only {
@@ -4073,12 +4273,13 @@
 .getcited-breakdown-card .card-icon {
     width: 36px;
     height: 36px;
-    background: var(--getcited-bg-muted);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     border-radius: var(--getcited-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: var(--getcited-space-sm);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .getcited-breakdown-card .card-icon .dashicons {

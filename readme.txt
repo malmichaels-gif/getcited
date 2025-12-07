@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,20 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.7.1 =
+* New: Premium admin UI animations and polish for modern SaaS-like experience
+* New: Score circle animates on page load with subtle glow effect
+* New: Cards lift on hover with layered shadow system
+* New: Section headers feature gradient accent line
+* New: Buttons have gradient backgrounds with lift and press effects
+* New: Toggle switches animate with bounce and glow on activation
+* New: Health warnings/errors pulse to draw attention
+* New: Stat numbers display with gradient text
+* New: Staggered fade-in animation for page sections
+* New: Refined focus-visible states for accessibility
+* New: Empty state component styling
+* Improved: All animations respect prefers-reduced-motion for accessibility
 
 = 1.7.0 =
 * New: Admin UI redesign with refined color palette - orange reserved for primary CTAs and score display
