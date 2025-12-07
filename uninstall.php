@@ -90,7 +90,7 @@ function getcited_uninstall() {
          )"
     );
 
-    // 4. Delete user meta (dismissed notices + author fields)
+    // 4. Delete user meta (dismissed notices, author fields, tip index)
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires pattern delete of plugin user meta
     $wpdb->query(
         "DELETE FROM {$wpdb->usermeta}
@@ -100,7 +100,8 @@ function getcited_uninstall() {
              'getcited_twitter',
              'getcited_job_title',
              'getcited_expertise',
-             'getcited_orcid'
+             'getcited_orcid',
+             'getcited_tip_index'
          )"
     );
 

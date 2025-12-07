@@ -67,6 +67,9 @@ class GetCited_Dashboard {
         // llms.txt regeneration handler (v1.6.12)
         add_action( 'wp_ajax_getcited_regenerate_llms', array( $this, 'ajax_regenerate_llms' ) );
 
+        // Dashboard tips handler (v1.6.14)
+        add_action( 'wp_ajax_getcited_next_tip', array( $this, 'ajax_next_tip' ) );
+
         // Admin notices for citation nudge (v1.5.1)
         add_action( 'admin_notices', array( $this, 'maybe_show_citation_nudge' ) );
     }
@@ -690,5 +693,98 @@ class GetCited_Dashboard {
 
         delete_transient( 'getcited_show_citation_nudge' );
         wp_send_json_success();
+    }
+
+    /**
+     * Get AI visibility tips
+     *
+     * @since 1.6.14
+     * @return array Array of tips with title and content.
+     */
+    public static function get_tips() {
+        return array(
+            array(
+                'title'   => __( 'Write Quotable Content', 'getcited' ),
+                'content' => __( 'Write content that\'s easy for AI to quote. If your paragraph could be read aloud by ChatGPT as a standalone answer, you\'re doing it right.', 'getcited' ),
+            ),
+            array(
+                'title'   => __( 'Match Common Questions', 'getcited' ),
+                'content' => __( 'Create pages that match questions people ask AI. Instead of generic posts, write directly at questions like "How do I..." or "What\'s the best way to..."', 'getcited' ),
+            ),
+            array(
+                'title'   => __( 'Use Answer-Sized Blocks', 'getcited' ),
+                'content' => __( 'Short, punchy explanations (150-250 words) get referenced more than long essays. Think "What X really means" or "The simple version of X."', 'getcited' ),
+            ),
+            array(
+                'title'   => __( 'Publish Original Data', 'getcited' ),
+                'content' => __( 'AIs love numbers because they anchor answers. Even small studies work: "We analyzed 23 landing pages..." or "We tested 10 subject lines..."', 'getcited' ),
+            ),
+            array(
+                'title'   => __( 'Keep Identity Consistent', 'getcited' ),
+                'content' => __( 'Use the same name, bio, and expertise signal everywhere. AIs prefer people who look like authorities — fill out your Organization and Author settings.', 'getcited' ),
+            ),
+        );
+    }
+
+    /**
+     * Get current tip index for user
+     *
+     * @since 1.6.14
+     * @return int Current tip index.
+     */
+    public static function get_current_tip_index() {
+        $user_id = get_current_user_id();
+        $index   = get_user_meta( $user_id, 'getcited_tip_index', true );
+
+        if ( '' === $index ) {
+            $index = 0;
+        }
+
+        return absint( $index );
+    }
+
+    /**
+     * Get current tip for display
+     *
+     * @since 1.6.14
+     * @return array Current tip with title and content.
+     */
+    public static function get_current_tip() {
+        $tips  = self::get_tips();
+        $index = self::get_current_tip_index();
+
+        // Ensure index is within bounds.
+        if ( $index >= count( $tips ) ) {
+            $index = 0;
+        }
+
+        return $tips[ $index ];
+    }
+
+    /**
+     * AJAX: Advance to next tip
+     *
+     * @since 1.6.14
+     */
+    public function ajax_next_tip() {
+        check_ajax_referer( 'getcited_admin', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Permission denied' );
+        }
+
+        $user_id = get_current_user_id();
+        $tips    = self::get_tips();
+        $index   = self::get_current_tip_index();
+
+        // Advance to next tip, wrap around.
+        $index = ( $index + 1 ) % count( $tips );
+        update_user_meta( $user_id, 'getcited_tip_index', $index );
+
+        wp_send_json_success( array(
+            'tip'   => $tips[ $index ],
+            'index' => $index,
+            'total' => count( $tips ),
+        ) );
     }
 }

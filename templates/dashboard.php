@@ -42,6 +42,11 @@ if ( ! empty( $recent_posts ) ) {
 		$freshness_text = sprintf( __( '%d days ago', 'getcited' ), $days_ago );
 	}
 }
+
+// Get current tip for display (v1.6.14).
+$current_tip = GetCited_Dashboard::get_current_tip();
+$tip_index   = GetCited_Dashboard::get_current_tip_index();
+$tips_count  = count( GetCited_Dashboard::get_tips() );
 ?>
 
 <div class="wrap getcited-wrap">
@@ -49,38 +54,65 @@ if ( ! empty( $recent_posts ) ) {
 
 	<div class="getcited-dashboard">
 
-		<!-- AI Visibility Score Hero -->
-		<div class="getcited-section getcited-visibility-score-section">
-			<div class="visibility-score-container">
-				<div class="visibility-score-info">
-					<h2><?php esc_html_e( 'AI Visibility Score', 'getcited' ); ?></h2>
-					<p class="tier-label tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
-						<?php echo esc_html( $visibility_score['tier']['label'] ); ?>
-					</p>
-					<?php if ( ! empty( $visibility_score['recommendations'] ) ) : ?>
-					<p class="score-recommendation">
-						<?php echo esc_html( $visibility_score['recommendations'][0] ); ?>
-					</p>
-					<?php endif; ?>
-					<button type="button" class="button getcited-refresh-score">
-						<span class="dashicons dashicons-update"></span>
-						<?php esc_html_e( 'Refresh', 'getcited' ); ?>
-					</button>
+		<!-- Top Row: Score + Tips -->
+		<div class="getcited-dashboard-top-row">
+			<!-- AI Visibility Score Hero -->
+			<div class="getcited-section getcited-visibility-score-section">
+				<div class="visibility-score-container">
+					<div class="visibility-score-info">
+						<h2><?php esc_html_e( 'AI Visibility Score', 'getcited' ); ?></h2>
+						<p class="tier-label tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
+							<?php echo esc_html( $visibility_score['tier']['label'] ); ?>
+						</p>
+						<?php if ( ! empty( $visibility_score['recommendations'] ) ) : ?>
+						<p class="score-recommendation">
+							<?php echo esc_html( $visibility_score['recommendations'][0] ); ?>
+						</p>
+						<?php endif; ?>
+						<button type="button" class="button getcited-refresh-score">
+							<span class="dashicons dashicons-update"></span>
+							<?php esc_html_e( 'Refresh', 'getcited' ); ?>
+						</button>
+					</div>
+					<?php
+					$score_class = '';
+					$total = $visibility_score['total'];
+					if ( $total >= 80 ) {
+						$score_class = 'score-high';
+					} elseif ( $total >= 51 ) {
+						$score_class = 'score-medium';
+					} else {
+						$score_class = 'score-low';
+					}
+					?>
+					<div class="getcited-score-display large circular <?php echo esc_attr( $score_class ); ?>">
+						<span class="score"><?php echo esc_html( $total ); ?></span>
+						<span class="max">/100</span>
+					</div>
 				</div>
-				<?php
-				$score_class = '';
-				$total = $visibility_score['total'];
-				if ( $total >= 80 ) {
-					$score_class = 'score-high';
-				} elseif ( $total >= 51 ) {
-					$score_class = 'score-medium';
-				} else {
-					$score_class = 'score-low';
-				}
-				?>
-				<div class="getcited-score-display large circular <?php echo esc_attr( $score_class ); ?>">
-					<span class="score"><?php echo esc_html( $total ); ?></span>
-					<span class="max">/100</span>
+			</div>
+
+			<!-- AI Visibility Tips -->
+			<div class="getcited-section getcited-tips-section">
+				<div class="getcited-tip-container">
+					<h2>
+						<span class="dashicons dashicons-lightbulb"></span>
+						<?php esc_html_e( 'AI Visibility Tip', 'getcited' ); ?>
+					</h2>
+					<h3 class="getcited-tip-title"><?php echo esc_html( $current_tip['title'] ); ?></h3>
+					<p class="getcited-tip-content"><?php echo esc_html( $current_tip['content'] ); ?></p>
+					<div class="getcited-tip-footer">
+						<span class="getcited-tip-counter">
+							<?php
+							/* translators: 1: current tip number, 2: total tips */
+							printf( esc_html__( 'Tip %1$d of %2$d', 'getcited' ), $tip_index + 1, $tips_count );
+							?>
+						</span>
+						<a href="#" class="getcited-next-tip">
+							<?php esc_html_e( 'Next tip', 'getcited' ); ?>
+							<span class="dashicons dashicons-arrow-right-alt2"></span>
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -21,6 +21,7 @@
         initSchemaSettings();
         initCitabilityAnalysis();
         initVisibilityScore();
+        initTips();
         initHealthCheck();
         initRobotsRulesActions();
         initWaitlistForm();
@@ -1074,6 +1075,68 @@
                     }, 2000);
                 });
         });
+    }
+
+    // ==========================================================================
+    // AI Visibility Tips (v1.6.14)
+    // ==========================================================================
+
+    function initTips() {
+        const nextTipLink = document.querySelector('.getcited-next-tip');
+        if (!nextTipLink) return;
+
+        nextTipLink.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const tipTitle = document.querySelector('.getcited-tip-title');
+            const tipContent = document.querySelector('.getcited-tip-content');
+            const tipCounter = document.querySelector('.getcited-tip-counter');
+
+            if (!tipTitle || !tipContent) return;
+
+            // Add loading state
+            this.style.pointerEvents = 'none';
+            this.style.opacity = '0.5';
+
+            ajax('getcited_next_tip', {})
+                .then(response => {
+                    if (response.success && response.data.tip) {
+                        // Fade out
+                        tipTitle.style.opacity = '0';
+                        tipContent.style.opacity = '0';
+
+                        setTimeout(() => {
+                            // Update content
+                            tipTitle.textContent = response.data.tip.title;
+                            tipContent.textContent = response.data.tip.content;
+
+                            // Update counter
+                            if (tipCounter) {
+                                tipCounter.textContent = 'Tip ' + (response.data.index + 1) + ' of ' + response.data.total;
+                            }
+
+                            // Fade in
+                            tipTitle.style.opacity = '1';
+                            tipContent.style.opacity = '1';
+                        }, 150);
+                    }
+
+                    // Reset link state
+                    this.style.pointerEvents = '';
+                    this.style.opacity = '';
+                })
+                .catch(() => {
+                    // Reset link state on error
+                    this.style.pointerEvents = '';
+                    this.style.opacity = '';
+                });
+        });
+
+        // Add transition styles
+        const tipTitle = document.querySelector('.getcited-tip-title');
+        const tipContent = document.querySelector('.getcited-tip-content');
+        if (tipTitle) tipTitle.style.transition = 'opacity 0.15s ease';
+        if (tipContent) tipContent.style.transition = 'opacity 0.15s ease';
     }
 
     // ==========================================================================

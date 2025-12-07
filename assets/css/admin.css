@@ -3910,6 +3910,115 @@
 }
 
 /* ==========================================================================
+   Dashboard Top Row (Score + Tips)
+   ========================================================================== */
+
+.getcited-dashboard-top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--getcited-space-lg);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+@media (max-width: 900px) {
+    .getcited-dashboard-top-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Remove margin from sections inside grid */
+.getcited-dashboard-top-row .getcited-section {
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   AI Visibility Tips Card
+   ========================================================================== */
+
+.getcited-tips-section {
+    background: #fff;
+    border-radius: var(--getcited-radius-lg);
+    padding: var(--getcited-space-xl);
+    border-left: 4px solid var(--getcited-warning);
+    box-shadow: var(--getcited-shadow-md);
+    display: flex;
+    flex-direction: column;
+}
+
+.getcited-tip-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.getcited-tips-section h2 {
+    margin: 0 0 var(--getcited-space-md) 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--getcited-gray-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.getcited-tips-section h2 .dashicons {
+    color: var(--getcited-warning);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.getcited-tip-title {
+    margin: 0 0 var(--getcited-space-sm) 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--getcited-gray-700);
+}
+
+.getcited-tip-content {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--getcited-gray-600);
+    flex-grow: 1;
+}
+
+.getcited-tip-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--getcited-space-lg);
+    padding-top: var(--getcited-space-md);
+    border-top: 1px solid var(--getcited-gray-200);
+}
+
+.getcited-tip-counter {
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-next-tip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--getcited-primary);
+    text-decoration: none;
+    transition: color var(--getcited-transition);
+}
+
+.getcited-next-tip:hover {
+    color: var(--getcited-primary-dark);
+}
+
+.getcited-next-tip .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ==========================================================================
    Score Breakdown Cards
    ========================================================================== */
 

@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.6.13
+Stable tag: 1.6.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,10 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.6.14 =
+* New: AI Visibility Tips card on dashboard with rotating tips for improving content citability
+* New: Two-column layout on dashboard showing score and tips side by side
 
 = 1.6.13 =
 * Changed: Lowered PHP requirement from 8.0 to 7.4 for broader compatibility
