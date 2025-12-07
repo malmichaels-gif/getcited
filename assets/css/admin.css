@@ -13,15 +13,20 @@
    ========================================================================== */
 
 :root {
-    /* Primary palette - Orange (HeyTC branding) */
-    --getcited-primary: #FFA500;
-    --getcited-primary-dark: #E69500;
-    --getcited-primary-light: #FFB733;
+    /* Primary palette - Orange (reserved for CTAs and score display) */
+    --getcited-primary: #F97316;
+    --getcited-primary-dark: #EA580C;
+    --getcited-primary-light: #FB923C;
 
-    /* Accent colors */
-    --getcited-accent: #FFA500;
-    --getcited-accent-light: #FFF3E0;
-    --getcited-accent-hover: #E69500;
+    /* Neutral accent (for icons, borders, secondary elements) */
+    --getcited-neutral: #64748B;
+    --getcited-neutral-light: #94A3B8;
+    --getcited-neutral-dark: #475569;
+
+    /* Accent colors (legacy support) */
+    --getcited-accent: #F97316;
+    --getcited-accent-light: #FFF7ED;
+    --getcited-accent-hover: #EA580C;
     --getcited-warning: #eab308;
     --getcited-error: #ef4444;
     --getcited-success: #22c55e;
@@ -33,7 +38,16 @@
     --getcited-status-caution: #f97316;
     --getcited-status-error: #ef4444;
     --getcited-status-info: #6b7280;
-    
+
+    /* Backgrounds - Layered whites */
+    --getcited-bg-base: #FFFFFF;
+    --getcited-bg-subtle: #F8FAFC;
+    --getcited-bg-muted: #F1F5F9;
+
+    /* Borders - Softer */
+    --getcited-border: #E2E8F0;
+    --getcited-border-light: #F1F5F9;
+
     /* Neutrals */
     --getcited-gray-50: #f9fafb;
     --getcited-gray-100: #f3f4f6;
@@ -154,8 +168,8 @@
 }
 
 .getcited-wrap .button:not(.button-primary):hover {
-    border-color: var(--getcited-primary);
-    color: var(--getcited-primary);
+    border-color: var(--getcited-neutral);
+    color: var(--getcited-gray-700);
 }
 
 /* Upload button - orange to match primary buttons */
@@ -182,8 +196,8 @@
 .getcited-wrap input[type="number"]:focus,
 .getcited-wrap textarea:focus,
 .getcited-wrap select:focus {
-    border-color: var(--getcited-primary);
-    box-shadow: 0 0 0 1px var(--getcited-primary);
+    border-color: var(--getcited-neutral);
+    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.15);
     outline: none;
 }
 
@@ -230,7 +244,7 @@
 .getcited-card .card-icon {
     width: 40px;
     height: 40px;
-    background: var(--getcited-primary);
+    background: var(--getcited-bg-muted);
     border-radius: var(--getcited-radius-sm);
     display: flex;
     align-items: center;
@@ -238,7 +252,7 @@
 }
 
 .getcited-card .card-icon .dashicons {
-    color: #fff;
+    color: var(--getcited-neutral);
     font-size: 22px;
     width: 20px;
     height: 20px;
@@ -268,14 +282,14 @@
 .getcited-card .card-link {
     font-size: 15px;
     font-weight: 500;
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     text-decoration: none;
     margin-top: auto;
     padding-top: var(--getcited-space-sm);
 }
 
 .getcited-card .card-link:hover {
-    color: var(--getcited-primary-dark);
+    color: var(--getcited-neutral-dark);
 }
 
 /* ==========================================================================
@@ -432,7 +446,7 @@
 }
 
 .getcited-health-section .getcited-health-expand:focus {
-    outline: 2px solid var(--getcited-primary);
+    outline: 2px solid var(--getcited-neutral);
     outline-offset: 2px;
 }
 
@@ -582,7 +596,7 @@
 
 .alternative-action a,
 .paste-location a {
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     text-decoration: none;
 }
 
@@ -833,13 +847,13 @@
 
 /* Toggle focus styles for keyboard accessibility */
 .getcited-toggle input:focus-visible + .toggle-slider {
-    outline: 2px solid var(--getcited-primary);
+    outline: 2px solid var(--getcited-neutral);
     outline-offset: 2px;
 }
 
 /* Fallback for browsers without focus-visible support */
 .getcited-toggle input:focus + .toggle-slider {
-    outline: 2px solid var(--getcited-primary);
+    outline: 2px solid var(--getcited-neutral);
     outline-offset: 2px;
 }
 
@@ -859,8 +873,8 @@
 }
 
 .getcited-badge.recommended {
-    background: var(--getcited-primary);
-    color: #fff;
+    background: var(--getcited-bg-muted);
+    color: var(--getcited-neutral-dark);
 }
 
 /* ==========================================================================
@@ -945,9 +959,9 @@
 }
 
 .getcited-editor textarea:focus {
-    border-color: var(--getcited-primary);
+    border-color: var(--getcited-neutral);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.15);
 }
 
 /* Editor label for editable content (v1.5.5) */
@@ -965,7 +979,7 @@
     font-size: 18px;
     width: 16px;
     height: 16px;
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
 }
 
 .getcited-preview h3 {
@@ -1185,7 +1199,7 @@
 }
 
 .getcited-detected-types summary:hover {
-    color: var(--getcited-primary);
+    color: var(--getcited-gray-800);
 }
 
 .getcited-detected-types ul {
@@ -1393,7 +1407,7 @@
 }
 
 .getcited-posts-table td a:hover {
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral-dark);
 }
 
 .getcited-score-badge {
@@ -2101,8 +2115,8 @@
 }
 
 .getcited-wizard-progress .progress-step.active {
-    color: var(--getcited-primary);
-    border-bottom-color: var(--getcited-primary);
+    color: var(--getcited-gray-800);
+    border-bottom-color: var(--getcited-neutral);
 }
 
 .getcited-wizard-progress .progress-step.completed {
@@ -2123,7 +2137,7 @@
 }
 
 .getcited-wizard-progress .progress-step.active .step-number {
-    background: var(--getcited-primary);
+    background: var(--getcited-neutral);
     color: #fff;
 }
 
@@ -2242,13 +2256,13 @@
 }
 
 .wizard-secondary-action a {
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     text-decoration: none;
     font-weight: 500;
 }
 
 .wizard-secondary-action a:hover {
-    color: var(--getcited-primary-dark);
+    color: var(--getcited-neutral-dark);
     text-decoration: underline;
 }
 
@@ -2297,12 +2311,12 @@
 }
 
 .getcited-skip-scan.prominent {
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     font-weight: 500;
 }
 
 .getcited-skip-scan.prominent:hover {
-    color: var(--getcited-primary-dark);
+    color: var(--getcited-neutral-dark);
 }
 
 /* Site Type Selection - 3x3 grid for 9 options */
@@ -2348,15 +2362,15 @@
 }
 
 .getcited-site-type input:checked + .site-type-card {
-    border-color: var(--getcited-primary);
-    background: rgba(13, 148, 136, 0.05);
+    border-color: var(--getcited-neutral);
+    background: var(--getcited-bg-subtle);
 }
 
 .site-type-card .dashicons {
     font-size: 42px;
     width: 40px;
     height: 40px;
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     margin-bottom: var(--getcited-space-md);
 }
 
@@ -2407,15 +2421,15 @@
 }
 
 .getcited-radio-card input:checked + .radio-card-content {
-    border-color: var(--getcited-primary);
-    background: rgba(13, 148, 136, 0.05);
+    border-color: var(--getcited-neutral);
+    background: var(--getcited-bg-subtle);
 }
 
 .radio-card-content .dashicons {
     font-size: 34px;
     width: 32px;
     height: 32px;
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
 }
 
 .radio-card-content strong {
@@ -2475,8 +2489,8 @@
 
 .getcited-org-form input:focus {
     outline: none;
-    border-color: var(--getcited-primary);
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+    border-color: var(--getcited-neutral);
+    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.15);
 }
 
 /* Setup Summary */
@@ -2584,7 +2598,7 @@
 .verify-url .llms-url-link {
     display: block;
     margin-top: var(--getcited-space-sm);
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     word-break: break-all;
 }
 
@@ -2599,8 +2613,8 @@
 }
 
 .host-guidance-box {
-    background: var(--getcited-accent-light);
-    border: 1px solid var(--getcited-primary);
+    background: var(--getcited-bg-subtle);
+    border: 1px solid var(--getcited-border);
     border-radius: var(--getcited-radius-md);
     padding: var(--getcited-space-md);
     text-align: left;
@@ -2621,7 +2635,7 @@
 
 .host-guidance-box .host-docs-link {
     font-size: 14px;
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
 }
 
 .verify-fix-options {
@@ -2695,7 +2709,7 @@
 }
 
 .wordpress-com-note {
-    background: var(--getcited-accent-light);
+    background: var(--getcited-bg-subtle);
     padding: var(--getcited-space-md);
     border-radius: var(--getcited-radius-sm);
     font-size: 15px;
@@ -2703,7 +2717,7 @@
 }
 
 .wordpress-com-note a {
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
 }
 
 /* Verify step action buttons */
@@ -3116,7 +3130,7 @@
     display: block;
     font-size: 26px;
     font-weight: 700;
-    color: var(--getcited-primary);
+    color: var(--getcited-gray-900);
     line-height: 1;
     margin-bottom: var(--getcited-space-xs);
 }
@@ -3218,8 +3232,8 @@
 .getcited-compact-form input:focus,
 .getcited-compact-form textarea:focus {
     outline: none;
-    border-color: var(--getcited-primary);
-    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.1);
+    border-color: var(--getcited-neutral);
+    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.15);
 }
 
 /* ==========================================================================
@@ -3748,8 +3762,8 @@
     color: var(--getcited-gray-800);
     border-radius: var(--getcited-radius-lg);
     padding: var(--getcited-space-xl);
-    border-left: 4px solid var(--getcited-primary);
-    box-shadow: var(--getcited-shadow-md);
+    border: 1px solid var(--getcited-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .visibility-score-container {
@@ -3939,8 +3953,8 @@
     background: #fff;
     border-radius: var(--getcited-radius-lg);
     padding: var(--getcited-space-xl);
-    border-left: 4px solid var(--getcited-warning);
-    box-shadow: var(--getcited-shadow-md);
+    border: 1px solid var(--getcited-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
 }
@@ -3962,7 +3976,7 @@
 }
 
 .getcited-tips-section h2 .dashicons {
-    color: var(--getcited-warning);
+    color: var(--getcited-neutral);
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -4003,13 +4017,13 @@
     gap: 4px;
     font-size: 14px;
     font-weight: 500;
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     text-decoration: none;
     transition: color var(--getcited-transition);
 }
 
 .getcited-next-tip:hover {
-    color: var(--getcited-primary-dark);
+    color: var(--getcited-neutral-dark);
 }
 
 .getcited-next-tip .dashicons {
@@ -4043,7 +4057,7 @@
 }
 
 .getcited-breakdown-card:hover {
-    border-color: var(--getcited-primary);
+    border-color: var(--getcited-neutral-light);
     box-shadow: var(--getcited-shadow-md);
 }
 
@@ -4059,7 +4073,7 @@
 .getcited-breakdown-card .card-icon {
     width: 36px;
     height: 36px;
-    background: var(--getcited-accent-light);
+    background: var(--getcited-bg-muted);
     border-radius: var(--getcited-radius-sm);
     display: flex;
     align-items: center;
@@ -4068,7 +4082,7 @@
 }
 
 .getcited-breakdown-card .card-icon .dashicons {
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     font-size: 20px;
     width: 18px;
     height: 18px;
@@ -4110,7 +4124,7 @@
 }
 
 .getcited-breakdown-card .card-status.status-incomplete {
-    color: var(--getcited-primary);
+    color: var(--getcited-status-warning);
 }
 
 .getcited-breakdown-card .card-status .dashicons {
@@ -4122,7 +4136,7 @@
 
 .getcited-breakdown-card .card-action {
     font-size: 13px;
-    color: var(--getcited-primary);
+    color: var(--getcited-neutral);
     margin-top: var(--getcited-space-sm);
     font-weight: 500;
 }

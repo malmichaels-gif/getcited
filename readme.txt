@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.6.14
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,14 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.7.0 =
+* New: Admin UI redesign with refined color palette - orange reserved for primary CTAs and score display
+* New: Neutral slate gray (#64748B) accent for icons, borders, and secondary elements
+* Improved: Softer borders and subtle shadows for modern, professional appearance
+* Improved: Consistent form focus states using neutral gray instead of orange
+* Improved: Dashboard score section and tips card now use unified card styling
+* Improved: Breakdown cards, health check, and wizard steps updated with neutral styling
 
 = 1.6.14 =
 * New: AI Visibility Tips card on dashboard with rotating tips for improving content citability
