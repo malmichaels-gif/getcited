@@ -1658,18 +1658,24 @@
 
 .getcited-factors-grid {
     display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--getcited-space-sm);
 }
 
 .getcited-factors-grid .factor-item {
-    display: grid;
-    grid-template-columns: 20px 140px 60px 1fr;
+    display: flex;
+    align-items: flex-start;
     gap: var(--getcited-space-sm);
-    align-items: start;
-    padding: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
     background: #fff;
     border-radius: var(--getcited-radius-sm);
-    font-size: 15px;
+    font-size: 14px;
+}
+
+.getcited-factors-grid .factor-item .factor-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .getcited-factors-grid .factor-item.passed {
@@ -1693,27 +1699,19 @@
 }
 
 .getcited-factors-grid .factor-label {
-    font-weight: 500;
+    font-weight: 600;
     color: var(--getcited-gray-700);
 }
 
-.getcited-factors-grid .factor-score {
-    color: var(--getcited-gray-500);
-    font-size: 14px;
-}
-
 .getcited-factors-grid .factor-message {
-    color: var(--getcited-gray-600);
+    color: var(--getcited-gray-500);
+    font-size: 13px;
+    line-height: 1.4;
 }
 
 @media (max-width: 768px) {
-    .getcited-factors-grid .factor-item {
-        grid-template-columns: 20px 1fr;
-    }
-
-    .getcited-factors-grid .factor-score,
-    .getcited-factors-grid .factor-message {
-        grid-column: 2;
+    .getcited-factors-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1741,6 +1739,54 @@
 .getcited-rubric-table tfoot td {
     font-weight: 600;
     border-top: 2px solid var(--getcited-gray-300);
+}
+
+/* What AI Looks For - Tips Grid */
+.getcited-ai-tips-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--getcited-space-md);
+}
+
+.getcited-ai-tips-grid .ai-tip-card {
+    background: #fff;
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-md);
+    padding: var(--getcited-space-md);
+}
+
+.getcited-ai-tips-grid .ai-tip-card .dashicons {
+    color: var(--getcited-primary);
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    margin-bottom: var(--getcited-space-xs);
+}
+
+.getcited-ai-tips-grid .ai-tip-card h4 {
+    margin: 0 0 var(--getcited-space-xs) 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--getcited-gray-700);
+}
+
+.getcited-ai-tips-grid .ai-tip-card p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--getcited-gray-500);
+}
+
+@media (max-width: 1200px) {
+    .getcited-ai-tips-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .getcited-ai-tips-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Citability buttons - styled like Refresh button (v1.5.4) */

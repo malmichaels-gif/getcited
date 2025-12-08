@@ -879,7 +879,7 @@
                             // Build top 3 recommendations list
                             const top3 = data.recommendations.slice(0, 3).map(r => `<li>${r}</li>`).join('');
 
-                            // Build full factor breakdown HTML
+                            // Build full factor breakdown HTML (no point values to avoid score gaming)
                             let factorsHtml = '<div class="getcited-factors-grid">';
                             for (const [key, factor] of Object.entries(data.factors)) {
                                 const rubric = data.rubric[key] || {};
@@ -888,9 +888,10 @@
                                 factorsHtml += `
                                     <div class="factor-item ${iconClass}">
                                         <span class="factor-icon">${icon}</span>
-                                        <span class="factor-label">${rubric.label || key}</span>
-                                        <span class="factor-score">${factor.score}/${rubric.max_points || '?'}</span>
-                                        <span class="factor-message">${factor.message}</span>
+                                        <div class="factor-content">
+                                            <span class="factor-label">${rubric.label || key}</span>
+                                            <span class="factor-message">${factor.message}</span>
+                                        </div>
                                     </div>
                                 `;
                             }

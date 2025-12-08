@@ -103,7 +103,7 @@ $crawler_stats = $request_logger->get_request_stats();
                         <span class="stat-label"><?php esc_html_e( 'Published Posts', 'getcited' ); ?></span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value"><?php echo esc_html( $analyzed_count ); ?>/5</span>
+                        <span class="stat-value"><?php echo esc_html( $analyzed_count ); ?>/10</span>
                         <span class="stat-label"><?php esc_html_e( 'Analyzed (Free)', 'getcited' ); ?></span>
                     </div>
                 </div>
@@ -179,58 +179,74 @@ $crawler_stats = $request_logger->get_request_stats();
                 <?php endif; ?>
             <?php endif; ?>
 
-            <!-- Pro Upsell inline -->
-            <div class="getcited-inline-upsell">
-                <span class="dashicons dashicons-lock"></span>
-                <?php
-                printf(
-                    /* translators: %d: number of published posts */
-                    esc_html__( 'Upgrade to Pro to audit all %d posts with detailed recommendations.', 'getcited' ),
-                    esc_html( $total_posts )
-                );
-                ?>
-                <button type="button" class="button getcited-join-waitlist">
-                    <?php esc_html_e( 'Join Waitlist', 'getcited' ); ?>
-                </button>
-            </div>
         </div>
 
-        <!-- Scoring Rubric (Collapsible) -->
-        <div class="getcited-section getcited-rubric getcited-collapsible" data-collapsed="true">
+        <!-- What AI Looks For (Collapsible) -->
+        <div class="getcited-section getcited-ai-guide getcited-collapsible">
             <h2 class="getcited-collapsible-header">
-                <?php esc_html_e( 'Scoring Rubric', 'getcited' ); ?>
-                <span class="dashicons dashicons-arrow-down-alt2"></span>
+                <?php esc_html_e( 'What AI Looks For', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-up-alt2"></span>
             </h2>
-            <div class="getcited-collapsible-content" style="display: none;">
-                <p class="description">
-                    <?php esc_html_e( 'These factors determine how likely AI systems are to cite your content:', 'getcited' ); ?>
+            <div class="getcited-collapsible-content">
+                <p class="description" style="margin-bottom: var(--getcited-space-md);">
+                    <?php esc_html_e( 'AI systems prefer content that is well-structured, authoritative, and easy to understand. Here\'s what makes content more likely to be cited:', 'getcited' ); ?>
                 </p>
 
-                <table class="getcited-rubric-table">
-                <thead>
-                    <tr>
-                        <th><?php esc_html_e( 'Factor', 'getcited' ); ?></th>
-                        <th><?php esc_html_e( 'Points', 'getcited' ); ?></th>
-                        <th><?php esc_html_e( 'What We Check', 'getcited' ); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ( $rubric as $key => $factor ) : ?>
-                        <tr>
-                            <td><strong><?php echo esc_html( $factor['label'] ); ?></strong></td>
-                            <td><?php echo esc_html( $factor['max_points'] ); ?></td>
-                            <td><?php echo esc_html( $factor['description'] ); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td><strong><?php esc_html_e( 'Total', 'getcited' ); ?></strong></td>
-                        <td><strong>100</strong></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-                </table>
+                <div class="getcited-ai-tips-grid">
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-editor-paragraph"></span>
+                        <h4><?php esc_html_e( 'Clear Opening Summary', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Start with a concise paragraph that states your main point. AI systems often pull from the first paragraph when generating responses.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-heading"></span>
+                        <h4><?php esc_html_e( 'Logical Heading Structure', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Use H2 and H3 headings to organize content hierarchically. This helps AI understand your content\'s structure and find specific information.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-format-chat"></span>
+                        <h4><?php esc_html_e( 'FAQ Sections', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Question-and-answer formats are highly citable. AI systems can easily extract and reference specific Q&A pairs.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-text-page"></span>
+                        <h4><?php esc_html_e( 'Comprehensive Depth', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Longer, in-depth content (1,000+ words) demonstrates expertise. Shallow content is less likely to be cited as authoritative.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-list-view"></span>
+                        <h4><?php esc_html_e( 'Lists and Tables', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Structured data like bullet points, numbered lists, and tables are easy for AI to parse and reference directly.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-shortcode"></span>
+                        <h4><?php esc_html_e( 'Schema Markup', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Article and FAQ schema help AI systems understand your content type and extract structured information.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-admin-users"></span>
+                        <h4><?php esc_html_e( 'Author Attribution', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Named authors with bios signal credibility. Anonymous content is less trustworthy to AI systems.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-calendar-alt"></span>
+                        <h4><?php esc_html_e( 'Content Freshness', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Recently published or updated content is preferred. Keep publish dates visible and update old posts regularly.', 'getcited' ); ?></p>
+                    </div>
+
+                    <div class="ai-tip-card">
+                        <span class="dashicons dashicons-admin-links"></span>
+                        <h4><?php esc_html_e( 'Internal & External Links', 'getcited' ); ?></h4>
+                        <p><?php esc_html_e( 'Link to related content on your site and cite authoritative external sources. This builds topical authority and credibility.', 'getcited' ); ?></p>
+                    </div>
+                </div>
             </div>
         </div>
 
