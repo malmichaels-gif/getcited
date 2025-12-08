@@ -35,6 +35,7 @@
         initSourceToggle();
         initMediaUpload();
         initLoadMorePosts();
+        initCustomCheckboxes();
     }
 
     // ==========================================================================
@@ -1512,7 +1513,8 @@
             }
 
             // Update progress bar
-            wizard.querySelectorAll('.progress-step').forEach(function(step, i) {
+            var progressSteps = wizard.querySelectorAll('.progress-step');
+            progressSteps.forEach(function(step, i) {
                 step.classList.remove('active', 'completed');
                 if (i < index) {
                     step.classList.add('completed');
@@ -1520,6 +1522,14 @@
                     step.classList.add('active');
                 }
             });
+
+            // Update progress line fill width (v1.7.3)
+            var progressBar = wizard.querySelector('.getcited-wizard-progress');
+            if (progressBar && progressSteps.length > 1) {
+                var progressPercent = (index / (progressSteps.length - 1)) * 100;
+                // Calculate the width relative to the line (which spans between first and last dots)
+                progressBar.style.setProperty('--progress-width', progressPercent + '%');
+            }
 
             currentStep = index;
         }
@@ -2454,6 +2464,44 @@
             btn.addEventListener('click', function() {
                 const postId = this.dataset.postId;
                 analyzePost(postId, this);
+            });
+        });
+    }
+
+    // ==========================================================================
+    // v1.7.2 - Custom Checkbox Component
+    // ==========================================================================
+
+    /**
+     * Initialize custom checkbox component interactions
+     */
+    function initCustomCheckboxes() {
+        // Toggle is-checked class on custom checkboxes
+        document.querySelectorAll('.getcited-checkbox-custom input[type="checkbox"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                const label = this.closest('.getcited-checkbox-custom');
+                if (label) {
+                    label.classList.toggle('is-checked', this.checked);
+                }
+            });
+        });
+
+        // Radio card selection - toggle is-selected class
+        document.querySelectorAll('.getcited-radio-card input[type="radio"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                const name = this.name;
+                // Remove selected from all cards with same name
+                document.querySelectorAll('.getcited-radio-card input[name="' + name + '"]').forEach(function(radio) {
+                    const card = radio.closest('.getcited-radio-card');
+                    if (card) {
+                        card.classList.remove('selected', 'is-selected');
+                    }
+                });
+                // Add selected to current card
+                const currentCard = this.closest('.getcited-radio-card');
+                if (currentCard) {
+                    currentCard.classList.add('selected', 'is-selected');
+                }
             });
         });
     }

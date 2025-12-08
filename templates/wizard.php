@@ -37,23 +37,27 @@ if ( empty( $org['name'] ) ) {
             <?php $step_num++; endforeach; ?>
         </div>
 
-        <!-- Step 1: Welcome -->
+        <!-- Step 1: Welcome - Two-Column Hero -->
         <div class="getcited-wizard-step" data-step="welcome">
             <div class="wizard-content">
-                <div class="wizard-icon">
-                    <span class="dashicons dashicons-format-quote"></span>
+                <div class="wizard-hero-visual">
+                    <div class="wizard-icon">
+                        <span class="dashicons dashicons-format-quote"></span>
+                    </div>
                 </div>
-                <h1><?php esc_html_e( 'Welcome to GetCited', 'getcited' ); ?></h1>
-                <p class="wizard-subtitle">
-                    <?php esc_html_e( "Let's make your site visible to AI search engines like ChatGPT, Claude, and Perplexity.", 'getcited' ); ?>
-                </p>
-                <p>
-                    <?php esc_html_e( 'This wizard will help you configure optimal settings in about 2 minutes.', 'getcited' ); ?>
-                </p>
+                <div class="wizard-hero-text">
+                    <h1><?php esc_html_e( 'Welcome to GetCited', 'getcited' ); ?></h1>
+                    <p class="wizard-subtitle">
+                        <?php esc_html_e( "Let's make your site visible to AI search engines like ChatGPT, Claude, and Perplexity.", 'getcited' ); ?>
+                    </p>
+                    <p>
+                        <?php esc_html_e( 'This quick setup takes about 2 minutes.', 'getcited' ); ?>
+                    </p>
+                </div>
             </div>
             <div class="wizard-actions">
                 <button type="button" class="button button-primary button-hero getcited-wizard-next">
-                    <?php esc_html_e( "Let's Go", 'getcited' ); ?> →
+                    <?php esc_html_e( 'Get Started', 'getcited' ); ?> →
                 </button>
                 <p>
                     <a href="#" class="getcited-wizard-skip">
@@ -76,6 +80,7 @@ if ( empty( $org['name'] ) ) {
                         <label class="getcited-site-type">
                             <input type="radio" name="site_type" value="<?php echo esc_attr( $key ); ?>">
                             <div class="site-type-card">
+                                <span class="card-check"></span>
                                 <span class="dashicons <?php echo esc_attr( $type['icon'] ); ?>"></span>
                                 <strong><?php echo esc_html( $type['label'] ); ?></strong>
                                 <span class="description"><?php echo esc_html( $type['description'] ); ?></span>
@@ -146,16 +151,18 @@ if ( empty( $org['name'] ) ) {
                     <label class="getcited-radio-card selected">
                         <input type="radio" name="crawler_choice" value="allow_all" checked>
                         <div class="radio-card-content">
+                            <span class="card-check"></span>
                             <span class="dashicons dashicons-yes-alt"></span>
                             <strong><?php esc_html_e( 'Allow all AI crawlers', 'getcited' ); ?></strong>
                             <span class="recommended-badge"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
                             <p><?php esc_html_e( 'Maximize visibility to ChatGPT, Claude, Perplexity, and other AI systems.', 'getcited' ); ?></p>
                         </div>
                     </label>
-                    
+
                     <label class="getcited-radio-card">
                         <input type="radio" name="crawler_choice" value="customize">
                         <div class="radio-card-content">
+                            <span class="card-check"></span>
                             <span class="dashicons dashicons-admin-generic"></span>
                             <strong><?php esc_html_e( 'Let me customize', 'getcited' ); ?></strong>
                             <p><?php esc_html_e( "I'll choose which crawlers to allow after setup.", 'getcited' ); ?></p>
@@ -230,9 +237,10 @@ if ( empty( $org['name'] ) ) {
                         <div class="verify-fix-options">
                             <h3><?php esc_html_e( 'Choose how to proceed:', 'getcited' ); ?></h3>
 
-                            <label class="getcited-radio-card verify-option" data-option="write_physical">
+                            <label class="getcited-radio-card verify-option selected" data-option="write_physical">
                                 <input type="radio" name="verify_fix" value="write_physical" checked>
                                 <div class="radio-card-content">
+                                    <span class="card-check"></span>
                                     <span class="dashicons dashicons-media-text"></span>
                                     <strong><?php esc_html_e( 'Write a physical file', 'getcited' ); ?></strong>
                                     <span class="recommended-badge"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
@@ -243,6 +251,7 @@ if ( empty( $org['name'] ) ) {
                             <label class="getcited-radio-card verify-option" data-option="download">
                                 <input type="radio" name="verify_fix" value="download">
                                 <div class="radio-card-content">
+                                    <span class="card-check"></span>
                                     <span class="dashicons dashicons-download"></span>
                                     <strong><?php esc_html_e( 'Download and upload manually', 'getcited' ); ?></strong>
                                     <p><?php esc_html_e( 'Download the file and upload via SFTP/cPanel.', 'getcited' ); ?></p>
@@ -252,6 +261,7 @@ if ( empty( $org['name'] ) ) {
                             <label class="getcited-radio-card verify-option" data-option="skip">
                                 <input type="radio" name="verify_fix" value="skip">
                                 <div class="radio-card-content">
+                                    <span class="card-check"></span>
                                     <span class="dashicons dashicons-clock"></span>
                                     <strong><?php esc_html_e( 'Skip for now', 'getcited' ); ?></strong>
                                     <p><?php esc_html_e( "I'll fix this later in settings.", 'getcited' ); ?></p>

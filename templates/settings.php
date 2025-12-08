@@ -33,16 +33,17 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
         <!-- Pro Teaser Banner -->
         <?php $pro_teaser->render_page_teaser( 'settings' ); ?>
 
-        <!-- Two-Column Grid: General + Advanced -->
-        <div class="getcited-settings-grid">
-            <!-- Left Column: General Settings -->
-            <div class="getcited-section">
-                <h2><?php esc_html_e( 'General', 'getcited' ); ?></h2>
+        <!-- Two-column layout for Site Config and Data Management -->
+        <div class="getcited-two-column" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--getcited-space-lg); margin-bottom: var(--getcited-space-lg);">
+
+            <!-- Site Configuration -->
+            <div class="getcited-section" style="margin-bottom: 0;">
+                <h2><?php esc_html_e( 'Site Configuration', 'getcited' ); ?></h2>
 
                 <div class="getcited-compact-form">
                     <div class="form-row form-row-full">
                         <label for="site_type"><?php esc_html_e( 'Site Type', 'getcited' ); ?></label>
-                        <select name="site_type" id="site_type" style="width: 100%; max-width: 300px;">
+                        <select name="site_type" id="site_type" style="width: 100%;">
                             <option value="blog" <?php selected( $site_type, 'blog' ); ?>>
                                 <?php esc_html_e( 'Blog', 'getcited' ); ?>
                             </option>
@@ -71,7 +72,7 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                                 <?php esc_html_e( 'Other', 'getcited' ); ?>
                             </option>
                         </select>
-                        <p class="description" style="margin-top: 4px;">
+                        <p class="description" style="margin-top: 4px; margin-bottom: 0;">
                             <?php esc_html_e( 'Changing this does not auto-update llms.txt.', 'getcited' ); ?>
                             <a href="#" class="getcited-regenerate-llms">
                                 <?php esc_html_e( 'Regenerate', 'getcited' ); ?>
@@ -79,9 +80,9 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                             <span class="getcited-regenerate-status" style="margin-left: 8px;"></span>
                         </p>
                     </div>
-                    <div class="form-row form-row-full" style="margin-top: var(--getcited-space-md);">
-                        <label><?php esc_html_e( 'Setup Wizard', 'getcited' ); ?></label>
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited&wizard=1' ) ); ?>" class="button">
+                    <div style="margin-top: 12px;">
+                        <label style="display: block; margin-bottom: 4px;"><?php esc_html_e( 'Setup Wizard', 'getcited' ); ?></label>
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited&wizard=1' ) ); ?>" class="button button-primary">
                             <span class="dashicons dashicons-admin-tools" style="vertical-align: text-bottom; margin-right: 4px;"></span>
                             <?php esc_html_e( 'Run Setup Wizard Again', 'getcited' ); ?>
                         </a>
@@ -89,55 +90,64 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                 </div>
             </div>
 
-            <!-- Right Column: Advanced Settings -->
-            <div class="getcited-section">
-                <h2><?php esc_html_e( 'Advanced', 'getcited' ); ?></h2>
+            <!-- Data Management -->
+            <div class="getcited-section" style="margin-bottom: 0;">
+                <h2><?php esc_html_e( 'Data Management', 'getcited' ); ?></h2>
 
                 <div class="getcited-schema-options-compact">
-                    <label class="getcited-checkbox-compact">
-                        <input type="checkbox"
-                               name="debug_mode"
-                               id="debug_mode"
-                               value="1"
-                               <?php checked( $debug_mode ); ?>>
-                        <span class="checkbox-label">
-                            <strong><?php esc_html_e( 'Debug Mode', 'getcited' ); ?></strong>
-                            <span class="description"><?php esc_html_e( 'Log detailed info for troubleshooting', 'getcited' ); ?></span>
-                        </span>
-                    </label>
-
-                    <label class="getcited-checkbox-compact">
+                    <label class="getcited-checkbox-custom <?php echo $keep_on_delete ? 'is-checked' : ''; ?>">
                         <input type="checkbox"
                                name="keep_on_delete"
                                id="keep_on_delete"
                                value="1"
                                <?php checked( $keep_on_delete ); ?>>
-                        <span class="checkbox-label">
-                            <strong><?php esc_html_e( 'Keep Settings on Delete', 'getcited' ); ?></strong>
-                            <span class="description"><?php esc_html_e( 'Preserve config when uninstalling', 'getcited' ); ?></span>
+                        <span class="check-box"></span>
+                        <span class="check-content">
+                            <strong><?php esc_html_e( 'Keep Settings on Uninstall', 'getcited' ); ?></strong>
+                            <span class="check-description"><?php esc_html_e( 'Preserve config when deleting the plugin', 'getcited' ); ?></span>
                         </span>
                     </label>
                 </div>
+
+                <p class="description" style="margin-top: var(--getcited-space-lg); margin-bottom: var(--getcited-space-sm);">
+                    <?php esc_html_e( 'Backup and restore your configuration.', 'getcited' ); ?>
+                </p>
+                <div class="getcited-export-import-buttons" style="display: flex; gap: var(--getcited-space-md);">
+                    <input type="file"
+                           id="getcited-import-file"
+                           accept=".json"
+                           style="display: none;">
+                    <button type="button" class="button button-primary getcited-export-settings">
+                        <span class="dashicons dashicons-download" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+                        <?php esc_html_e( 'Download JSON', 'getcited' ); ?>
+                    </button>
+                    <button type="button" class="button button-primary getcited-import-settings">
+                        <span class="dashicons dashicons-upload" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+                        <?php esc_html_e( 'Upload JSON', 'getcited' ); ?>
+                    </button>
+                </div>
             </div>
+
         </div>
 
-        <!-- Request Logging -->
+        <!-- Logging & Analytics -->
         <div class="getcited-section">
-            <h2><?php esc_html_e( 'Request Logging', 'getcited' ); ?></h2>
+            <h2><?php esc_html_e( 'Logging & Analytics', 'getcited' ); ?></h2>
             <p class="description">
                 <?php esc_html_e( 'Track when AI crawlers and other bots access your llms.txt file.', 'getcited' ); ?>
             </p>
 
             <div class="getcited-schema-options-compact">
-                <label class="getcited-checkbox-compact">
+                <label class="getcited-checkbox-custom <?php echo $request_logging_enabled ? 'is-checked' : ''; ?>">
                     <input type="checkbox"
                            name="request_logging_enabled"
                            id="request_logging_enabled"
                            value="1"
                            <?php checked( $request_logging_enabled ); ?>>
-                    <span class="checkbox-label">
+                    <span class="check-box"></span>
+                    <span class="check-content">
                         <strong><?php esc_html_e( 'Enable Request Logging', 'getcited' ); ?></strong>
-                        <span class="description"><?php esc_html_e( 'Log llms.txt access attempts', 'getcited' ); ?></span>
+                        <span class="check-description"><?php esc_html_e( 'Log llms.txt access attempts', 'getcited' ); ?></span>
                     </span>
                 </label>
             </div>
@@ -166,94 +176,71 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
 
                 <div class="form-row" style="margin-top: var(--getcited-space-md);">
                     <label><?php esc_html_e( 'Clear Log', 'getcited' ); ?></label>
-                    <button type="button" class="button getcited-clear-request-log">
-                        <span class="dashicons dashicons-trash" style="vertical-align: text-bottom; margin-right: 4px;"></span>
-                        <?php esc_html_e( 'Clear All Request Logs', 'getcited' ); ?>
-                    </button>
-                    <span class="getcited-clear-log-status"></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Import/Export (Collapsible) -->
-        <div class="getcited-section getcited-collapsible" data-collapsed="true">
-            <h2 class="getcited-collapsible-header">
-                <?php esc_html_e( 'Import / Export', 'getcited' ); ?>
-                <span class="dashicons dashicons-arrow-down-alt2"></span>
-            </h2>
-            <div class="getcited-collapsible-content" style="display: none;">
-                <div class="getcited-compact-form">
-                    <div class="form-row">
-                        <label><?php esc_html_e( 'Export Settings', 'getcited' ); ?></label>
-                        <button type="button" class="button getcited-export-settings">
-                            <span class="dashicons dashicons-download" style="vertical-align: text-bottom; margin-right: 4px;"></span>
-                            <?php esc_html_e( 'Download JSON', 'getcited' ); ?>
+                    <div>
+                        <button type="button" class="button getcited-clear-request-log" style="padding: 6px 12px;">
+                            <span class="dashicons dashicons-trash" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+                            <?php esc_html_e( 'Clear All Request Logs', 'getcited' ); ?>
                         </button>
-                    </div>
-                    <div class="form-row">
-                        <label><?php esc_html_e( 'Import Settings', 'getcited' ); ?></label>
-                        <input type="file"
-                               id="getcited-import-file"
-                               accept=".json"
-                               style="display: none;">
-                        <button type="button" class="button getcited-import-settings">
-                            <span class="dashicons dashicons-upload" style="vertical-align: text-bottom; margin-right: 4px;"></span>
-                            <?php esc_html_e( 'Upload JSON', 'getcited' ); ?>
-                        </button>
+                        <span class="getcited-clear-log-status"></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Developer Tools (Collapsible) -->
-        <div class="getcited-section getcited-collapsible" data-collapsed="true">
-            <h2 class="getcited-collapsible-header">
-                <?php esc_html_e( 'Developer Tools', 'getcited' ); ?>
-                <span class="dashicons dashicons-arrow-down-alt2"></span>
-            </h2>
-            <div class="getcited-collapsible-content" style="display: none;">
-                <p class="description">
-                    <?php esc_html_e( 'GetCited includes WP-CLI commands for developers and automation.', 'getcited' ); ?>
+        <!-- Developer Tools (Visible by default) -->
+        <div class="getcited-section">
+            <h2><?php esc_html_e( 'Developer Tools', 'getcited' ); ?></h2>
+
+            <div class="getcited-schema-options-compact" style="margin-bottom: var(--getcited-space-lg);">
+                <label class="getcited-checkbox-custom <?php echo $debug_mode ? 'is-checked' : ''; ?>">
+                    <input type="checkbox"
+                           name="debug_mode"
+                           id="debug_mode"
+                           value="1"
+                           <?php checked( $debug_mode ); ?>>
+                    <span class="check-box"></span>
+                    <span class="check-content">
+                        <strong><?php esc_html_e( 'Debug Mode', 'getcited' ); ?></strong>
+                        <span class="check-description"><?php esc_html_e( 'Log detailed info for troubleshooting', 'getcited' ); ?></span>
+                    </span>
+                </label>
+            </div>
+
+            <div class="getcited-cli-commands">
+                <h3 style="margin-top: 0; margin-bottom: var(--getcited-space-sm);"><?php esc_html_e( 'WP-CLI Commands', 'getcited' ); ?></h3>
+
+                <table class="widefat striped">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e( 'Command', 'getcited' ); ?></th>
+                            <th><?php esc_html_e( 'Description', 'getcited' ); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>wp getcited status</code></td><td><?php esc_html_e( 'View configuration and health status', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited check</code></td><td><?php esc_html_e( 'Run health checks', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited crawlers</code></td><td><?php esc_html_e( 'List all AI crawlers and status', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited crawler &lt;name&gt; &lt;allow|block&gt;</code></td><td><?php esc_html_e( 'Set crawler access', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited crawler-log</code></td><td><?php esc_html_e( 'View, clear, or export crawler log', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited llms-txt</code></td><td><?php esc_html_e( 'Output llms.txt content', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited robots-txt</code></td><td><?php esc_html_e( 'Output robots.txt rules', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited citability &lt;post_id&gt;</code></td><td><?php esc_html_e( 'Analyze citability of a post', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited audit</code></td><td><?php esc_html_e( 'Run citability audit on recent posts', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited export</code></td><td><?php esc_html_e( 'Export settings to JSON', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited import &lt;file&gt;</code></td><td><?php esc_html_e( 'Import settings from JSON', 'getcited' ); ?></td></tr>
+                        <tr><td><code>wp getcited flush</code></td><td><?php esc_html_e( 'Clear caches and flush rewrites', 'getcited' ); ?></td></tr>
+                    </tbody>
+                </table>
+
+                <p class="description" style="margin-top: var(--getcited-space-md);">
+                    <?php
+                    printf(
+                        /* translators: %s: WP-CLI command example */
+                        esc_html__( 'Run %s for detailed help on any command.', 'getcited' ),
+                        '<code>wp getcited &lt;command&gt; --help</code>'
+                    );
+                    ?>
                 </p>
-
-                <div class="getcited-cli-commands">
-                    <h3 style="margin-top: 0; margin-bottom: var(--getcited-space-sm);"><?php esc_html_e( 'Available Commands', 'getcited' ); ?></h3>
-
-                    <table class="widefat striped">
-                        <thead>
-                            <tr>
-                                <th><?php esc_html_e( 'Command', 'getcited' ); ?></th>
-                                <th><?php esc_html_e( 'Description', 'getcited' ); ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>wp getcited status</code></td><td><?php esc_html_e( 'View configuration and health status', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited check</code></td><td><?php esc_html_e( 'Run health checks', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited crawlers</code></td><td><?php esc_html_e( 'List all AI crawlers and status', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited crawler &lt;name&gt; &lt;allow|block&gt;</code></td><td><?php esc_html_e( 'Set crawler access', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited crawler-log</code></td><td><?php esc_html_e( 'View AI crawler visits', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited crawler-log --clear</code></td><td><?php esc_html_e( 'Clear all log entries', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited crawler-log --export=file.csv</code></td><td><?php esc_html_e( 'Export log to CSV', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited llms-txt</code></td><td><?php esc_html_e( 'Output llms.txt content', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited robots-txt</code></td><td><?php esc_html_e( 'Output robots.txt rules', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited citability &lt;post_id&gt;</code></td><td><?php esc_html_e( 'Analyze post citability', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited audit</code></td><td><?php esc_html_e( 'Audit recent posts', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited export</code></td><td><?php esc_html_e( 'Export settings to JSON', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited import &lt;file&gt;</code></td><td><?php esc_html_e( 'Import settings from JSON', 'getcited' ); ?></td></tr>
-                            <tr><td><code>wp getcited flush</code></td><td><?php esc_html_e( 'Clear caches and flush rewrites', 'getcited' ); ?></td></tr>
-                        </tbody>
-                    </table>
-
-                    <p class="description" style="margin-top: 16px;">
-                        <?php
-                        printf(
-                            /* translators: %s: WP-CLI command example */
-                            esc_html__( 'Run %s for detailed help on any command.', 'getcited' ),
-                            '<code>wp getcited &lt;command&gt; --help</code>'
-                        );
-                        ?>
-                    </p>
-                </div>
             </div>
         </div>
 
@@ -263,18 +250,17 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                 <?php esc_html_e( 'System Information', 'getcited' ); ?>
                 <span class="dashicons dashicons-arrow-down-alt2"></span>
             </h2>
+            <p class="description" style="margin-top: calc(-1 * var(--getcited-space-sm));">
+                <?php esc_html_e( 'Copy this when requesting support.', 'getcited' ); ?>
+            </p>
             <div class="getcited-collapsible-content" style="display: none;">
-                <p class="description">
-                    <?php esc_html_e( 'Copy this information when requesting support.', 'getcited' ); ?>
-                </p>
-
                 <textarea id="getcited-system-info"
                           rows="12"
                           readonly
                           class="large-text code"><?php echo esc_textarea( $dashboard->render_system_info() ); ?></textarea>
 
                 <p style="margin-top: var(--getcited-space-sm);">
-                    <button type="button" class="button getcited-copy-system-info">
+                    <button type="button" class="button button-primary getcited-copy-system-info">
                         <span class="dashicons dashicons-clipboard" style="vertical-align: text-bottom; margin-right: 4px;"></span>
                         <?php esc_html_e( 'Copy to Clipboard', 'getcited' ); ?>
                     </button>

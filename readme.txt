@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.7.1
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,6 +102,51 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.8.0 =
+* New: Complete admin UI redesign with refined minimalist aesthetic
+* New: Plus Jakarta Sans typography for distinctive, professional look
+* New: Simplified color palette with strategic orange restraint (CTAs only)
+* New: Quick Actions section on dashboard for common tasks
+* New: Compact health status display on dashboard
+* New: Score breakdown now collapsible (cleaner default view)
+* New: AI Visibility Tips section now collapsible
+* New: Score circle uses color-coded borders based on score tier (green/yellow/red)
+* Changed: Wizard progress bar redesigned with numbered steps and connecting lines
+* Changed: Wizard welcome screen now centered, typography-focused
+* Changed: Settings page reorganized into logical groups (Site Config, Logging, Developer Tools, Data Management)
+* Changed: llms.txt page reorganized - AI Citation Guidelines now visible by default
+* Changed: Developer Tools section now visible by default on Settings page
+* Removed: Heavy effects (pulse animations, gradient glows, stagger delays)
+* Removed: Orange hover highlights on tables (now neutral gray)
+* Removed: Bounce animations on toggle switches
+* Improved: Consistent 4px spacing scale across all components
+* Improved: Single subtle shadow style for all cards
+* Improved: Simplified button styles (solid colors, no gradients)
+
+= 1.7.3 =
+* New: Premium SaaS-style wizard redesign with modern progress indicator
+* New: Connected dots progress bar with animated fill line (replaces numbered circles)
+* New: Two-column hero layout on wizard welcome screen with large gradient icon
+* New: Elevated card design with top gradient accent bar on selection
+* New: Premium hero button with gradient background and hover lift effect
+* New: Dashboard score display with subtle pulse animation on page load
+* New: Breakdown cards hover effect with 3px lift and layered shadows
+* New: Health check status indicator bar at bottom of each item
+* New: Staggered section entrance animations across all admin pages
+* New: Premium table styling with uppercase headers and hover highlight
+* Improved: Typography refinements with tighter letter-spacing and bolder weights
+* Improved: All animations respect prefers-reduced-motion for accessibility
+
+= 1.7.2 =
+* New: Premium custom checkbox component with 22px styled checkboxes (replacing hard-to-see 13px browser defaults)
+* New: Checkbox cards show orange highlight and checkmark when selected
+* New: Wizard site type and crawler choice cards now lift on hover with selection checkmark
+* New: Step transitions with slide-in animation when navigating wizard
+* New: Progress step pulses when active with highlighted number
+* Improved: All checkboxes across llms.txt, settings, and wizard pages use new component
+* Improved: Radio card selection shows animated checkmark indicator
+* Improved: All animations respect prefers-reduced-motion for accessibility
 
 = 1.7.1 =
 * New: Premium admin UI animations and polish for modern SaaS-like experience

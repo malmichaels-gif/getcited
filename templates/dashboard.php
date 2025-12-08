@@ -54,71 +54,108 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 
 	<div class="getcited-dashboard">
 
-		<!-- Top Row: Score + Tips -->
-		<div class="getcited-dashboard-top-row">
-			<!-- AI Visibility Score Hero -->
-			<div class="getcited-section getcited-visibility-score-section">
-				<div class="visibility-score-container">
-					<div class="visibility-score-info">
-						<h2><?php esc_html_e( 'AI Visibility Score', 'getcited' ); ?></h2>
-						<p class="tier-label tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
-							<?php echo esc_html( $visibility_score['tier']['label'] ); ?>
-						</p>
-						<?php if ( ! empty( $visibility_score['recommendations'] ) ) : ?>
-						<p class="score-recommendation">
-							<?php echo esc_html( $visibility_score['recommendations'][0] ); ?>
-						</p>
-						<?php endif; ?>
-						<button type="button" class="button getcited-refresh-score">
-							<span class="dashicons dashicons-update"></span>
-							<?php esc_html_e( 'Refresh', 'getcited' ); ?>
-						</button>
-					</div>
-					<?php
-					$score_class = '';
-					$total = $visibility_score['total'];
-					if ( $total >= 80 ) {
-						$score_class = 'score-high';
-					} elseif ( $total >= 51 ) {
-						$score_class = 'score-medium';
-					} else {
-						$score_class = 'score-low';
-					}
-					?>
-					<div class="getcited-score-display large circular <?php echo esc_attr( $score_class ); ?>">
-						<span class="score"><?php echo esc_html( $total ); ?></span>
-						<span class="max">/100</span>
-					</div>
+		<!-- AI Visibility Score Hero (Full Width) -->
+		<div class="getcited-section getcited-visibility-score-section">
+			<div class="visibility-score-container">
+				<div class="visibility-score-info">
+					<h2><?php esc_html_e( 'AI Visibility Score', 'getcited' ); ?></h2>
+					<p class="tier-label tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
+						<?php echo esc_html( $visibility_score['tier']['label'] ); ?>
+					</p>
+					<?php if ( ! empty( $visibility_score['recommendations'] ) ) : ?>
+					<p class="score-recommendation">
+						<?php echo esc_html( $visibility_score['recommendations'][0] ); ?>
+					</p>
+					<?php endif; ?>
+					<button type="button" class="button getcited-refresh-score">
+						<span class="dashicons dashicons-update"></span>
+						<?php esc_html_e( 'Refresh', 'getcited' ); ?>
+					</button>
 				</div>
-			</div>
-
-			<!-- AI Visibility Tips -->
-			<div class="getcited-section getcited-tips-section">
-				<div class="getcited-tip-container">
-					<h2>
-						<span class="dashicons dashicons-lightbulb"></span>
-						<?php esc_html_e( 'AI Visibility Tip', 'getcited' ); ?>
-					</h2>
-					<h3 class="getcited-tip-title"><?php echo esc_html( $current_tip['title'] ); ?></h3>
-					<p class="getcited-tip-content"><?php echo esc_html( $current_tip['content'] ); ?></p>
-					<div class="getcited-tip-footer">
-						<span class="getcited-tip-counter">
-							<?php
-							/* translators: 1: current tip number, 2: total tips */
-							printf( esc_html__( 'Tip %1$d of %2$d', 'getcited' ), $tip_index + 1, $tips_count );
-							?>
-						</span>
-						<a href="#" class="getcited-next-tip">
-							<?php esc_html_e( 'Next tip', 'getcited' ); ?>
-							<span class="dashicons dashicons-arrow-right-alt2"></span>
-						</a>
-					</div>
+				<?php
+				$score_class = '';
+				$total = $visibility_score['total'];
+				if ( $total >= 80 ) {
+					$score_class = 'score-high';
+				} elseif ( $total >= 51 ) {
+					$score_class = 'score-medium';
+				} else {
+					$score_class = 'score-low';
+				}
+				?>
+				<div class="getcited-score-display large circular <?php echo esc_attr( $score_class ); ?>">
+					<span class="score"><?php echo esc_html( $total ); ?></span>
+					<span class="max">/100</span>
 				</div>
 			</div>
 		</div>
 
-		<!-- Score Breakdown Cards -->
-		<div class="getcited-breakdown-cards">
+		<!-- Quick Actions + Health Status (Two Column) -->
+		<div class="getcited-dashboard-actions-row">
+			<!-- Quick Actions -->
+			<div class="getcited-section getcited-quick-actions-section">
+				<h2><?php esc_html_e( 'Quick Actions', 'getcited' ); ?></h2>
+				<div class="getcited-quick-actions">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>" class="quick-action-link">
+						<span class="dashicons dashicons-edit"></span>
+						<?php esc_html_e( 'Edit llms.txt', 'getcited' ); ?>
+					</a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-crawlers' ) ); ?>" class="quick-action-link">
+						<span class="dashicons dashicons-visibility"></span>
+						<?php esc_html_e( 'View Crawlers', 'getcited' ); ?>
+					</a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-citability' ) ); ?>" class="quick-action-link">
+						<span class="dashicons dashicons-chart-bar"></span>
+						<?php esc_html_e( 'Run Audit', 'getcited' ); ?>
+					</a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-schema' ) ); ?>" class="quick-action-link">
+						<span class="dashicons dashicons-admin-site-alt3"></span>
+						<?php esc_html_e( 'Schema Settings', 'getcited' ); ?>
+					</a>
+				</div>
+			</div>
+
+			<!-- Health Status (Compact) -->
+			<div class="getcited-section getcited-health-section">
+				<h2>
+					<?php esc_html_e( 'Health Status', 'getcited' ); ?>
+					<button type="button" class="button getcited-run-health-check">
+						<span class="dashicons dashicons-yes-alt"></span>
+						<?php esc_html_e( 'Run Check', 'getcited' ); ?>
+					</button>
+				</h2>
+				<div class="getcited-health-summary">
+					<?php
+					$health_status = $stats['health'];
+					$quick_checks  = array(
+						'llms_txt'      => __( 'llms.txt', 'getcited' ),
+						'robots_txt'    => __( 'robots.txt', 'getcited' ),
+						'schema'        => __( 'Schema', 'getcited' ),
+						'rewrite_rules' => __( 'Rewrites', 'getcited' ),
+					);
+					foreach ( $quick_checks as $key => $label ) :
+						if ( ! isset( $health_status[ $key ] ) ) continue;
+						$check = $health_status[ $key ];
+						$icon  = $check['status'] === 'ok' ? '✓' : ( $check['status'] === 'warning' ? '!' : '✕' );
+						$class = 'status-' . $check['status'];
+					?>
+					<div class="health-status-item <?php echo esc_attr( $class ); ?>">
+						<span class="status-icon"><?php echo esc_html( $icon ); ?></span>
+						<span class="status-label"><?php echo esc_html( $label ); ?></span>
+					</div>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		</div>
+
+		<!-- Score Breakdown (Collapsible) -->
+		<div class="getcited-section getcited-collapsible" data-collapsed="true">
+			<h2 class="getcited-collapsible-header">
+				<?php esc_html_e( 'Score Breakdown', 'getcited' ); ?>
+				<span class="dashicons dashicons-arrow-down-alt2"></span>
+			</h2>
+			<div class="getcited-collapsible-content" style="display: none;">
+				<div class="getcited-breakdown-cards">
 			<?php foreach ( $visibility_score['breakdown'] as $key => $score ) :
 				$max        = $max_points[ $key ];
 				$is_perfect = ( $score === $max );
@@ -165,6 +202,35 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 			</div>
 			<?php endif; ?>
 			<?php endforeach; ?>
+				</div>
+			</div>
+		</div>
+
+		<!-- AI Visibility Tips (Collapsible) -->
+		<div class="getcited-section getcited-collapsible getcited-tips-section" data-collapsed="true">
+			<h2 class="getcited-collapsible-header">
+				<span class="dashicons dashicons-lightbulb"></span>
+				<?php esc_html_e( 'AI Visibility Tip', 'getcited' ); ?>
+				<span class="dashicons dashicons-arrow-down-alt2"></span>
+			</h2>
+			<div class="getcited-collapsible-content" style="display: none;">
+				<div class="getcited-tip-container">
+					<h3 class="getcited-tip-title"><?php echo esc_html( $current_tip['title'] ); ?></h3>
+					<p class="getcited-tip-content"><?php echo esc_html( $current_tip['content'] ); ?></p>
+					<div class="getcited-tip-footer">
+						<span class="getcited-tip-counter">
+							<?php
+							/* translators: 1: current tip number, 2: total tips */
+							printf( esc_html__( 'Tip %1$d of %2$d', 'getcited' ), $tip_index + 1, $tips_count );
+							?>
+						</span>
+						<a href="#" class="getcited-next-tip">
+							<?php esc_html_e( 'Next tip', 'getcited' ); ?>
+							<span class="dashicons dashicons-arrow-right-alt2"></span>
+						</a>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- Two Column Grid: Activity + Health Check -->

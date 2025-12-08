@@ -1,37 +1,41 @@
 /**
- * GetCited Admin Styles
+ * GetCited Admin Styles v1.8.0
  *
- * Design inspired by modern dashboard UIs:
- * - Card-based layouts with subtle shadows
- * - Clean typography with clear hierarchy
- * - Orange accent color (HeyTC branding)
- * - Dark accents for Pro/locked features
+ * Design: Refined Minimalism
+ * - Typography-driven with Plus Jakarta Sans
+ * - Strategic color restraint (orange for primary CTAs only)
+ * - Generous whitespace and refined spacing
+ * - Subtle, purposeful animations
  */
 
+/* Google Fonts - Plus Jakarta Sans */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
 /* ==========================================================================
-   CSS Variables
+   CSS Variables - v1.8.0 Refined Palette
    ========================================================================== */
 
 :root {
-    /* Primary palette - Orange (reserved for CTAs and score display) */
+    /* Primary - Orange (use sparingly, CTAs only) */
     --getcited-primary: #F97316;
-    --getcited-primary-dark: #EA580C;
-    --getcited-primary-light: #FB923C;
+    --getcited-primary-hover: #EA580C;
+    --getcited-primary-light: rgba(249, 115, 22, 0.08);
 
-    /* Neutral accent (for icons, borders, secondary elements) */
+    /* Neutral palette (primary UI color) */
     --getcited-neutral: #64748B;
     --getcited-neutral-light: #94A3B8;
     --getcited-neutral-dark: #475569;
 
-    /* Accent colors (legacy support) */
+    /* Legacy support */
+    --getcited-primary-dark: #EA580C;
     --getcited-accent: #F97316;
     --getcited-accent-light: #FFF7ED;
     --getcited-accent-hover: #EA580C;
-    --getcited-warning: #eab308;
-    --getcited-error: #ef4444;
-    --getcited-success: #22c55e;
 
     /* Status colors (semantic) */
+    --getcited-success: #22c55e;
+    --getcited-warning: #eab308;
+    --getcited-error: #ef4444;
     --getcited-status-success: #22c55e;
     --getcited-status-good: #84cc16;
     --getcited-status-warning: #eab308;
@@ -39,16 +43,24 @@
     --getcited-status-error: #ef4444;
     --getcited-status-info: #6b7280;
 
-    /* Backgrounds - Layered whites */
+    /* Backgrounds - Warm off-whites */
+    --getcited-bg: #FAFAFA;
     --getcited-bg-base: #FFFFFF;
     --getcited-bg-subtle: #F8FAFC;
     --getcited-bg-muted: #F1F5F9;
+    --getcited-surface: #FFFFFF;
 
     /* Borders - Softer */
-    --getcited-border: #E2E8F0;
-    --getcited-border-light: #F1F5F9;
+    --getcited-border: #E5E7EB;
+    --getcited-border-light: #F3F4F6;
+    --getcited-border-subtle: #F3F4F6;
 
-    /* Neutrals */
+    /* Text hierarchy (warm grays) */
+    --getcited-text-primary: #1F2937;
+    --getcited-text-secondary: #4B5563;
+    --getcited-text-muted: #9CA3AF;
+
+    /* Neutrals (gray scale) */
     --getcited-gray-50: #f9fafb;
     --getcited-gray-100: #f3f4f6;
     --getcited-gray-200: #e5e7eb;
@@ -59,14 +71,21 @@
     --getcited-gray-700: #374151;
     --getcited-gray-800: #1f2937;
     --getcited-gray-900: #111827;
-    
+
     /* Dark theme (for Pro sections) */
     --getcited-dark-bg: #1e1e2e;
     --getcited-dark-card: #2a2a3e;
     --getcited-dark-border: #3a3a4e;
     --getcited-dark-text: #e5e7eb;
     --getcited-dark-muted: #9ca3af;
-    
+
+    /* Typography scale (5 sizes) */
+    --getcited-font-xs: 12px;
+    --getcited-font-sm: 14px;
+    --getcited-font-md: 16px;
+    --getcited-font-lg: 20px;
+    --getcited-font-xl: 28px;
+
     /* Spacing */
     --getcited-space-xs: 4px;
     --getcited-space-sm: 8px;
@@ -74,33 +93,32 @@
     --getcited-space-lg: 24px;
     --getcited-space-xl: 32px;
     --getcited-space-2xl: 48px;
-    
+
     /* Border radius */
     --getcited-radius-sm: 6px;
     --getcited-radius-md: 10px;
-    --getcited-radius-lg: 16px;
+    --getcited-radius-lg: 12px;
     --getcited-radius-full: 9999px;
-    
-    /* Shadows */
-    --getcited-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --getcited-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --getcited-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    
-    /* Transitions */
+
+    /* Shadows - Simplified (single subtle shadow) */
+    --getcited-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --getcited-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --getcited-shadow-lg: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    /* Transitions - Quick and purposeful */
     --getcited-transition: 150ms ease;
-    --getcited-transition-smooth: 0.25s ease;
-    --getcited-transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --getcited-transition-smooth: 200ms ease;
 }
 
 /* ==========================================================================
-   Keyframe Animations
+   Keyframe Animations - v1.8.0 Simplified
    ========================================================================== */
 
-/* Section entrance animation */
-@keyframes getcited-section-enter {
+/* Single entrance animation (no stagger) */
+@keyframes getcited-fade-up {
     from {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
@@ -125,24 +143,10 @@
     }
 }
 
-/* Pulse animation for warnings */
-@keyframes getcited-pulse-warning {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4);
-    }
-    50% {
-        box-shadow: 0 0 0 8px rgba(234, 179, 8, 0);
-    }
-}
-
-/* Pulse animation for errors */
-@keyframes getcited-pulse-error {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-    }
-    50% {
-        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-    }
+/* Spinning icon for loading states */
+@keyframes getcited-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* Respect reduced motion preference */
@@ -223,149 +227,124 @@
 }
 
 /* ==========================================================================
-   Base Styles
+   Base Styles - v1.8.0 Typography-Driven
    ========================================================================== */
 
 .getcited-wrap {
     max-width: 1400px;
     margin: 20px 20px 20px 0;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .getcited-wrap h1 {
-    font-size: 30px;
-    font-weight: 600;
-    color: var(--getcited-gray-900);
+    font-size: var(--getcited-font-xl);
+    font-weight: 700;
+    color: var(--getcited-text-primary);
     margin-bottom: 8px;
+    letter-spacing: -0.02em;
 }
 
 .getcited-wrap > p.description {
-    font-size: 16px;
-    color: var(--getcited-gray-500);
+    font-size: var(--getcited-font-md);
+    color: var(--getcited-text-secondary);
     margin-bottom: var(--getcited-space-lg);
 }
 
 /* ==========================================================================
-   Sections & Cards
+   Sections & Cards - v1.8.0 Clean Minimal
    ========================================================================== */
 
 .getcited-section {
-    background: #fff;
+    background: var(--getcited-surface);
     border: 1px solid var(--getcited-border);
-    border-radius: var(--getcited-radius-md);
+    border-radius: var(--getcited-radius-lg);
     padding: var(--getcited-space-lg);
     margin-bottom: var(--getcited-space-lg);
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.04),
-        0 4px 12px rgba(0, 0, 0, 0.03);
-    animation: getcited-section-enter 0.4s ease-out both;
+    box-shadow: var(--getcited-shadow-sm);
+    animation: getcited-fade-up 0.3s ease-out both;
 }
 
-/* Staggered entrance for multiple sections */
-.getcited-section:nth-child(2) { animation-delay: 0.08s; }
-.getcited-section:nth-child(3) { animation-delay: 0.16s; }
-.getcited-section:nth-child(4) { animation-delay: 0.24s; }
-.getcited-section:nth-child(5) { animation-delay: 0.32s; }
-.getcited-section:nth-child(6) { animation-delay: 0.40s; }
+/* No stagger delays - single entrance animation */
 
 .getcited-section h2 {
-    font-size: 18px;
+    font-size: var(--getcited-font-lg);
     font-weight: 600;
-    color: var(--getcited-gray-800);
+    color: var(--getcited-text-primary);
     margin: 0 0 var(--getcited-space-md) 0;
-    padding: 0;
+    padding: 0 0 12px 0;
+    border-bottom: 1px solid var(--getcited-border-subtle);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--getcited-space-md);
     letter-spacing: -0.01em;
-    position: relative;
 }
 
-/* Section header accent line */
-.getcited-section h2::before {
-    content: '';
-    position: absolute;
-    left: calc(-1 * var(--getcited-space-lg));
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 20px;
-    background: linear-gradient(180deg, var(--getcited-primary) 0%, var(--getcited-primary-light) 100%);
-    border-radius: 2px;
-}
+/* No orange accent bar */
 
 .getcited-section h2 .button {
-    font-size: 14px;
+    font-size: var(--getcited-font-sm);
 }
 
 .getcited-section p.description {
-    color: var(--getcited-gray-500);
+    color: var(--getcited-text-secondary);
     font-size: 15px;
     margin: 0 0 var(--getcited-space-md) 0;
 }
 
 /* ==========================================================================
-   Global Button Styles
+   Global Button Styles - v1.8.0 Solid Colors
    ========================================================================== */
 
 .getcited-wrap .button-primary,
 .getcited-wrap .button.button-primary {
-    background: linear-gradient(180deg, var(--getcited-primary) 0%, var(--getcited-primary-dark) 100%);
-    border-color: var(--getcited-primary-dark);
+    background: var(--getcited-primary);
+    border: none;
     color: #fff;
-    box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    transition: all 0.2s ease;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 16px;
+    transition: background var(--getcited-transition);
 }
 
 .getcited-wrap .button-primary:hover,
 .getcited-wrap .button-primary:focus,
 .getcited-wrap .button.button-primary:hover,
 .getcited-wrap .button.button-primary:focus {
-    background: linear-gradient(180deg, var(--getcited-primary-light) 0%, var(--getcited-primary) 100%);
-    border-color: var(--getcited-primary-dark);
+    background: var(--getcited-primary-hover);
     color: #fff;
-    transform: translateY(-1px);
-    box-shadow:
-        0 4px 8px rgba(249, 115, 22, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .getcited-wrap .button-primary:active,
 .getcited-wrap .button.button-primary:active {
-    transform: translateY(0);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+    background: var(--getcited-primary-hover);
 }
 
 .getcited-wrap .button:not(.button-primary) {
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: border-color var(--getcited-transition), color var(--getcited-transition);
+    border-radius: 8px;
 }
 
 .getcited-wrap .button:not(.button-primary):hover {
     border-color: var(--getcited-neutral);
-    color: var(--getcited-gray-700);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    color: var(--getcited-text-primary);
 }
 
 .getcited-wrap .button:not(.button-primary):active {
-    transform: translateY(0);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    background: var(--getcited-gray-100);
 }
 
 /* Upload button - orange to match primary buttons */
 .getcited-upload-logo {
     background: var(--getcited-primary) !important;
-    border-color: var(--getcited-primary) !important;
+    border: none !important;
     color: #fff !important;
+    font-weight: 600 !important;
 }
 
 .getcited-upload-logo:hover,
 .getcited-upload-logo:focus {
-    background: var(--getcited-primary-dark) !important;
-    border-color: var(--getcited-primary-dark) !important;
+    background: var(--getcited-primary-hover) !important;
     color: #fff !important;
 }
 
@@ -408,35 +387,30 @@
 }
 
 .getcited-card {
-    background: var(--getcited-gray-50);
+    background: var(--getcited-surface);
     border: 1px solid var(--getcited-border);
-    border-radius: var(--getcited-radius-md);
+    border-radius: var(--getcited-radius-lg);
     padding: var(--getcited-space-lg);
     display: flex;
     flex-direction: column;
     gap: var(--getcited-space-sm);
     position: relative;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    transition: transform var(--getcited-transition-smooth), box-shadow var(--getcited-transition-smooth), border-color var(--getcited-transition);
+    box-shadow: var(--getcited-shadow-sm);
+    transition: border-color var(--getcited-transition);
 }
 
 .getcited-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--getcited-border);
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.08),
-        0 8px 24px rgba(0, 0, 0, 0.04);
+    border-color: var(--getcited-gray-300);
 }
 
 .getcited-card .card-icon {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: var(--getcited-bg);
     border-radius: var(--getcited-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .getcited-card .card-icon .dashicons {
@@ -562,7 +536,6 @@
 
 .getcited-status-warning .health-icon {
     background: var(--getcited-warning);
-    animation: getcited-pulse-warning 2s ease-in-out infinite;
 }
 
 .getcited-status-warning .health-icon::after {
@@ -578,7 +551,6 @@
 
 .getcited-status-error .health-icon {
     background: var(--getcited-error);
-    animation: getcited-pulse-error 2s ease-in-out infinite;
 }
 
 .getcited-status-error .health-icon::after {
@@ -1010,7 +982,7 @@
     right: 0;
     bottom: 0;
     background-color: var(--getcited-gray-300);
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+    transition: background var(--getcited-transition-smooth);
     border-radius: var(--getcited-radius-full);
 }
 
@@ -1022,14 +994,13 @@
     left: 3px;
     bottom: 3px;
     background-color: white;
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition: transform var(--getcited-transition-smooth);
     border-radius: 50%;
-    box-shadow: var(--getcited-shadow-sm);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .getcited-toggle input:checked + .toggle-slider {
     background-color: var(--getcited-success);
-    box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
 }
 
 .getcited-toggle input:checked + .toggle-slider::before {
@@ -1527,49 +1498,46 @@
     color: var(--getcited-gray-400);
 }
 
-/* Circular score display */
+/* Circular score display - v1.8.0 Simplified */
 .getcited-score-display.circular {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     margin: var(--getcited-space-md) auto;
     border-radius: 50%;
-    border: 6px solid var(--getcited-primary, #F97316);
-    background: var(--getcited-gray-50, #f9fafb);
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    border: 3px solid var(--getcited-border);
+    background: white;
+    box-shadow: var(--getcited-shadow-lg);
 }
 
 .getcited-score-display.circular .score {
-    font-size: 50px;
+    font-size: 42px;
     font-weight: 700;
-    color: var(--getcited-gray-900);
+    color: var(--getcited-text-primary);
     line-height: 1;
 }
 
 .getcited-score-display.circular .max {
-    font-size: 20px;
-    color: var(--getcited-gray-500);
+    font-size: 16px;
+    color: var(--getcited-text-muted);
     margin-top: 4px;
 }
 
-/* Score-based fill colors: 80+ green, 51-79 yellow, <50 red */
+/* Score-based border colors: 80+ green, 51-79 yellow, <50 red */
 .getcited-score-display.circular.score-high {
-    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-    border-color: var(--getcited-primary, #F97316);
+    border-color: #22c55e;
 }
 
 .getcited-score-display.circular.score-medium {
-    background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
-    border-color: var(--getcited-primary, #F97316);
+    border-color: #eab308;
 }
 
 .getcited-score-display.circular.score-low {
-    background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
-    border-color: var(--getcited-primary, #F97316);
+    border-color: #ef4444;
 }
 
 .getcited-posts-table {
@@ -1871,23 +1839,19 @@
 }
 
 /* Settings page buttons */
-.getcited-clear-request-log,
 .getcited-export-settings,
 .getcited-import-settings,
-.getcited-copy-system-info,
-.getcited-settings-page .form-row .button:not(.button-primary) {
+.getcited-copy-system-info {
     background: var(--getcited-primary) !important;
     border: 1px solid var(--getcited-primary) !important;
     color: #fff !important;
 }
 
-.getcited-clear-request-log:hover,
 .getcited-export-settings:hover,
 .getcited-import-settings:hover,
-.getcited-copy-system-info:hover,
-.getcited-settings-page .form-row .button:not(.button-primary):hover {
-    background: var(--getcited-primary-dark) !important;
-    border-color: var(--getcited-primary-dark) !important;
+.getcited-copy-system-info:hover {
+    background: var(--getcited-primary-hover) !important;
+    border-color: var(--getcited-primary-hover) !important;
     color: #fff !important;
 }
 
@@ -2289,67 +2253,115 @@
     min-height: 400px; /* Ensure minimum height for content */
 }
 
+/* v1.8.0 Minimal Progress Bar - Numbered Steps */
 .getcited-wizard-progress {
     display: flex;
-    background: var(--getcited-gray-50);
-    border-bottom: 1px solid var(--getcited-gray-200);
+    justify-content: center;
+    gap: 0;
+    padding: 32px 48px;
+    background: transparent;
+}
+
+/* No background connector line - using ::after on steps */
+.getcited-wizard-progress::before,
+.getcited-wizard-progress::after {
+    display: none;
 }
 
 .getcited-wizard-progress .progress-step {
-    flex: 1;
-    padding: var(--getcited-space-md) var(--getcited-space-sm);
-    text-align: center;
-    font-size: 15px; /* Increased from 12px */
-    color: var(--getcited-gray-400);
-    border-bottom: 3px solid transparent; /* Thicker border */
-    transition: all var(--getcited-transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--getcited-font-sm);
+    color: var(--getcited-text-muted);
+    transition: color var(--getcited-transition);
+    position: relative;
 }
 
 .getcited-wizard-progress .progress-step.active {
-    color: var(--getcited-gray-800);
-    border-bottom-color: var(--getcited-neutral);
+    color: var(--getcited-text-primary);
 }
 
 .getcited-wizard-progress .progress-step.completed {
-    color: var(--getcited-success);
+    color: var(--getcited-primary);
 }
 
+/* Numbered step circles */
 .getcited-wizard-progress .step-number {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px; /* Increased from 24px */
-    height: 28px; /* Increased from 24px */
-    background: var(--getcited-gray-200);
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 2px solid var(--getcited-border);
     border-radius: 50%;
+    font-size: var(--getcited-font-sm);
     font-weight: 600;
-    font-size: 15px;
-    margin-right: 8px;
+    color: var(--getcited-text-muted);
+    transition: all var(--getcited-transition);
 }
 
+/* Active step */
 .getcited-wizard-progress .progress-step.active .step-number {
-    background: var(--getcited-neutral);
-    color: #fff;
+    border-color: var(--getcited-primary);
+    color: var(--getcited-primary);
+    background: var(--getcited-primary-light);
 }
 
+/* Completed step */
 .getcited-wizard-progress .progress-step.completed .step-number {
-    background: var(--getcited-success);
-    color: #fff;
+    border-color: var(--getcited-primary);
+    background: var(--getcited-primary);
+    color: white;
+}
+
+.getcited-wizard-progress .progress-step.completed .step-number::after {
+    content: '✓';
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Connecting line between steps */
+.getcited-wizard-progress .progress-step:not(:last-child)::after {
+    content: '';
+    width: 48px;
+    height: 2px;
+    background: var(--getcited-border);
+    margin: 0 12px;
+}
+
+.getcited-wizard-progress .progress-step.completed:not(:last-child)::after {
+    background: var(--getcited-primary);
 }
 
 .getcited-wizard-progress .step-title {
     display: none;
+    font-weight: 500;
+    letter-spacing: -0.01em;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 700px) {
     .getcited-wizard-progress .step-title {
-        display: inline;
+        display: block;
     }
 }
 
 .getcited-wizard-step {
     padding: var(--getcited-space-2xl);
     display: none; /* Hidden by default, JS will show active step */
+    animation: wizard-step-enter 0.4s ease-out;
+}
+
+@keyframes wizard-step-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Ensure first step is visible before JS loads */
@@ -2370,11 +2382,84 @@
     margin-bottom: var(--getcited-space-xl);
 }
 
+/* v1.8.0 Welcome Step - Typography-Driven, Centered */
+.getcited-wizard-step[data-step="welcome"] .wizard-content {
+    display: block;
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto var(--getcited-space-xl);
+    padding: 48px 24px;
+}
+
+/* Brand icon - simple star accent */
+.wizard-brand {
+    margin-bottom: 24px;
+}
+
+.wizard-brand .brand-icon {
+    font-size: 48px;
+    color: var(--getcited-primary);
+}
+
+/* Legacy support for existing hero visual */
+.wizard-hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+/* Simplified icon - smaller, less glow */
+.wizard-hero-visual .wizard-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--getcited-primary);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.wizard-hero-visual .wizard-icon .dashicons {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: #fff;
+}
+
+/* v1.8.0 Typography-driven welcome text */
+.wizard-hero-text h1,
+.wizard-content h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--getcited-text-primary);
+    margin: 0 0 12px 0;
+}
+
+.wizard-hero-text .wizard-subtitle,
+.wizard-lead {
+    font-size: 18px;
+    color: var(--getcited-text-secondary);
+    line-height: 1.5;
+    margin: 0 0 8px 0;
+}
+
+.wizard-hero-text > p:last-of-type,
+.wizard-sub {
+    font-size: 15px;
+    color: var(--getcited-text-muted);
+    margin: 0;
+}
+
+/* Icon for non-welcome steps - simplified */
 .wizard-icon {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, var(--getcited-primary) 0%, var(--getcited-primary-light) 100%);
-    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    background: var(--getcited-primary);
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2382,30 +2467,25 @@
 }
 
 .wizard-icon .dashicons {
-    font-size: 52px;
-    width: 50px;
-    height: 50px;
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
     color: #fff;
 }
 
 .wizard-icon.success {
-    background: linear-gradient(135deg, var(--getcited-success) 0%, #34d399 100%);
-}
-
-.wizard-content h1 {
-    font-size: 34px;
-    color: var(--getcited-gray-900);
-    margin: 0 0 var(--getcited-space-md) 0;
+    background: var(--getcited-success);
 }
 
 .wizard-subtitle {
-    font-size: 20px;
-    color: var(--getcited-gray-600);
+    font-size: 18px;
+    color: var(--getcited-text-secondary);
     margin: 0 0 var(--getcited-space-lg) 0;
+    line-height: 1.5;
 }
 
 .wizard-content > p:last-child {
-    color: var(--getcited-gray-500);
+    color: var(--getcited-text-muted);
     margin: 0;
 }
 
@@ -2413,10 +2493,42 @@
     text-align: center;
 }
 
-.wizard-actions .button-hero {
-    font-size: 20px;
-    padding: 14px 40px;
+/* v1.8.0 Hero Button - Solid, no gradient */
+.wizard-actions .button-hero,
+.button-hero {
+    background: var(--getcited-primary);
+    border: none;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    color: #fff;
     height: auto;
+    transition: background var(--getcited-transition);
+    cursor: pointer;
+}
+
+.wizard-actions .button-hero:hover,
+.button-hero:hover {
+    background: var(--getcited-primary-hover);
+    color: #fff;
+}
+
+.wizard-actions .button-hero:active,
+.button-hero:active {
+    background: var(--getcited-primary-hover);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .getcited-wizard-step[data-step="welcome"] .wizard-content {
+        padding: 24px 16px;
+    }
+
+    .wizard-hero-text h1,
+    .wizard-content h1 {
+        font-size: 26px;
+    }
 }
 
 .wizard-actions > p {
@@ -2539,42 +2651,52 @@
     display: none;
 }
 
+/* v1.8.0 Clean Site Type Cards */
 .site-type-card {
-    padding: var(--getcited-space-xl);
-    background: var(--getcited-gray-50);
-    border: 2px solid var(--getcited-gray-200);
-    border-radius: var(--getcited-radius-md);
+    padding: 20px;
+    background: white;
+    border: 1px solid var(--getcited-border);
+    border-radius: var(--getcited-radius-lg);
     text-align: center;
-    transition: all var(--getcited-transition);
+    transition: border-color var(--getcited-transition);
 }
 
+/* No gradient bar */
+
+/* Hover - border only */
 .getcited-site-type:hover .site-type-card {
-    border-color: var(--getcited-gray-300);
+    border-color: var(--getcited-text-muted);
 }
 
+/* Selected - border + subtle ring */
 .getcited-site-type input:checked + .site-type-card {
-    border-color: var(--getcited-neutral);
-    background: var(--getcited-bg-subtle);
+    border-color: var(--getcited-primary);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 .site-type-card .dashicons {
-    font-size: 42px;
-    width: 40px;
-    height: 40px;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
     color: var(--getcited-neutral);
-    margin-bottom: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-sm);
 }
+
+/* No hover scale on icon */
 
 .site-type-card strong {
     display: block;
     color: var(--getcited-gray-800);
-    font-size: 18px;
-    margin-bottom: 6px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
 }
 
 .site-type-card .description {
-    font-size: 15px;
+    font-size: 14px;
     color: var(--getcited-gray-500);
+    line-height: 1.4;
 }
 
 /* Crawler Choice */
@@ -2595,55 +2717,99 @@
     display: none;
 }
 
+/* Premium Radio Cards */
 .radio-card-content {
     padding: var(--getcited-space-xl);
-    background: var(--getcited-gray-50);
-    border: 2px solid var(--getcited-gray-200);
-    border-radius: var(--getcited-radius-md);
+    background: #fff;
+    border: 1px solid var(--getcited-gray-100);
+    border-radius: 16px;
     display: flex;
     flex-wrap: wrap;
     gap: var(--getcited-space-md);
     align-items: center;
-    transition: all var(--getcited-transition);
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.02),
+        0 4px 8px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
+/* Top gradient bar */
+.radio-card-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: transparent;
+    transition: background 0.3s ease;
+}
+
+/* Hover - lift effect */
 .getcited-radio-card:hover .radio-card-content {
-    border-color: var(--getcited-gray-300);
+    transform: translateY(-4px);
+    box-shadow:
+        0 8px 16px rgba(0, 0, 0, 0.06),
+        0 16px 32px rgba(0, 0, 0, 0.04);
+    border-color: var(--getcited-gray-200);
 }
 
-.getcited-radio-card input:checked + .radio-card-content {
-    border-color: var(--getcited-neutral);
-    background: var(--getcited-bg-subtle);
+/* Selected state */
+.getcited-radio-card input:checked + .radio-card-content,
+.getcited-radio-card.selected .radio-card-content {
+    border-color: var(--getcited-primary);
+    transform: translateY(-4px);
+    box-shadow:
+        0 8px 16px rgba(249, 115, 22, 0.1),
+        0 16px 32px rgba(249, 115, 22, 0.08);
+}
+
+.getcited-radio-card input:checked + .radio-card-content::before,
+.getcited-radio-card.selected .radio-card-content::before {
+    background: linear-gradient(90deg, var(--getcited-primary), var(--getcited-primary-light));
 }
 
 .radio-card-content .dashicons {
-    font-size: 34px;
+    font-size: 32px;
     width: 32px;
     height: 32px;
-    color: var(--getcited-neutral);
+    color: var(--getcited-primary);
+    transition: transform 0.3s ease;
+}
+
+.getcited-radio-card:hover .radio-card-content .dashicons {
+    transform: scale(1.1);
 }
 
 .radio-card-content strong {
     color: var(--getcited-gray-800);
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
+/* Premium Recommended Badge */
 .radio-card-content .recommended-badge {
-    background: var(--getcited-success);
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
     color: #fff;
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: var(--getcited-radius-full);
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
 }
 
 .radio-card-content p {
     width: 100%;
     margin: var(--getcited-space-sm) 0 0 0;
     color: var(--getcited-gray-500);
-    font-size: 16px;
+    font-size: 15px;
     padding-left: 40px;
+    line-height: 1.5;
 }
 
 /* Organization Form */
@@ -3998,7 +4164,6 @@
     max-width: 140px;
     flex-shrink: 0;
     overflow: visible;
-    filter: drop-shadow(0 0 20px rgba(249, 115, 22, 0.12));
 }
 
 .visibility-score-circle .score-svg {
@@ -4229,36 +4394,131 @@
 }
 
 /* ==========================================================================
-   Score Breakdown Cards
+   v1.8.0 Dashboard Quick Actions Row
+   ========================================================================== */
+
+.getcited-dashboard-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--getcited-space-lg);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+@media (max-width: 900px) {
+    .getcited-dashboard-actions-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.getcited-dashboard-actions-row .getcited-section {
+    margin-bottom: 0;
+}
+
+/* Quick Actions Grid */
+.getcited-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-quick-actions .quick-action-link {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-md);
+    background: var(--getcited-bg);
+    border: 1px solid var(--getcited-border);
+    border-radius: var(--getcited-radius-sm);
+    text-decoration: none;
+    color: var(--getcited-text-secondary);
+    font-size: var(--getcited-font-sm);
+    font-weight: 500;
+    transition: border-color var(--getcited-transition), color var(--getcited-transition);
+}
+
+.getcited-quick-actions .quick-action-link:hover {
+    border-color: var(--getcited-neutral);
+    color: var(--getcited-text-primary);
+}
+
+.getcited-quick-actions .quick-action-link .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--getcited-neutral);
+}
+
+/* Compact Health Status */
+.getcited-health-section .getcited-health-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+}
+
+.health-status-item {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    background: var(--getcited-bg);
+    border-radius: var(--getcited-radius-sm);
+    font-size: var(--getcited-font-sm);
+}
+
+.health-status-item .status-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+}
+
+.health-status-item.status-ok .status-icon {
+    background: var(--getcited-success);
+}
+
+.health-status-item.status-warning .status-icon {
+    background: var(--getcited-warning);
+}
+
+.health-status-item.status-error .status-icon {
+    background: var(--getcited-error);
+}
+
+.health-status-item .status-label {
+    color: var(--getcited-text-secondary);
+}
+
+/* ==========================================================================
+   Score Breakdown Cards - v1.8.0 Simplified
    ========================================================================== */
 
 .getcited-breakdown-cards {
     display: flex;
     flex-wrap: wrap;
     gap: var(--getcited-space-md);
-    margin-bottom: var(--getcited-space-lg);
 }
 
 .getcited-breakdown-card {
     flex: 1 1 180px;
     min-width: 160px;
     max-width: 220px;
-    background: #fff;
+    background: var(--getcited-surface);
     border: 1px solid var(--getcited-border);
-    border-radius: var(--getcited-radius-md);
+    border-radius: var(--getcited-radius-lg);
     padding: var(--getcited-space-md);
     text-decoration: none;
     color: inherit;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    transition: transform var(--getcited-transition-smooth), box-shadow var(--getcited-transition-smooth), border-color var(--getcited-transition);
+    box-shadow: var(--getcited-shadow-sm);
+    transition: border-color var(--getcited-transition);
 }
 
 .getcited-breakdown-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--getcited-border);
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.08),
-        0 8px 24px rgba(0, 0, 0, 0.04);
+    border-color: var(--getcited-gray-300);
 }
 
 .getcited-breakdown-card.card-info-only {
@@ -4266,8 +4526,7 @@
 }
 
 .getcited-breakdown-card.card-info-only:hover {
-    border-color: var(--getcited-gray-200);
-    box-shadow: var(--getcited-shadow-sm);
+    border-color: var(--getcited-border);
 }
 
 .getcited-breakdown-card .card-icon {
@@ -4595,4 +4854,539 @@
 
 .getcited-clear-log-status.error {
     color: var(--getcited-error);
+}
+
+/* ==========================================================================
+   v1.7.2 - Custom Checkbox Component
+   ========================================================================== */
+
+/* Premium checkbox container */
+.getcited-checkbox-custom {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: var(--getcited-gray-50);
+    border: 1px solid var(--getcited-border);
+    border-radius: var(--getcited-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Hide native input */
+.getcited-checkbox-custom input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Custom checkbox display */
+.getcited-checkbox-custom .check-box {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border: 2px solid var(--getcited-gray-300);
+    border-radius: 5px;
+    background: #fff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-top: 1px;
+}
+
+/* Check content layout */
+.getcited-checkbox-custom .check-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.getcited-checkbox-custom .check-content strong {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--getcited-gray-800);
+}
+
+.getcited-checkbox-custom .check-description {
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+    line-height: 1.4;
+}
+
+/* Hover state */
+.getcited-checkbox-custom:hover {
+    border-color: var(--getcited-gray-300);
+    background: #fff;
+}
+
+.getcited-checkbox-custom:hover .check-box {
+    border-color: var(--getcited-primary);
+}
+
+/* Checked state */
+.getcited-checkbox-custom.is-checked {
+    border-color: var(--getcited-primary);
+    background: var(--getcited-accent-light);
+}
+
+.getcited-checkbox-custom.is-checked .check-box {
+    background: var(--getcited-primary);
+    border-color: var(--getcited-primary);
+}
+
+.getcited-checkbox-custom.is-checked .check-box::after {
+    content: '\2713';
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Disabled state */
+.getcited-checkbox-custom.is-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.getcited-checkbox-custom.is-disabled:hover {
+    border-color: var(--getcited-border);
+    background: var(--getcited-gray-50);
+}
+
+.getcited-checkbox-custom.is-disabled:hover .check-box {
+    border-color: var(--getcited-gray-300);
+}
+
+/* Focus state */
+.getcited-checkbox-custom:focus-within {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--getcited-primary);
+}
+
+/* ==========================================================================
+   v1.7.2 - Wizard Card Selection
+   ========================================================================== */
+
+/* Site type card enhancements */
+.getcited-site-type .site-type-card {
+    position: relative;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.getcited-site-type .site-type-card:hover {
+    border-color: var(--getcited-gray-300);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Selected state via input:checked */
+.getcited-site-type input:checked + .site-type-card {
+    border-color: var(--getcited-primary);
+    background: var(--getcited-accent-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+}
+
+/* Card check indicator */
+.getcited-site-type .card-check,
+.getcited-radio-card .card-check {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--getcited-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.2s ease;
+}
+
+.getcited-site-type input:checked + .site-type-card .card-check,
+.getcited-radio-card.is-selected .card-check,
+.getcited-radio-card input:checked ~ .radio-card-content .card-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.getcited-site-type .card-check::after,
+.getcited-radio-card .card-check::after {
+    content: '\2713';
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Radio card enhancements */
+.getcited-radio-card {
+    position: relative;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.getcited-radio-card:hover {
+    border-color: var(--getcited-gray-300);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.getcited-radio-card.selected,
+.getcited-radio-card.is-selected {
+    border-color: var(--getcited-primary);
+    background: var(--getcited-accent-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+}
+
+/* Make radio card content position relative for check placement */
+.getcited-radio-card .radio-card-content {
+    position: relative;
+}
+
+/* ==========================================================================
+   v1.7.2 - Wizard Step Transitions
+   ========================================================================== */
+
+/* Step content animation */
+.getcited-wizard-step {
+    animation: getcited-wizard-step-enter 0.4s ease-out;
+}
+
+@keyframes getcited-wizard-step-enter {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Progress step pulse when active */
+.getcited-wizard-progress .progress-step.is-active {
+    animation: getcited-step-pulse 0.5s ease-out;
+}
+
+@keyframes getcited-step-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Step number highlight transition */
+.getcited-wizard-progress .progress-step .step-number {
+    transition: all 0.3s ease;
+}
+
+.getcited-wizard-progress .progress-step.is-active .step-number {
+    background: var(--getcited-primary);
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
+}
+
+/* ==========================================================================
+   v1.7.2 - Form Label Hierarchy
+   ========================================================================== */
+
+/* Primary label (for main options) */
+.getcited-label-primary {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--getcited-gray-800);
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* Secondary label (for sub-options) */
+.getcited-label-secondary {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--getcited-gray-600);
+}
+
+/* Description text consistency */
+.check-description,
+.getcited-field-description {
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+    margin-top: 2px;
+    display: block;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   v1.7.2 - Reduced Motion Support
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .getcited-checkbox-custom,
+    .getcited-checkbox-custom .check-box,
+    .getcited-site-type .site-type-card,
+    .getcited-radio-card,
+    .getcited-site-type .card-check,
+    .getcited-radio-card .card-check,
+    .getcited-wizard-progress .progress-step .step-number {
+        transition: none;
+    }
+
+    .getcited-wizard-step {
+        animation: none;
+    }
+
+    .getcited-wizard-progress .progress-step.is-active {
+        animation: none;
+    }
+}
+
+/* ==========================================================================
+   v1.7.3 - Premium SaaS Admin Redesign
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Dashboard Premium Styles
+   --------------------------------------------------------------------------- */
+
+/* Score Section Hero Treatment */
+.getcited-dashboard-top .getcited-section:first-child {
+    background: linear-gradient(135deg, #fff 0%, #fefefe 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle background accent */
+.getcited-dashboard-top .getcited-section:first-child::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.04) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Score display glow and animation */
+.getcited-score-display.circular {
+    box-shadow:
+        0 4px 12px rgba(249, 115, 22, 0.15),
+        0 0 20px rgba(249, 115, 22, 0.08);
+    animation: score-pulse 0.6s ease-out;
+}
+
+@keyframes score-pulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Score number entrance */
+.getcited-score-display.circular .score {
+    animation: score-number-enter 0.8s ease-out 0.2s both;
+}
+
+@keyframes score-number-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Breakdown Cards - Elevated */
+.getcited-breakdown-card {
+    background: #fff;
+    border: 1px solid var(--getcited-gray-100);
+    border-radius: 12px;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.02),
+        0 4px 8px rgba(0, 0, 0, 0.02);
+    transition: all 0.25s ease;
+}
+
+.getcited-breakdown-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 8px 16px rgba(0, 0, 0, 0.06),
+        0 16px 32px rgba(0, 0, 0, 0.03);
+}
+
+/* Breakdown card icon - refined */
+.getcited-breakdown-card .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--getcited-gray-50) 0%, var(--getcited-gray-100) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Health Check - Visual Status Indicators
+   --------------------------------------------------------------------------- */
+
+.getcited-health-item {
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+/* Status indicator bar at bottom */
+.getcited-health-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--getcited-gray-200);
+    transition: background 0.3s ease;
+}
+
+.getcited-health-item.getcited-status-success::after {
+    background: var(--getcited-success);
+}
+
+.getcited-health-item.getcited-status-warning::after {
+    background: var(--getcited-warning);
+}
+
+.getcited-health-item.getcited-status-error::after {
+    background: var(--getcited-error);
+}
+
+/* ---------------------------------------------------------------------------
+   Global Premium Patterns
+   --------------------------------------------------------------------------- */
+
+/* Premium Section Cards */
+.getcited-section {
+    border: 1px solid var(--getcited-gray-100);
+    border-radius: 12px;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.02),
+        0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+/* Section headers - refined */
+.getcited-section > h2:first-child {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--getcited-gray-800);
+    letter-spacing: -0.01em;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--getcited-gray-100);
+    margin-bottom: 16px;
+}
+
+/* Premium Primary Buttons */
+.getcited-wrap .button-primary {
+    background: linear-gradient(180deg, var(--getcited-primary) 0%, var(--getcited-primary-dark) 100%);
+    border: none;
+    box-shadow:
+        0 2px 4px rgba(249, 115, 22, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: all 0.2s ease;
+}
+
+.getcited-wrap .button-primary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 8px rgba(249, 115, 22, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.getcited-wrap .button-primary:active {
+    transform: translateY(0);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Staggered section entrance animation */
+.getcited-wrap .getcited-section {
+    animation: section-enter 0.4s ease-out both;
+}
+
+.getcited-wrap .getcited-section:nth-child(1) { animation-delay: 0s; }
+.getcited-wrap .getcited-section:nth-child(2) { animation-delay: 0.08s; }
+.getcited-wrap .getcited-section:nth-child(3) { animation-delay: 0.08s; }
+.getcited-wrap .getcited-section:nth-child(4) { animation-delay: 0.16s; }
+.getcited-wrap .getcited-section:nth-child(5) { animation-delay: 0.24s; }
+.getcited-wrap .getcited-section:nth-child(6) { animation-delay: 0.32s; }
+
+@keyframes section-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Premium Table Styling */
+.getcited-wrap .widefat {
+    border: 1px solid var(--getcited-gray-100);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.getcited-wrap .widefat thead th {
+    background: var(--getcited-gray-50);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--getcited-gray-500);
+    border-bottom: 1px solid var(--getcited-gray-100);
+}
+
+.getcited-wrap .widefat tbody tr {
+    transition: background 0.15s ease;
+}
+
+.getcited-wrap .widefat tbody tr:hover {
+    background: var(--getcited-bg);
+}
+
+.getcited-wrap .widefat td {
+    border-bottom: 1px solid var(--getcited-gray-50);
+}
+
+/* Reduced motion for v1.7.3 animations */
+@media (prefers-reduced-motion: reduce) {
+    .getcited-wrap .getcited-section,
+    .getcited-score-display.circular,
+    .getcited-score-display.circular .score,
+    .getcited-breakdown-card,
+    .getcited-wizard-step {
+        animation: none;
+    }
+
+    .getcited-breakdown-card,
+    .getcited-health-item,
+    .getcited-wrap .widefat tbody tr {
+        transition: none;
+    }
 }
