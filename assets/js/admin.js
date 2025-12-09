@@ -1179,11 +1179,8 @@
         nextTipLink.addEventListener('click', function(e) {
             e.preventDefault();
 
-            const tipTitle = document.querySelector('.getcited-tip-title');
-            const tipContent = document.querySelector('.getcited-tip-content');
-            const tipCounter = document.querySelector('.getcited-tip-counter');
-
-            if (!tipTitle || !tipContent) return;
+            const tipText = document.querySelector('.getcited-tip-bar .tip-text');
+            if (!tipText) return;
 
             // Add loading state
             this.style.pointerEvents = 'none';
@@ -1193,22 +1190,14 @@
                 .then(response => {
                     if (response.success && response.data.tip) {
                         // Fade out
-                        tipTitle.style.opacity = '0';
-                        tipContent.style.opacity = '0';
+                        tipText.style.opacity = '0';
 
                         setTimeout(() => {
-                            // Update content
-                            tipTitle.textContent = response.data.tip.title;
-                            tipContent.textContent = response.data.tip.content;
-
-                            // Update counter
-                            if (tipCounter) {
-                                tipCounter.textContent = 'Tip ' + (response.data.index + 1) + ' of ' + response.data.total;
-                            }
+                            // Update content with inline format
+                            tipText.innerHTML = '<strong>' + response.data.tip.title + ':</strong> ' + response.data.tip.content;
 
                             // Fade in
-                            tipTitle.style.opacity = '1';
-                            tipContent.style.opacity = '1';
+                            tipText.style.opacity = '1';
                         }, 150);
                     }
 
@@ -1224,10 +1213,8 @@
         });
 
         // Add transition styles
-        const tipTitle = document.querySelector('.getcited-tip-title');
-        const tipContent = document.querySelector('.getcited-tip-content');
-        if (tipTitle) tipTitle.style.transition = 'opacity 0.15s ease';
-        if (tipContent) tipContent.style.transition = 'opacity 0.15s ease';
+        const tipText = document.querySelector('.getcited-tip-bar .tip-text');
+        if (tipText) tipText.style.transition = 'opacity 0.15s ease';
     }
 
     // ==========================================================================

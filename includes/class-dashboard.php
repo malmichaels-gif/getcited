@@ -445,11 +445,52 @@ class GetCited_Dashboard {
     public function get_llms_activity() {
         $logger = GetCited_Request_Logger::instance();
 
-        return array(
-            'recent'   => $logger->get_recent_requests( 30, 10 ),
-            'stats'    => $logger->get_request_stats( 30 ),
-            'enabled'  => GetCited_Settings::instance()->get( 'request_logging_enabled' ),
+        // TODO: Remove dummy data after review.
+        $dummy_requests = array(
+            (object) array(
+                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-2 hours' ) ),
+                'bot_name'     => 'ChatGPT-User',
+                'category'     => 'ai_chat',
+            ),
+            (object) array(
+                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
+                'bot_name'     => 'Claude-Web',
+                'category'     => 'ai_chat',
+            ),
+            (object) array(
+                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
+                'bot_name'     => 'PerplexityBot',
+                'category'     => 'ai_search',
+            ),
+            (object) array(
+                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
+                'bot_name'     => 'GPTBot',
+                'category'     => 'ai_training',
+            ),
+            (object) array(
+                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-4 days' ) ),
+                'bot_name'     => 'Anthropic-AI',
+                'category'     => 'ai_chat',
+            ),
         );
+
+        $dummy_stats = array(
+            'total'       => 23,
+            'unique_bots' => 5,
+        );
+
+        return array(
+            'recent'   => $dummy_requests,
+            'stats'    => $dummy_stats,
+            'enabled'  => true,
+        );
+
+        // Original code (commented out for dummy data):
+        // return array(
+        //     'recent'   => $logger->get_recent_requests( 30, 10 ),
+        //     'stats'    => $logger->get_request_stats( 30 ),
+        //     'enabled'  => GetCited_Settings::instance()->get( 'request_logging_enabled' ),
+        // );
     }
 
     /**
@@ -702,6 +743,9 @@ class GetCited_Dashboard {
      * @return array Array of tips with title and content.
      */
     public static function get_tips() {
+        $schema_url = admin_url( 'admin.php?page=getcited-schema' );
+        $llms_url   = admin_url( 'admin.php?page=getcited-llms-txt' );
+
         return array(
             array(
                 'title'   => __( 'Write Quotable Content', 'getcited' ),
@@ -721,7 +765,13 @@ class GetCited_Dashboard {
             ),
             array(
                 'title'   => __( 'Keep Identity Consistent', 'getcited' ),
-                'content' => __( 'Use the same name, bio, and expertise signal everywhere. AIs prefer people who look like authorities — fill out your Organization and Author settings.', 'getcited' ),
+                /* translators: %s: URL to Schema settings page */
+                'content' => sprintf( __( 'Use the same name, bio, and expertise signal everywhere. AIs prefer people who look like authorities — <a href="%s">fill out your Organization and Author settings</a>.', 'getcited' ), esc_url( $schema_url ) ),
+            ),
+            array(
+                'title'   => __( 'Optimize Your llms.txt', 'getcited' ),
+                /* translators: %s: URL to llms.txt settings page */
+                'content' => sprintf( __( 'Your llms.txt file tells AI crawlers about your site. <a href="%s">Add your site description and key topics</a> to help AI understand your expertise.', 'getcited' ), esc_url( $llms_url ) ),
             ),
         );
     }

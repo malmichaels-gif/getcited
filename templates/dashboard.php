@@ -67,7 +67,7 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 						<?php echo esc_html( $visibility_score['recommendations'][0] ); ?>
 					</p>
 					<?php endif; ?>
-					<button type="button" class="button getcited-refresh-score">
+					<button type="button" class="button button-primary getcited-refresh-score">
 						<span class="dashicons dashicons-update"></span>
 						<?php esc_html_e( 'Refresh', 'getcited' ); ?>
 					</button>
@@ -90,72 +90,10 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 			</div>
 		</div>
 
-		<!-- Quick Actions + Health Status (Two Column) -->
-		<div class="getcited-dashboard-actions-row">
-			<!-- Quick Actions -->
-			<div class="getcited-section getcited-quick-actions-section">
-				<h2><?php esc_html_e( 'Quick Actions', 'getcited' ); ?></h2>
-				<div class="getcited-quick-actions">
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>" class="quick-action-link">
-						<span class="dashicons dashicons-edit"></span>
-						<?php esc_html_e( 'Edit llms.txt', 'getcited' ); ?>
-					</a>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-crawlers' ) ); ?>" class="quick-action-link">
-						<span class="dashicons dashicons-visibility"></span>
-						<?php esc_html_e( 'View Crawlers', 'getcited' ); ?>
-					</a>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-citability' ) ); ?>" class="quick-action-link">
-						<span class="dashicons dashicons-chart-bar"></span>
-						<?php esc_html_e( 'Run Audit', 'getcited' ); ?>
-					</a>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-schema' ) ); ?>" class="quick-action-link">
-						<span class="dashicons dashicons-admin-site-alt3"></span>
-						<?php esc_html_e( 'Schema Settings', 'getcited' ); ?>
-					</a>
-				</div>
-			</div>
-
-			<!-- Health Status (Compact) -->
-			<div class="getcited-section getcited-health-section">
-				<h2>
-					<?php esc_html_e( 'Health Status', 'getcited' ); ?>
-					<button type="button" class="button getcited-run-health-check">
-						<span class="dashicons dashicons-yes-alt"></span>
-						<?php esc_html_e( 'Run Check', 'getcited' ); ?>
-					</button>
-				</h2>
-				<div class="getcited-health-summary">
-					<?php
-					$health_status = $stats['health'];
-					$quick_checks  = array(
-						'llms_txt'      => __( 'llms.txt', 'getcited' ),
-						'robots_txt'    => __( 'robots.txt', 'getcited' ),
-						'schema'        => __( 'Schema', 'getcited' ),
-						'rewrite_rules' => __( 'Rewrites', 'getcited' ),
-					);
-					foreach ( $quick_checks as $key => $label ) :
-						if ( ! isset( $health_status[ $key ] ) ) continue;
-						$check = $health_status[ $key ];
-						$icon  = $check['status'] === 'ok' ? '✓' : ( $check['status'] === 'warning' ? '!' : '✕' );
-						$class = 'status-' . $check['status'];
-					?>
-					<div class="health-status-item <?php echo esc_attr( $class ); ?>">
-						<span class="status-icon"><?php echo esc_html( $icon ); ?></span>
-						<span class="status-label"><?php echo esc_html( $label ); ?></span>
-					</div>
-					<?php endforeach; ?>
-				</div>
-			</div>
-		</div>
-
-		<!-- Score Breakdown (Collapsible) -->
-		<div class="getcited-section getcited-collapsible" data-collapsed="true">
-			<h2 class="getcited-collapsible-header">
-				<?php esc_html_e( 'Score Breakdown', 'getcited' ); ?>
-				<span class="dashicons dashicons-arrow-down-alt2"></span>
-			</h2>
-			<div class="getcited-collapsible-content" style="display: none;">
-				<div class="getcited-breakdown-cards">
+		<!-- Score Components -->
+		<div class="getcited-section getcited-score-components">
+			<h2><?php esc_html_e( 'Score Components', 'getcited' ); ?></h2>
+			<div class="getcited-breakdown-cards">
 			<?php foreach ( $visibility_score['breakdown'] as $key => $score ) :
 				$max        = $max_points[ $key ];
 				$is_perfect = ( $score === $max );
@@ -202,39 +140,18 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 			</div>
 			<?php endif; ?>
 			<?php endforeach; ?>
-				</div>
 			</div>
 		</div>
 
-		<!-- AI Visibility Tips (Collapsible) -->
-		<div class="getcited-section getcited-collapsible getcited-tips-section" data-collapsed="true">
-			<h2 class="getcited-collapsible-header">
-				<span class="dashicons dashicons-lightbulb"></span>
-				<?php esc_html_e( 'AI Visibility Tip', 'getcited' ); ?>
-				<span class="dashicons dashicons-arrow-down-alt2"></span>
-			</h2>
-			<div class="getcited-collapsible-content" style="display: none;">
-				<div class="getcited-tip-container">
-					<h3 class="getcited-tip-title"><?php echo esc_html( $current_tip['title'] ); ?></h3>
-					<p class="getcited-tip-content"><?php echo esc_html( $current_tip['content'] ); ?></p>
-					<div class="getcited-tip-footer">
-						<span class="getcited-tip-counter">
-							<?php
-							/* translators: 1: current tip number, 2: total tips */
-							printf( esc_html__( 'Tip %1$d of %2$d', 'getcited' ), $tip_index + 1, $tips_count );
-							?>
-						</span>
-						<a href="#" class="getcited-next-tip">
-							<?php esc_html_e( 'Next tip', 'getcited' ); ?>
-							<span class="dashicons dashicons-arrow-right-alt2"></span>
-						</a>
-					</div>
-				</div>
-			</div>
+		<!-- AI Visibility Tip (Inline Bar) -->
+		<div class="getcited-tip-bar">
+			<span class="dashicons dashicons-lightbulb"></span>
+			<span class="tip-text"><strong><?php echo esc_html( $current_tip['title'] ); ?>:</strong> <?php echo wp_kses( $current_tip['content'], array( 'a' => array( 'href' => array() ) ) ); ?></span>
+			<a href="#" class="getcited-next-tip"><?php esc_html_e( 'Next', 'getcited' ); ?> →</a>
 		</div>
 
-		<!-- Two Column Grid: Activity + Health Check -->
-		<div class="getcited-dashboard-grid">
+		<!-- llms.txt Activity + Health Status (Two Column) -->
+		<div class="getcited-dashboard-actions-row">
 			<!-- llms.txt Activity -->
 			<div class="getcited-section getcited-llms-activity-section">
 				<h2><?php esc_html_e( 'llms.txt Activity', 'getcited' ); ?></h2>
@@ -242,7 +159,7 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 				<?php if ( ! $llms_activity['enabled'] ) : ?>
 					<div class="getcited-activity-disabled">
 						<p><?php esc_html_e( 'Request logging is disabled.', 'getcited' ); ?></p>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-settings' ) ); ?>" class="button">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-settings' ) ); ?>" class="button button-primary">
 							<?php esc_html_e( 'Enable in Settings', 'getcited' ); ?>
 						</a>
 					</div>
@@ -256,223 +173,88 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 					</div>
 
 				<?php else : ?>
+					<?php $stats_data = $llms_activity['stats']; ?>
 					<div class="getcited-activity-content">
-						<div class="activity-list">
-							<table class="widefat">
-								<thead>
-									<tr>
-										<th><?php esc_html_e( 'Time', 'getcited' ); ?></th>
-										<th><?php esc_html_e( 'Bot', 'getcited' ); ?></th>
-										<th><?php esc_html_e( 'Type', 'getcited' ); ?></th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php
-									$display_count = min( 5, count( $llms_activity['recent'] ) );
-									for ( $i = 0; $i < $display_count; $i++ ) :
-										$request       = $llms_activity['recent'][ $i ];
-										$category_info = GetCited_Request_Logger::get_category_display( $request->category );
-										$time          = strtotime( $request->request_time );
-									?>
-									<tr>
-										<td class="activity-time">
-											<?php echo esc_html( date_i18n( 'M j, H:i', $time ) ); ?>
-										</td>
-										<td class="activity-bot">
-											<?php echo esc_html( $request->bot_name ); ?>
-										</td>
-										<td class="activity-category">
-											<span class="category-badge category-<?php echo esc_attr( $category_info['class'] ); ?>">
-												<span class="category-icon" aria-hidden="true"><?php echo wp_kses( $category_info['icon'], array() ); ?></span>
-												<?php echo esc_html( $category_info['label'] ); ?>
-											</span>
-										</td>
-									</tr>
-									<?php endfor; ?>
-								</tbody>
-							</table>
+						<div class="activity-stats-column">
+							<div class="stat-card">
+								<span class="stat-number"><?php echo esc_html( $stats_data['total'] ); ?></span>
+								<span class="stat-label"><?php esc_html_e( 'Requests', 'getcited' ); ?></span>
+							</div>
+							<div class="stat-card">
+								<span class="stat-number"><?php echo esc_html( $stats_data['unique_bots'] ); ?></span>
+								<span class="stat-label"><?php esc_html_e( 'Unique Bots', 'getcited' ); ?></span>
+							</div>
 						</div>
-						<div class="activity-stats">
+						<div class="activity-list">
 							<?php
-							$stats_data = $llms_activity['stats'];
+							$display_count = min( 5, count( $llms_activity['recent'] ) );
+							for ( $i = 0; $i < $display_count; $i++ ) :
+								$request = $llms_activity['recent'][ $i ];
+								$time    = strtotime( $request->request_time );
 							?>
-							<p>
-								<strong><?php echo esc_html( $stats_data['total'] ); ?></strong>
-								<?php esc_html_e( 'requests', 'getcited' ); ?> •
-								<strong><?php echo esc_html( $stats_data['unique_bots'] ); ?></strong>
-								<?php esc_html_e( 'unique bots', 'getcited' ); ?>
-							</p>
+							<div class="activity-item">
+								<span class="activity-bot"><?php echo esc_html( $request->bot_name ); ?></span>
+								<span class="activity-time"><?php echo esc_html( human_time_diff( $time, current_time( 'timestamp' ) ) ); ?> <?php esc_html_e( 'ago', 'getcited' ); ?></span>
+							</div>
+							<?php endfor; ?>
 						</div>
 					</div>
 				<?php endif; ?>
 			</div>
 
-			<!-- Health Check Summary -->
+			<!-- Health Status (Compact) -->
 			<div class="getcited-section getcited-health-section">
 				<h2>
-					<?php esc_html_e( 'Health Check', 'getcited' ); ?>
-					<button type="button" class="button getcited-run-health-check">
+					<?php esc_html_e( 'Health Status', 'getcited' ); ?>
+					<button type="button" class="button button-primary getcited-run-health-check">
 						<span class="dashicons dashicons-yes-alt"></span>
 						<?php esc_html_e( 'Run Check', 'getcited' ); ?>
 					</button>
 				</h2>
-
 				<div class="getcited-health-summary">
 					<?php
 					$health_status = $stats['health'];
-					$checks        = array(
+					$quick_checks  = array(
 						'llms_txt'      => __( 'llms.txt', 'getcited' ),
 						'robots_txt'    => __( 'robots.txt', 'getcited' ),
 						'schema'        => __( 'Schema', 'getcited' ),
 						'rewrite_rules' => __( 'Rewrites', 'getcited' ),
 					);
-
-					// Link targets for each health check badge.
-					$badge_links = array(
+					$check_links = array(
 						'llms_txt'      => admin_url( 'admin.php?page=getcited-llms-txt' ),
 						'robots_txt'    => admin_url( 'admin.php?page=getcited-crawlers' ),
 						'schema'        => admin_url( 'admin.php?page=getcited-schema' ),
 						'rewrite_rules' => admin_url( 'options-permalink.php' ),
 					);
-
-					// Tooltips explaining each check (v1.5.4).
-					$badge_tooltips = array(
-						'llms_txt'      => __( 'Your llms.txt file for AI discoverability', 'getcited' ),
-						'robots_txt'    => __( 'AI crawler rules in robots.txt', 'getcited' ),
-						'schema'        => __( 'JSON-LD structured data for AI understanding', 'getcited' ),
-						'rewrite_rules' => __( 'WordPress rewrite rules for /llms.txt URL. If broken, visit Settings → Permalinks and click Save.', 'getcited' ),
-					);
-
-					foreach ( $checks as $key => $label ) :
-						if ( ! isset( $health_status[ $key ] ) ) {
-							continue;
-						}
-						$check       = $health_status[ $key ];
-						$badge_class = 'badge-' . $check['status'];
-						$icon        = $check['status'] === 'ok' ? 'dashicons-yes' : ( $check['status'] === 'warning' ? 'dashicons-warning' : 'dashicons-no' );
-						$link        = $badge_links[ $key ] ?? '#';
-						$tooltip     = $badge_tooltips[ $key ] ?? '';
+					foreach ( $quick_checks as $key => $label ) :
+						if ( ! isset( $health_status[ $key ] ) ) continue;
+						$check = $health_status[ $key ];
+						$icon  = $check['status'] === 'ok' ? '✓' : ( $check['status'] === 'warning' ? '!' : '✕' );
+						$class = 'status-' . $check['status'];
+						$link  = $check_links[ $key ] ?? '#';
 					?>
-					<a href="<?php echo esc_url( $link ); ?>" class="getcited-health-badge <?php echo esc_attr( $badge_class ); ?>" title="<?php echo esc_attr( $tooltip ); ?>">
-						<span class="dashicons <?php echo esc_attr( $icon ); ?>"></span>
-						<?php echo esc_html( $label ); ?>
+					<a href="<?php echo esc_url( $link ); ?>" class="health-status-item <?php echo esc_attr( $class ); ?>">
+						<span class="status-icon"><?php echo esc_html( $icon ); ?></span>
+						<span class="status-label"><?php echo esc_html( $label ); ?></span>
 					</a>
 					<?php endforeach; ?>
 				</div>
-
 				<p class="description">
 					<?php
-					$all_ok = true;
-					foreach ( $health_status as $check ) {
-						if ( isset( $check['status'] ) && $check['status'] !== 'ok' ) {
-							$all_ok = false;
-							break;
+					$issues = array();
+					foreach ( $quick_checks as $key => $label ) {
+						if ( isset( $health_status[ $key ] ) && $health_status[ $key ]['status'] !== 'ok' ) {
+							$issues[] = $label;
 						}
 					}
-					if ( $all_ok ) {
+					if ( empty( $issues ) ) {
 						esc_html_e( 'All systems healthy. Your site is ready for AI crawlers.', 'getcited' );
 					} else {
-						esc_html_e( 'Some items need attention. Click "Run Check" for details.', 'getcited' );
+						/* translators: %s: comma-separated list of items needing attention */
+						printf( esc_html__( '%s needs attention. Click to fix.', 'getcited' ), esc_html( implode( ', ', $issues ) ) );
 					}
 					?>
 				</p>
-
-				<!-- Hidden detailed results for AJAX refresh -->
-				<div class="getcited-health-results" style="display: none;">
-					<?php
-					$all_checks = array(
-						'llms_txt'      => __( 'llms.txt', 'getcited' ),
-						'robots_txt'    => __( 'robots.txt', 'getcited' ),
-						'schema'        => __( 'Schema', 'getcited' ),
-						'rewrite_rules' => __( 'Rewrite Rules', 'getcited' ),
-						'crawler_list'  => __( 'Crawler List', 'getcited' ),
-					);
-
-					foreach ( $all_checks as $key => $label ) :
-						if ( ! isset( $health_status[ $key ] ) ) {
-							continue;
-						}
-						$check        = $health_status[ $key ];
-						$status_class = $health->get_status_class( $check['status'] );
-						$has_details  = ! empty( $check['details'] ) || ! empty( $check['action_type'] );
-					$details_id = 'health-details-' . esc_attr( $key );
-					?>
-						<div class="getcited-health-item <?php echo esc_attr( $status_class ); ?><?php echo $has_details ? ' has-details' : ''; ?>" data-check="<?php echo esc_attr( $key ); ?>">
-							<div class="health-item-header">
-								<span class="health-icon" aria-hidden="true"></span>
-								<span class="health-label"><?php echo esc_html( $label ); ?></span>
-								<span class="health-message"><?php echo esc_html( $check['message'] ); ?></span>
-
-								<?php if ( $has_details ) : ?>
-									<?php /* translators: %s: health check label */ ?>
-									<button type="button" class="getcited-health-expand" aria-expanded="false" aria-controls="<?php echo esc_attr( $details_id ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Show details for %s', 'getcited' ), $label ) ); ?>">
-										<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
-									</button>
-								<?php endif; ?>
-							</div>
-
-						<?php if ( $has_details ) : ?>
-							<div class="getcited-health-details" id="<?php echo esc_attr( $details_id ); ?>" style="display: none;">
-								<?php if ( ! empty( $check['details'] ) ) : ?>
-									<p class="details-text"><?php echo esc_html( $check['details'] ); ?></p>
-								<?php endif; ?>
-
-								<?php if ( ! empty( $check['options'] ) ) : ?>
-									<ul class="details-options">
-										<?php foreach ( $check['options'] as $option ) : ?>
-											<li><?php echo esc_html( $option ); ?></li>
-										<?php endforeach; ?>
-									</ul>
-								<?php endif; ?>
-
-								<?php if ( ! empty( $check['action_type'] ) ) : ?>
-									<div class="details-actions">
-
-										<?php if ( $check['action_type'] === 'auto_add' ) : ?>
-											<button type="button" class="button button-primary getcited-add-robots-rules">
-												<span class="dashicons dashicons-plus-alt2"></span>
-												<?php echo esc_html( $check['action_label'] ); ?>
-											</button>
-											<span class="getcited-action-status"></span>
-
-											<?php if ( ! empty( $check['seo_plugin'] ) ) : ?>
-												<p class="alternative-action">
-													<?php esc_html_e( 'Or add manually via:', 'getcited' ); ?>
-													<a href="<?php echo esc_url( admin_url( $check['seo_plugin']['robots_editor']['url'] ) ); ?>">
-														<?php echo esc_html( $check['seo_plugin']['robots_editor']['path'] ); ?>
-													</a>
-												</p>
-											<?php endif; ?>
-
-											<button type="button" class="button getcited-toggle-rules">
-												<?php esc_html_e( 'Preview Rules', 'getcited' ); ?>
-											</button>
-											<div class="getcited-rules-preview" style="display: none;">
-												<pre class="rules-code"><?php echo esc_html( $check['rules'] ); ?></pre>
-											</div>
-
-										<?php elseif ( $check['action_type'] === 'copy_rules' && ! empty( $check['rules'] ) ) : ?>
-											<div class="getcited-rules-preview">
-												<pre class="rules-code"><?php echo esc_html( $check['rules'] ); ?></pre>
-												<button type="button" class="button getcited-copy-rules" data-rules="<?php echo esc_attr( $check['rules'] ); ?>">
-													<span class="dashicons dashicons-clipboard"></span>
-													<?php esc_html_e( 'Copy Rules', 'getcited' ); ?>
-												</button>
-											</div>
-
-										<?php elseif ( ! empty( $check['action_url'] ) && ! empty( $check['action_label'] ) ) : ?>
-											<a href="<?php echo esc_url( $check['action_url'] ); ?>" class="button">
-												<?php echo esc_html( $check['action_label'] ); ?>
-											</a>
-										<?php endif; ?>
-
-									</div>
-								<?php endif; ?>
-							</div>
-						<?php endif; ?>
-						</div>
-					<?php endforeach; ?>
-				</div>
 			</div>
 		</div>
 
