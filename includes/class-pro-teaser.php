@@ -49,28 +49,40 @@ class GetCited_Pro_Teaser {
     public function get_features() {
         return array(
             'traffic' => array(
-                'name' => __( 'AI Referral Traffic', 'getcited' ),
-                'description' => __( 'Prove AI is sending you traffic', 'getcited' ),
+                'name' => __( 'AI Referral Traffic Dashboard', 'getcited' ),
+                'description' => __( 'See which AI sources send visitors', 'getcited' ),
                 'icon' => 'dashicons-chart-line',
-                'teaser' => __( 'Finally prove AI traffic is real — see exactly how many visitors ChatGPT and Perplexity send you', 'getcited' ),
+                'teaser' => __( 'Connect Google Analytics and see exactly which AI sources send traffic — Perplexity, ChatGPT, Gemini, and more', 'getcited' ),
             ),
-            'citations' => array(
-                'name' => __( 'Citation Tracking', 'getcited' ),
-                'description' => __( 'See when AI recommends you', 'getcited' ),
-                'icon' => 'dashicons-format-quote',
-                'teaser' => __( 'Know the moment AI recommends you — see which queries triggered citations', 'getcited' ),
-            ),
-            'full_audit' => array(
-                'name' => __( 'Full Site Audit', 'getcited' ),
-                'description' => __( 'Audit your whole site, not just 5 posts', 'getcited' ),
+            'citability' => array(
+                'name' => __( 'Full Citability Scoring', 'getcited' ),
+                'description' => __( 'Audit unlimited posts with export', 'getcited' ),
                 'icon' => 'dashicons-search',
-                'teaser' => __( 'Stop guessing which posts need work — audit everything, prioritize what matters', 'getcited' ),
+                'teaser' => __( 'Score unlimited posts, run bulk audits across your whole site, and export reports to share with your team', 'getcited' ),
+            ),
+            'share_of_voice' => array(
+                'name' => __( 'Citation Share of Voice', 'getcited' ),
+                'description' => __( 'Track your competitive share', 'getcited' ),
+                'icon' => 'dashicons-megaphone',
+                'teaser' => __( 'Monitor keywords that matter and see your share of AI citations compared to competitors', 'getcited' ),
+            ),
+            'competitor' => array(
+                'name' => __( 'Competitor Quick-Check', 'getcited' ),
+                'description' => __( 'Spot-check competitor citability', 'getcited' ),
+                'icon' => 'dashicons-visibility',
+                'teaser' => __( 'Run quick citability checks on competitor URLs to see how you stack up', 'getcited' ),
             ),
             'alerts' => array(
                 'name' => __( 'Citation Alerts', 'getcited' ),
-                'description' => __( 'Get pinged when you get cited', 'getcited' ),
+                'description' => __( 'Weekly digest and Slack notifications', 'getcited' ),
                 'icon' => 'dashicons-bell',
-                'teaser' => __( 'Never miss a win — get pinged the instant AI cites your content', 'getcited' ),
+                'teaser' => __( 'Get weekly email digests of your AI visibility, plus optional Slack webhooks for real-time updates', 'getcited' ),
+            ),
+            'support' => array(
+                'name' => __( 'Priority Support', 'getcited' ),
+                'description' => __( 'Fast help when you need it', 'getcited' ),
+                'icon' => 'dashicons-sos',
+                'teaser' => __( 'Jump the queue with priority email support and faster response times', 'getcited' ),
             ),
         );
     }
@@ -81,24 +93,24 @@ class GetCited_Pro_Teaser {
     public function get_page_teaser( $page ) {
         $teasers = array(
             'llms' => array(
-                'feature' => 'citations',
-                'message' => __( 'See when AI actually cites your llms.txt content', 'getcited' ),
+                'feature' => 'share_of_voice',
+                'message' => __( 'Track which keywords AI cites you for and monitor your competitive share', 'getcited' ),
             ),
             'crawlers' => array(
                 'feature' => 'traffic',
-                'message' => __( 'Know exactly which AI crawlers are driving real traffic', 'getcited' ),
+                'message' => __( 'See which AI crawlers are sending real traffic with GA4 integration', 'getcited' ),
             ),
             'schema' => array(
-                'feature' => 'full_audit',
-                'message' => __( 'Audit your entire site\'s schema for AI optimization', 'getcited' ),
+                'feature' => 'citability',
+                'message' => __( 'Run bulk citability audits across your entire site', 'getcited' ),
             ),
             'citability' => array(
-                'feature' => 'full_audit',
-                'message' => __( 'Unlock unlimited citability audits for your whole site', 'getcited' ),
+                'feature' => 'citability',
+                'message' => __( 'Score unlimited posts and export reports to share with your team', 'getcited' ),
             ),
             'settings' => array(
                 'feature' => 'alerts',
-                'message' => __( 'Get instant alerts when AI cites your content', 'getcited' ),
+                'message' => __( 'Get weekly digests and Slack alerts for your AI visibility', 'getcited' ),
             ),
         );
 
@@ -117,23 +129,20 @@ class GetCited_Pro_Teaser {
                 'sources' => array(
                     array( 'name' => 'Perplexity', 'visits' => 847, 'percent' => 68 ),
                     array( 'name' => 'ChatGPT', 'visits' => 203, 'percent' => 16 ),
-                    array( 'name' => 'Bing Copilot', 'visits' => 142, 'percent' => 11 ),
-                    array( 'name' => 'You.com', 'visits' => 38, 'percent' => 3 ),
+                    array( 'name' => 'Gemini', 'visits' => 142, 'percent' => 11 ),
+                    array( 'name' => 'Claude', 'visits' => 38, 'percent' => 3 ),
                     array( 'name' => 'Other', 'visits' => 17, 'percent' => 1 ),
                 ),
             ),
-            'citations' => array(
-                'total' => 47,
-                'sources' => array(
-                    array( 'name' => 'Perplexity', 'count' => 28 ),
-                    array( 'name' => 'Google AI Overview', 'count' => 12 ),
-                    array( 'name' => 'Bing Copilot', 'count' => 7 ),
-                ),
+            'share_of_voice' => array(
+                'keywords_tracked' => 12,
+                'your_share' => 34,
+                'top_keyword' => 'wordpress security tips',
             ),
             'top_pages' => array(
-                array( 'title' => 'WordPress Security Guide', 'visits' => 312, 'citations' => 8 ),
-                array( 'title' => 'Best Caching Plugins 2025', 'visits' => 289, 'citations' => 6 ),
-                array( 'title' => 'Speed Optimization Tips', 'visits' => 201, 'citations' => 5 ),
+                array( 'title' => 'WordPress Security Guide', 'visits' => 312, 'citability' => 92 ),
+                array( 'title' => 'Best Caching Plugins 2025', 'visits' => 289, 'citability' => 87 ),
+                array( 'title' => 'Speed Optimization Tips', 'visits' => 201, 'citability' => 78 ),
             ),
             'avg_citability' => 72,
         );
@@ -205,8 +214,8 @@ class GetCited_Pro_Teaser {
         ?>
         <div class="getcited-pro-teasers">
             <div class="getcited-pro-header">
-                <h3><?php esc_html_e( 'Pro Features — Coming Soon', 'getcited' ); ?></h3>
-                <p><?php esc_html_e( 'Founding members lock in early-adopter pricing', 'getcited' ); ?></p>
+                <h3><?php esc_html_e( 'GetCited Pro — Coming Soon', 'getcited' ); ?></h3>
+                <p><?php esc_html_e( 'Be the first to know when Pro launches', 'getcited' ); ?></p>
             </div>
 
             <div class="getcited-pro-features">
@@ -305,17 +314,20 @@ class GetCited_Pro_Teaser {
                     </div>
 
                     <div class="getcited-sample-section">
-                        <h3><?php esc_html_e( 'Citations Detected', 'getcited' ); ?></h3>
+                        <h3><?php esc_html_e( 'Citation Share of Voice', 'getcited' ); ?></h3>
                         <div class="getcited-sample-stat">
-                            <span class="stat-number"><?php echo esc_html( $report['citations']['total'] ); ?></span>
-                            <span class="stat-label"><?php esc_html_e( 'citations this month', 'getcited' ); ?></span>
+                            <span class="stat-number"><?php echo esc_html( $report['share_of_voice']['your_share'] ); ?>%</span>
+                            <span class="stat-label"><?php esc_html_e( 'your share of AI citations', 'getcited' ); ?></span>
                         </div>
-                        <div class="getcited-citation-sources">
-                            <?php foreach ( $report['citations']['sources'] as $source ) : ?>
-                                <span class="citation-source">
-                                    <?php echo esc_html( $source['name'] ); ?>: <?php echo esc_html( $source['count'] ); ?>
-                                </span>
-                            <?php endforeach; ?>
+                        <div class="getcited-share-details">
+                            <span class="share-detail">
+                                <strong><?php echo esc_html( $report['share_of_voice']['keywords_tracked'] ); ?></strong>
+                                <?php esc_html_e( 'keywords tracked', 'getcited' ); ?>
+                            </span>
+                            <span class="share-detail">
+                                <?php esc_html_e( 'Top keyword:', 'getcited' ); ?>
+                                <strong><?php echo esc_html( $report['share_of_voice']['top_keyword'] ); ?></strong>
+                            </span>
                         </div>
                     </div>
 
@@ -326,7 +338,7 @@ class GetCited_Pro_Teaser {
                                 <tr>
                                     <th><?php esc_html_e( 'Page', 'getcited' ); ?></th>
                                     <th><?php esc_html_e( 'AI Visits', 'getcited' ); ?></th>
-                                    <th><?php esc_html_e( 'Citations', 'getcited' ); ?></th>
+                                    <th><?php esc_html_e( 'Citability', 'getcited' ); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -334,7 +346,7 @@ class GetCited_Pro_Teaser {
                                     <tr>
                                         <td><?php echo esc_html( $page['title'] ); ?></td>
                                         <td><?php echo esc_html( number_format( $page['visits'] ) ); ?></td>
-                                        <td><?php echo esc_html( $page['citations'] ); ?></td>
+                                        <td><?php echo esc_html( $page['citability'] ); ?>/100</td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>

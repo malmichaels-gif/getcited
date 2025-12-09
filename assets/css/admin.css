@@ -2263,18 +2263,23 @@
     font-weight: 500;
 }
 
-.getcited-citation-sources {
+.getcited-share-details {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--getcited-space-sm);
+    gap: var(--getcited-space-md);
+    margin-top: var(--getcited-space-sm);
 }
 
-.citation-source {
+.getcited-share-details .share-detail {
     background: var(--getcited-dark-card);
-    padding: 4px 10px;
-    border-radius: var(--getcited-radius-full);
+    padding: 8px 14px;
+    border-radius: var(--getcited-radius-md);
     font-size: 13px;
     color: var(--getcited-dark-muted);
+}
+
+.getcited-share-details .share-detail strong {
+    color: #fff;
 }
 
 .getcited-sample-table {
