@@ -4,7 +4,7 @@ Tags: ai, chatgpt, claude, perplexity, llms.txt
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.8.0
+Stable tag: 1.9.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,49 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.9.0 =
+* Changed: Navigation menu reordered for better UX flow
+* Changed: llms.txt and Citability moved higher (unique value propositions)
+* Changed: Schema moved lower (often handled by SEO plugins)
+* New order: Dashboard → llms.txt → Citability → AI Crawlers → Schema → Settings
+
+= 1.8.9 =
+* New: Dashboard tagline emphasizing AI visibility over traditional SEO
+* Changed: Visibility score recommendations now action-focused without point values
+* Improved: Messaging matches Citability page philosophy (guide, not gamify)
+
+= 1.8.8 =
+* New: Personalized sample Pro report using actual site data
+* Improved: Pro teaser shows your site name in mock traffic dashboard
+* Improved: Share of Voice shows your domain competing against blurred competitors
+
+= 1.8.7 =
+* Changed: Pro features marketing content refined
+* Changed: Pro launch date updated to Spring 2026
+
+= 1.8.6 =
+* New: Inline tip bar on dashboard (replaces collapsible tips section)
+* Improved: Tips now rotate with "Next" button
+* Improved: Cleaner dashboard layout with tip bar below score components
+
+= 1.8.5 =
+* Improved: AI Crawlers page UX improvements
+
+= 1.8.4 =
+* Improved: Minor UI refinements
+
+= 1.8.3 =
+* Improved: Schema page Organization Details section UI
+* Improved: Better visual hierarchy for schema configuration
+
+= 1.8.2 =
+* Improved: Citability page UI enhancements
+* Improved: Educational content for citability scoring
+
+= 1.8.1 =
+* Changed: Settings page reorganized into cleaner logical groups
+* Improved: UI polish across settings page
 
 = 1.8.0 =
 * New: Complete admin UI redesign with refined minimalist aesthetic

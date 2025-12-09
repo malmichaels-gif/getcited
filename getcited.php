@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.8.9
+ * Version: 1.9.0
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.8.9' );
+define( 'GETCITED_VERSION', '1.9.0' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -264,15 +264,6 @@ final class GetCited {
 
         add_submenu_page(
             'getcited',
-            __( 'AI Crawlers', 'getcited' ),
-            __( 'AI Crawlers', 'getcited' ),
-            $capability,
-            'getcited-crawlers',
-            array( GetCited_Dashboard::instance(), 'render_crawlers_page' )
-        );
-
-        add_submenu_page(
-            'getcited',
             __( 'llms.txt', 'getcited' ),
             __( 'llms.txt', 'getcited' ),
             $capability,
@@ -282,20 +273,29 @@ final class GetCited {
 
         add_submenu_page(
             'getcited',
-            __( 'Schema', 'getcited' ),
-            __( 'Schema', 'getcited' ),
-            $capability,
-            'getcited-schema',
-            array( GetCited_Dashboard::instance(), 'render_schema_page' )
-        );
-
-        add_submenu_page(
-            'getcited',
             __( 'Citability', 'getcited' ),
             __( 'Citability', 'getcited' ),
             $capability,
             'getcited-citability',
             array( GetCited_Dashboard::instance(), 'render_citability_page' )
+        );
+
+        add_submenu_page(
+            'getcited',
+            __( 'AI Crawlers', 'getcited' ),
+            __( 'AI Crawlers', 'getcited' ),
+            $capability,
+            'getcited-crawlers',
+            array( GetCited_Dashboard::instance(), 'render_crawlers_page' )
+        );
+
+        add_submenu_page(
+            'getcited',
+            __( 'Schema', 'getcited' ),
+            __( 'Schema', 'getcited' ),
+            $capability,
+            'getcited-schema',
+            array( GetCited_Dashboard::instance(), 'render_schema_page' )
         );
 
         add_submenu_page(
