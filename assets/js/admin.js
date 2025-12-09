@@ -690,6 +690,21 @@
 
         if (!saveBtn) return;
 
+        // Toggle schema types and warning visibility when enable checkbox changes
+        const enableCheckbox = document.getElementById('schema_enabled');
+        const typesWrapper = document.querySelector('.getcited-schema-types-wrapper');
+        const conflictWarning = document.querySelector('.getcited-schema-conflict-warning');
+
+        if (enableCheckbox && typesWrapper) {
+            enableCheckbox.addEventListener('change', () => {
+                const isChecked = enableCheckbox.checked;
+                typesWrapper.style.display = isChecked ? '' : 'none';
+                if (conflictWarning) {
+                    conflictWarning.style.display = isChecked ? '' : 'none';
+                }
+            });
+        }
+
         saveBtn.addEventListener('click', () => {
             const statusEl = saveBtn.nextElementSibling;
             saveBtn.disabled = true;
@@ -710,6 +725,13 @@
                 }
             });
 
+            const sameasUrls = [];
+            document.querySelectorAll('input[name="organization[sameas_urls][]"]').forEach(input => {
+                if (input.value.trim()) {
+                    sameasUrls.push(input.value.trim());
+                }
+            });
+
             const schemaEnabled = document.getElementById('schema_enabled')?.checked ?? true;
             const data = {
                 schema_enabled: schemaEnabled,
@@ -719,6 +741,7 @@
                     name: document.getElementById('org_name')?.value || '',
                     logo_url: document.getElementById('org_logo')?.value || '',
                     social_urls: socialUrls,
+                    sameas_urls: sameasUrls,
                     linkedin_company: document.getElementById('org_linkedin_company')?.value || '',
                     wikipedia: document.getElementById('org_wikipedia')?.value || '',
                     crunchbase: document.getElementById('org_crunchbase')?.value || ''
@@ -754,6 +777,20 @@
                 input.name = 'organization[social_urls][]';
                 input.className = 'regular-text';
                 input.placeholder = 'https://...';
+                container.appendChild(input);
+            });
+        }
+
+        // Add sameAs URL field
+        const addSameasBtn = document.querySelector('.getcited-add-sameas');
+        if (addSameasBtn) {
+            addSameasBtn.addEventListener('click', () => {
+                const container = document.querySelector('.getcited-sameas-urls');
+                const input = document.createElement('input');
+                input.type = 'url';
+                input.name = 'organization[sameas_urls][]';
+                input.className = 'regular-text';
+                input.placeholder = 'https://yelp.com/biz/... or https://bloomberg.com/profile/...';
                 container.appendChild(input);
             });
         }

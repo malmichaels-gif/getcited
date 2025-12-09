@@ -337,9 +337,12 @@
 /* Upload button - orange to match primary buttons */
 .getcited-upload-logo {
     background: var(--getcited-primary) !important;
-    border: none !important;
+    border: 1px solid var(--getcited-primary) !important;
     color: #fff !important;
     font-weight: 600 !important;
+    min-height: 30px;
+    line-height: 2.15384615;
+    padding: 0 12px;
 }
 
 .getcited-upload-logo:hover,
@@ -1240,9 +1243,10 @@
     gap: var(--getcited-space-sm);
 }
 
-/* Schema Detection Status */
+/* Schema Detection Status - white background like other sections */
 .getcited-detection-status {
     border-left: 4px solid var(--getcited-gray-300);
+    background: #fff;
 }
 
 .getcited-detection-status.active {
@@ -1251,17 +1255,14 @@
 
 .getcited-detection-status.handled {
     border-left-color: var(--getcited-success);
-    background: rgba(34, 197, 94, 0.03);
 }
 
 .getcited-detection-status.none {
     border-left-color: var(--getcited-warning);
-    background: rgba(245, 158, 11, 0.03);
 }
 
 .getcited-detection-status.disabled {
     border-left-color: var(--getcited-gray-400);
-    background: rgba(156, 163, 175, 0.03);
 }
 
 .getcited-status-indicator {
@@ -1288,25 +1289,11 @@
     margin: var(--getcited-space-sm) 0;
 }
 
-/* Re-scan button styled like Refresh button */
-.getcited-rescan-schema {
-    background: var(--getcited-primary) !important;
-    border: 1px solid var(--getcited-primary) !important;
-    color: #fff !important;
-}
-
-.getcited-rescan-schema:hover {
-    background: var(--getcited-primary-dark) !important;
-    border-color: var(--getcited-primary-dark) !important;
-    color: #fff !important;
-}
-
+/* Re-scan button - secondary style (inherits default .button styling) */
 .getcited-rescan-schema .dashicons {
-    font-size: 15px;
-    width: 14px;
-    height: 14px;
-    vertical-align: text-bottom;
-    margin-right: 4px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
 }
 
 /* Advanced Options - uses standard collapsible pattern */
@@ -1425,19 +1412,47 @@
     margin-top: 2px;
 }
 
-.getcited-social-urls {
+.getcited-social-urls,
+.getcited-sameas-urls {
     display: flex;
     flex-direction: column;
-    gap: var(--getcited-space-sm);
+    gap: var(--getcited-space-xs);
 }
 
-.getcited-social-urls input {
+.getcited-social-urls input,
+.getcited-sameas-urls input {
     width: 100%;
-    max-width: 400px;
 }
 
-.getcited-add-social {
-    max-width: 400px;
+.getcited-add-social,
+.getcited-add-sameas {
+    align-self: flex-start;
+}
+
+/* Organization Details two-column form styling */
+.getcited-org-two-column .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-xs);
+}
+
+.getcited-org-two-column label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--getcited-gray-700);
+}
+
+.getcited-org-two-column input {
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    border: 1px solid var(--getcited-gray-300);
+    border-radius: var(--getcited-radius-sm);
+    font-size: 14px;
+}
+
+.getcited-org-two-column input:focus {
+    outline: none;
+    border-color: var(--getcited-neutral);
+    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.15);
 }
 
 /* Green checkmark for active fields (v1.5.4) */
@@ -1872,13 +1887,18 @@
 }
 
 /* Schema page buttons */
-.getcited-add-social {
+.getcited-add-social,
+.getcited-add-sameas {
     background: var(--getcited-primary) !important;
     border: 1px solid var(--getcited-primary) !important;
     color: #fff !important;
+    min-height: 30px;
+    line-height: 2.15384615;
+    padding: 0 12px;
 }
 
-.getcited-add-social:hover {
+.getcited-add-social:hover,
+.getcited-add-sameas:hover {
     background: var(--getcited-primary-dark) !important;
     border-color: var(--getcited-primary-dark) !important;
     color: #fff !important;
@@ -3607,6 +3627,13 @@
     }
 }
 
+/* Organization Details two-column layout responsive */
+@media (max-width: 900px) {
+    .getcited-org-two-column {
+        grid-template-columns: 1fr !important;
+    }
+}
+
 .getcited-compact-form .form-row {
     display: flex;
     flex-direction: column;
@@ -4105,6 +4132,19 @@
     display: flex;
     flex-direction: column;
     gap: var(--getcited-space-sm);
+}
+
+/* 2x2 Grid layout for schema types */
+.getcited-schema-options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--getcited-space-sm);
+}
+
+@media (max-width: 600px) {
+    .getcited-schema-options-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .getcited-checkbox-compact {

@@ -223,6 +223,11 @@ class GetCited_Schema {
 			$same_as[] = $org['crunchbase'];
 		}
 
+		// Additional sameAs URLs (Yelp, Bloomberg, etc.).
+		if ( ! empty( $org['sameas_urls'] ) && is_array( $org['sameas_urls'] ) ) {
+			$same_as = array_merge( $same_as, array_filter( $org['sameas_urls'] ) );
+		}
+
 		if ( ! empty( $same_as ) ) {
 			$schema['sameAs'] = array_values( array_unique( array_filter( $same_as ) ) );
 		}
