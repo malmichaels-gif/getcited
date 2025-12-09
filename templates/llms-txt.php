@@ -148,12 +148,12 @@ $status = $health->get_status();
         </div>
 
         <!-- Content Settings (Collapsible) -->
-        <div class="getcited-section getcited-llms-advanced getcited-collapsible" data-collapsed="true">
+        <div class="getcited-section getcited-llms-advanced getcited-collapsible" data-collapsed="false">
             <h2 class="getcited-collapsible-header">
                 <?php esc_html_e( 'Content Settings', 'getcited' ); ?>
-                <span class="dashicons dashicons-arrow-down-alt2"></span>
+                <span class="dashicons dashicons-arrow-up-alt2"></span>
             </h2>
-            <div class="getcited-collapsible-content" style="display: none;">
+            <div class="getcited-collapsible-content">
                 <p class="description">
                     <?php esc_html_e( 'These fields enhance your llms.txt with additional context. Included when you scan your site.', 'getcited' ); ?>
                 </p>
@@ -391,14 +391,6 @@ $status = $health->get_status();
             <?php endif; ?>
         </div>
 
-        <!-- Save Button -->
-        <div class="getcited-section getcited-actions">
-            <button type="button" class="button button-primary getcited-save-llms-txt">
-                <?php esc_html_e( 'Save Changes', 'getcited' ); ?>
-            </button>
-            <span class="getcited-save-status"></span>
-        </div>
-
         <!-- Help -->
         <div class="getcited-section getcited-help">
             <h2><?php esc_html_e( 'llms.txt Format Guide', 'getcited' ); ?></h2>
@@ -417,6 +409,14 @@ $status = $health->get_status();
                     </a>
                 </p>
             </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="getcited-section getcited-actions">
+            <button type="button" class="button button-primary getcited-save-llms-txt">
+                <?php esc_html_e( 'Save Changes', 'getcited' ); ?>
+            </button>
+            <span class="getcited-save-status"></span>
         </div>
 
     </div>

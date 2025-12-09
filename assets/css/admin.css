@@ -1046,10 +1046,8 @@
    llms.txt Editor
    ========================================================================== */
 
-.getcited-llms-toggle {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--getcited-space-md);
+.getcited-llms-toggle h2 {
+    margin-bottom: var(--getcited-space-md);
 }
 
 .getcited-toggle-label {
