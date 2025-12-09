@@ -43,14 +43,16 @@ Zero impact on your front-end performance. No JavaScript or CSS loaded for visit
 
 GetCited complements Yoast SEO, Rank Math, and other SEO plugins. They handle Google optimization — we handle AI visibility.
 
-= Coming Soon (Pro Features) =
+= GetCited Pro — Spring 2026 =
 
 - AI Referral Traffic Dashboard (see visits from ChatGPT, Perplexity, etc.)
-- Citation Tracking (know when AI cites your content)
-- Full Site Audit (analyze all posts, not just 5)
-- Citation Alerts (email/Slack notifications)
+- Full Citability Scoring (audit unlimited posts with export)
+- Citation Share of Voice (track your competitive share)
+- Competitor Quick-Check (spot-check competitor citability)
+- Citation Alerts (weekly digests + Slack webhooks)
+- Private Community Access (connect with other AI-focused publishers)
 
-Join the waitlist from your dashboard to get early access!
+Join the waitlist from your dashboard for early bird pricing!
 
 == Installation ==
 

@@ -1991,7 +1991,7 @@
 
 .getcited-pro-features {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--getcited-space-md);
     margin-bottom: var(--getcited-space-xl);
 }
@@ -2107,6 +2107,13 @@
 .getcited-waitlist-count .count {
     color: var(--getcited-accent-light);
     font-weight: 600;
+}
+
+.getcited-pricing-hint {
+    font-size: 13px;
+    color: var(--getcited-dark-muted);
+    margin-top: var(--getcited-space-sm);
+    opacity: 0.8;
 }
 
 .getcited-sample-report {
@@ -2280,6 +2287,143 @@
 
 .getcited-share-details .share-detail strong {
     color: #fff;
+}
+
+/* Citation Alert - The Hook */
+.getcited-citation-alert {
+    display: flex;
+    gap: var(--getcited-space-md);
+    padding: var(--getcited-space-md);
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 88, 12, 0.1) 100%);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    border-radius: var(--getcited-radius-md);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-citation-alert .alert-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.getcited-citation-alert .alert-content {
+    flex: 1;
+}
+
+.getcited-citation-alert .alert-content strong {
+    display: block;
+    color: #f97316;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.getcited-citation-alert .alert-content p {
+    margin: 0 0 6px 0;
+    color: var(--getcited-dark-text);
+    font-size: 14px;
+}
+
+.getcited-citation-alert .alert-source {
+    color: #f97316;
+    font-weight: 600;
+}
+
+.getcited-citation-alert .alert-query {
+    display: block;
+    color: var(--getcited-dark-muted);
+    font-size: 13px;
+    font-style: italic;
+    margin-bottom: 4px;
+}
+
+.getcited-citation-alert .alert-time {
+    color: var(--getcited-dark-muted);
+    font-size: 12px;
+}
+
+/* Leaderboard */
+.getcited-leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+}
+
+.getcited-leaderboard .leaderboard-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 120px 40px;
+    gap: var(--getcited-space-sm);
+    align-items: center;
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    background: var(--getcited-dark-card);
+    border-radius: var(--getcited-radius-sm);
+}
+
+.getcited-leaderboard .leaderboard-row.is-you {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.1) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.getcited-leaderboard .leaderboard-rank {
+    color: var(--getcited-dark-muted);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.getcited-leaderboard .leaderboard-row.is-you .leaderboard-rank {
+    color: #22c55e;
+}
+
+.getcited-leaderboard .leaderboard-name {
+    color: var(--getcited-dark-text);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.getcited-leaderboard .leaderboard-row.is-you .leaderboard-name {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.getcited-leaderboard .leaderboard-name.is-blurred {
+    filter: blur(4px);
+    user-select: none;
+    opacity: 0.85;
+}
+
+.getcited-leaderboard .leaderboard-bar {
+    height: 6px;
+    background: var(--getcited-dark-border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.getcited-leaderboard .leaderboard-fill {
+    height: 100%;
+    background: var(--getcited-dark-muted);
+    border-radius: 3px;
+}
+
+.getcited-leaderboard .leaderboard-row.is-you .leaderboard-fill {
+    background: #22c55e;
+}
+
+.getcited-leaderboard .leaderboard-score {
+    text-align: right;
+    color: var(--getcited-dark-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.getcited-leaderboard .leaderboard-row.is-you .leaderboard-score {
+    color: #22c55e;
+}
+
+.leaderboard-hint {
+    margin: var(--getcited-space-sm) 0 0 0;
+    color: #22c55e;
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .getcited-sample-table {

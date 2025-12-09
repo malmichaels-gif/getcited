@@ -78,11 +78,11 @@ class GetCited_Pro_Teaser {
                 'icon' => 'dashicons-bell',
                 'teaser' => __( 'Get weekly email digests of your AI visibility, plus optional Slack webhooks for real-time updates', 'getcited' ),
             ),
-            'support' => array(
-                'name' => __( 'Priority Support', 'getcited' ),
-                'description' => __( 'Fast help when you need it', 'getcited' ),
-                'icon' => 'dashicons-sos',
-                'teaser' => __( 'Jump the queue with priority email support and faster response times', 'getcited' ),
+            'community' => array(
+                'name' => __( 'Private Community Access', 'getcited' ),
+                'description' => __( 'Connect with other publishers', 'getcited' ),
+                'icon' => 'dashicons-groups',
+                'teaser' => __( 'Join our private community of AI-focused publishers to share strategies and get direct founder access', 'getcited' ),
             ),
         );
     }
@@ -119,33 +119,144 @@ class GetCited_Pro_Teaser {
 
     /**
      * Get sample report data (for modal preview)
+     * Uses actual site data for personalization
      */
     public function get_sample_report() {
+        // Get site display name for leaderboard.
+        $site_display = $this->get_site_display_name();
+
+        // Get actual post titles from the site.
+        $recent_posts = get_posts( array(
+            'numberposts'      => 3,
+            'post_status'      => 'publish',
+            'post_type'        => 'post',
+            'orderby'          => 'comment_count',
+            'order'            => 'DESC',
+            'suppress_filters' => true,
+        ) );
+
+        // Build page titles - use real posts or fallbacks.
+        $page_titles = array();
+        if ( ! empty( $recent_posts ) ) {
+            foreach ( $recent_posts as $post ) {
+                $page_titles[] = $post->post_title;
+            }
+        }
+        // Pad with fallbacks if needed.
+        $fallback_titles = array(
+            __( 'Your Most Popular Post', 'getcited' ),
+            __( 'Your Second Best Post', 'getcited' ),
+            __( 'Another Great Article', 'getcited' ),
+        );
+        while ( count( $page_titles ) < 3 ) {
+            $page_titles[] = $fallback_titles[ count( $page_titles ) ];
+        }
+
+        // Try to derive a keyword from the site's primary category.
+        $keyword = $this->get_sample_keyword();
+
+        // Build the full query phrase (used in both alert and share of voice).
+        $query_phrase = sprintf(
+            /* translators: %s: keyword phrase */
+            __( 'best %s tips 2025', 'getcited' ),
+            $keyword
+        );
+
         return array(
             'period' => __( 'Last 30 Days', 'getcited' ),
+            'recent_citation' => array(
+                'source'  => 'Perplexity',
+                'page'    => $page_titles[0],
+                'query'   => $query_phrase,
+                'time'    => __( '2 hours ago', 'getcited' ),
+            ),
             'ai_traffic' => array(
-                'total' => 1247,
+                'total'  => 1247,
                 'change' => '+18%',
                 'sources' => array(
                     array( 'name' => 'Perplexity', 'visits' => 847, 'percent' => 68 ),
                     array( 'name' => 'ChatGPT', 'visits' => 203, 'percent' => 16 ),
                     array( 'name' => 'Gemini', 'visits' => 142, 'percent' => 11 ),
                     array( 'name' => 'Claude', 'visits' => 38, 'percent' => 3 ),
-                    array( 'name' => 'Other', 'visits' => 17, 'percent' => 1 ),
                 ),
             ),
             'share_of_voice' => array(
-                'keywords_tracked' => 12,
-                'your_share' => 34,
-                'top_keyword' => 'wordpress security tips',
+                'keyword'     => $query_phrase,
+                'your_score'  => 87,
+                'competitors' => array(
+                    array( 'name' => $site_display, 'score' => 87, 'is_you' => true, 'blur' => false ),
+                    array( 'name' => 'industryexpert.io', 'score' => 72, 'is_you' => false, 'blur' => true ),
+                    array( 'name' => 'nicheguide.co', 'score' => 68, 'is_you' => false, 'blur' => true ),
+                ),
             ),
             'top_pages' => array(
-                array( 'title' => 'WordPress Security Guide', 'visits' => 312, 'citability' => 92 ),
-                array( 'title' => 'Best Caching Plugins 2025', 'visits' => 289, 'citability' => 87 ),
-                array( 'title' => 'Speed Optimization Tips', 'visits' => 201, 'citability' => 78 ),
+                array( 'title' => $page_titles[0], 'visits' => 312, 'citability' => 92 ),
+                array( 'title' => $page_titles[1], 'visits' => 289, 'citability' => 87 ),
+                array( 'title' => $page_titles[2], 'visits' => 201, 'citability' => 78 ),
             ),
-            'avg_citability' => 72,
         );
+    }
+
+    /**
+     * Get a clean site display name for the leaderboard
+     * Falls back to site name if domain looks like staging/dev
+     */
+    private function get_site_display_name() {
+        $site_domain = wp_parse_url( home_url(), PHP_URL_HOST );
+        $site_domain = preg_replace( '/^www\./', '', $site_domain );
+
+        // Check if domain looks like staging/dev environment.
+        $staging_patterns = array( 'stg', 'staging', 'dev', 'local', 'test', 'kinsta', 'wpengine', 'pantheon', 'flywheel' );
+        $is_staging = false;
+        foreach ( $staging_patterns as $pattern ) {
+            if ( stripos( $site_domain, $pattern ) !== false ) {
+                $is_staging = true;
+                break;
+            }
+        }
+
+        // If staging, use site name instead.
+        if ( $is_staging ) {
+            $site_name = get_bloginfo( 'name' );
+            if ( $site_name ) {
+                // Convert to domain-like format (lowercase, no spaces).
+                return strtolower( str_replace( ' ', '', $site_name ) ) . '.com';
+            }
+        }
+
+        return $site_domain;
+    }
+
+    /**
+     * Get a sample keyword based on site content
+     */
+    private function get_sample_keyword() {
+        // Try to get from most used category.
+        $categories = get_categories( array(
+            'orderby'    => 'count',
+            'order'      => 'DESC',
+            'number'     => 1,
+            'hide_empty' => true,
+        ) );
+
+        if ( ! empty( $categories ) && $categories[0]->slug !== 'uncategorized' ) {
+            return strtolower( $categories[0]->name );
+        }
+
+        // Try site tagline words.
+        $tagline = get_bloginfo( 'description' );
+        if ( $tagline ) {
+            $words = explode( ' ', $tagline );
+            $words = array_filter( $words, function( $word ) {
+                return strlen( $word ) > 4;
+            } );
+            if ( ! empty( $words ) ) {
+                return strtolower( reset( $words ) );
+            }
+        }
+
+        // Fallback.
+        return __( 'your niche', 'getcited' );
     }
 
     /**
@@ -174,7 +285,7 @@ class GetCited_Pro_Teaser {
             <div class="teaser-content">
                 <span class="dashicons <?php echo esc_attr( $feature['icon'] ); ?>"></span>
                 <div class="teaser-text">
-                    <strong><?php esc_html_e( 'GetCited Pro - Coming Soon', 'getcited' ); ?></strong>
+                    <strong><?php esc_html_e( 'GetCited Pro — Spring 2026', 'getcited' ); ?></strong>
                     <span class="teaser-message"><?php echo esc_html( $teaser_data['message'] ); ?></span>
                 </div>
             </div>
@@ -214,7 +325,7 @@ class GetCited_Pro_Teaser {
         ?>
         <div class="getcited-pro-teasers">
             <div class="getcited-pro-header">
-                <h3><?php esc_html_e( 'GetCited Pro — Coming Soon', 'getcited' ); ?></h3>
+                <h3><?php esc_html_e( 'GetCited Pro — Spring 2026', 'getcited' ); ?></h3>
                 <p><?php esc_html_e( 'Be the first to know when Pro launches', 'getcited' ); ?></p>
             </div>
 
@@ -257,6 +368,7 @@ class GetCited_Pro_Teaser {
                             <?php esc_html_e( 'publishers on the waitlist', 'getcited' ); ?>
                         </p>
                     <?php endif; ?>
+                    <p class="getcited-pricing-hint"><?php esc_html_e( 'Early bird pricing for waitlist members', 'getcited' ); ?></p>
                 </div>
             <?php else : ?>
                 <div class="getcited-waitlist-confirmed">
@@ -289,9 +401,25 @@ class GetCited_Pro_Teaser {
                     <button type="button" class="getcited-modal-close">&times;</button>
                 </div>
                 <div class="getcited-modal-body">
-                    <p class="getcited-sample-notice">
-                        <?php esc_html_e( 'This is what your dashboard could look like. The question is — what are your real numbers?', 'getcited' ); ?>
-                    </p>
+                    <!-- Citation Alert - The Hook -->
+                    <div class="getcited-citation-alert">
+                        <span class="alert-icon">&#128276;</span>
+                        <div class="alert-content">
+                            <strong><?php esc_html_e( 'New Citation Detected!', 'getcited' ); ?></strong>
+                            <p>
+                                <?php
+                                printf(
+                                    /* translators: %1$s: AI source name, %2$s: page title */
+                                    esc_html__( '%1$s cited your "%2$s"', 'getcited' ),
+                                    '<span class="alert-source">' . esc_html( $report['recent_citation']['source'] ) . '</span>',
+                                    esc_html( $report['recent_citation']['page'] )
+                                );
+                                ?>
+                            </p>
+                            <span class="alert-query">"<?php echo esc_html( $report['recent_citation']['query'] ); ?>"</span>
+                            <span class="alert-time"><?php echo esc_html( $report['recent_citation']['time'] ); ?></span>
+                        </div>
+                    </div>
 
                     <div class="getcited-sample-section">
                         <h3><?php esc_html_e( 'AI Referral Traffic', 'getcited' ); ?> — <?php echo esc_html( $report['period'] ); ?></h3>
@@ -314,21 +442,20 @@ class GetCited_Pro_Teaser {
                     </div>
 
                     <div class="getcited-sample-section">
-                        <h3><?php esc_html_e( 'Citation Share of Voice', 'getcited' ); ?></h3>
-                        <div class="getcited-sample-stat">
-                            <span class="stat-number"><?php echo esc_html( $report['share_of_voice']['your_share'] ); ?>%</span>
-                            <span class="stat-label"><?php esc_html_e( 'your share of AI citations', 'getcited' ); ?></span>
+                        <h3><?php esc_html_e( 'Share of Voice', 'getcited' ); ?>: "<?php echo esc_html( $report['share_of_voice']['keyword'] ); ?>"</h3>
+                        <div class="getcited-leaderboard">
+                            <?php foreach ( $report['share_of_voice']['competitors'] as $index => $competitor ) : ?>
+                                <div class="leaderboard-row <?php echo $competitor['is_you'] ? 'is-you' : ''; ?>">
+                                    <span class="leaderboard-rank">#<?php echo esc_html( $index + 1 ); ?></span>
+                                    <span class="leaderboard-name<?php echo ! empty( $competitor['blur'] ) ? ' is-blurred' : ''; ?>"><?php echo esc_html( $competitor['name'] ); ?></span>
+                                    <div class="leaderboard-bar">
+                                        <div class="leaderboard-fill" style="width: <?php echo esc_attr( $competitor['score'] ); ?>%;"></div>
+                                    </div>
+                                    <span class="leaderboard-score"><?php echo esc_html( $competitor['score'] ); ?></span>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
-                        <div class="getcited-share-details">
-                            <span class="share-detail">
-                                <strong><?php echo esc_html( $report['share_of_voice']['keywords_tracked'] ); ?></strong>
-                                <?php esc_html_e( 'keywords tracked', 'getcited' ); ?>
-                            </span>
-                            <span class="share-detail">
-                                <?php esc_html_e( 'Top keyword:', 'getcited' ); ?>
-                                <strong><?php echo esc_html( $report['share_of_voice']['top_keyword'] ); ?></strong>
-                            </span>
-                        </div>
+                        <p class="leaderboard-hint"><?php esc_html_e( 'You\'re winning this keyword!', 'getcited' ); ?></p>
                     </div>
 
                     <div class="getcited-sample-section">
@@ -354,9 +481,9 @@ class GetCited_Pro_Teaser {
                     </div>
                 </div>
                 <div class="getcited-modal-footer">
-                    <p><?php esc_html_e( 'AI might already be sending you traffic. You just can\'t see it yet.', 'getcited' ); ?></p>
+                    <p><?php esc_html_e( 'Are you getting cited? Find out.', 'getcited' ); ?></p>
                     <button type="button" class="button button-primary getcited-join-waitlist">
-                        <?php esc_html_e( 'Find Out When Pro Launches', 'getcited' ); ?>
+                        <?php esc_html_e( 'Get Notified When Pro Launches', 'getcited' ); ?>
                     </button>
                 </div>
             </div>
