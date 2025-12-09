@@ -68,10 +68,10 @@ foreach ( $grouped_crawlers as $crawlers ) {
                     <span class="stat-label"><?php esc_html_e( 'Blocked', 'getcited' ); ?></span>
                 </div>
                 <div class="getcited-bulk-buttons">
-                    <button type="button" class="button getcited-allow-all">
+                    <button type="button" class="button button-primary getcited-allow-all">
                         <?php esc_html_e( 'Allow All', 'getcited' ); ?>
                     </button>
-                    <button type="button" class="button getcited-block-all">
+                    <button type="button" class="button button-primary getcited-block-all">
                         <?php esc_html_e( 'Block All', 'getcited' ); ?>
                     </button>
                 </div>
@@ -79,7 +79,7 @@ foreach ( $grouped_crawlers as $crawlers ) {
                     <?php
                     printf(
                         /* translators: %1$s: version number, %2$s: last updated date */
-                        esc_html__( 'List v%1$s (%2$s)', 'getcited' ),
+                        esc_html__( 'Crawler database v%1$s • Updated %2$s', 'getcited' ),
                         esc_html( $list_version ),
                         esc_html( $list_updated )
                     ); ?>
@@ -90,18 +90,19 @@ foreach ( $grouped_crawlers as $crawlers ) {
             <div class="getcited-section getcited-robots-settings">
                 <h2><?php esc_html_e( 'robots.txt', 'getcited' ); ?></h2>
 
-                <label class="getcited-toggle-label">
+                <label class="getcited-checkbox-custom <?php echo $robots_write_physical ? 'is-checked' : ''; ?> <?php echo ! $can_write ? 'is-disabled' : ''; ?>">
                     <input type="checkbox"
                            name="robots_write_physical"
                            id="robots_write_physical"
                            value="1"
                            <?php checked( $robots_write_physical ); ?>
                            <?php disabled( ! $can_write ); ?>>
-                    <strong><?php esc_html_e( 'Auto-write rules', 'getcited' ); ?></strong>
+                    <span class="check-box"></span>
+                    <span class="check-content">
+                        <strong><?php esc_html_e( 'Auto-write rules', 'getcited' ); ?></strong>
+                        <span class="check-description"><?php esc_html_e( 'Automatically sync crawler rules to robots.txt.', 'getcited' ); ?></span>
+                    </span>
                 </label>
-                <p class="description">
-                    <?php esc_html_e( 'Automatically sync crawler rules to robots.txt.', 'getcited' ); ?>
-                </p>
 
                 <?php if ( ! $can_write ) : ?>
                     <p class="getcited-notice getcited-notice-warning">
@@ -124,14 +125,9 @@ foreach ( $grouped_crawlers as $crawlers ) {
 
                 <?php if ( $can_write ) : ?>
                     <div class="getcited-robots-actions">
-                        <button type="button" class="button getcited-write-robots-file">
+                        <button type="button" class="button button-primary getcited-write-robots-file">
                             <?php esc_html_e( 'Write Now', 'getcited' ); ?>
                         </button>
-                        <?php if ( $rules_exist ) : ?>
-                            <button type="button" class="button getcited-remove-robots-rules">
-                                <?php esc_html_e( 'Remove', 'getcited' ); ?>
-                            </button>
-                        <?php endif; ?>
                         <span class="getcited-robots-status"></span>
                     </div>
                 <?php endif; ?>
@@ -225,16 +221,9 @@ foreach ( $grouped_crawlers as $crawlers ) {
                 <?php endif; ?>
             </div>
 
-            <button type="button" class="button getcited-add-custom">
+            <button type="button" class="button button-primary getcited-add-custom">
                 <?php esc_html_e( '+ Add Custom Crawler', 'getcited' ); ?>
             </button>
-
-            <div class="getcited-custom-actions">
-                <button type="button" class="button button-primary getcited-save-crawlers">
-                    <?php esc_html_e( 'Save Changes', 'getcited' ); ?>
-                </button>
-                <span class="getcited-save-status"></span>
-            </div>
         </div>
 
         <!-- robots.txt Preview (Collapsible) -->
@@ -245,10 +234,10 @@ foreach ( $grouped_crawlers as $crawlers ) {
             </h2>
             <div class="getcited-collapsible-content" style="display: none;">
                 <div class="getcited-preview-actions">
-                    <a href="<?php echo esc_url( home_url( '/robots.txt' ) ); ?>" target="_blank" class="button">
+                    <a href="<?php echo esc_url( home_url( '/robots.txt' ) ); ?>" target="_blank" class="button button-primary">
                         <?php esc_html_e( 'View Live', 'getcited' ); ?>
                     </a>
-                    <button type="button" class="button getcited-copy-content" data-target="robots_txt_preview">
+                    <button type="button" class="button button-primary getcited-copy-content" data-target="robots_txt_preview">
                         <span class="dashicons dashicons-clipboard"></span>
                         <?php esc_html_e( 'Copy', 'getcited' ); ?>
                     </button>
@@ -258,6 +247,14 @@ foreach ( $grouped_crawlers as $crawlers ) {
                     <?php esc_html_e( 'Copy and paste into robots.txt if auto-write is unavailable.', 'getcited' ); ?>
                 </p>
             </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="getcited-section getcited-actions">
+            <button type="button" class="button button-primary getcited-save-crawlers">
+                <?php esc_html_e( 'Save Changes', 'getcited' ); ?>
+            </button>
+            <span class="getcited-save-status"></span>
         </div>
 
     </div>

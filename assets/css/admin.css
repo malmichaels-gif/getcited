@@ -872,6 +872,23 @@
     color: var(--getcited-gray-500);
 }
 
+.getcited-crawler-groups {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--getcited-space-lg);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-crawler-groups .getcited-crawler-group {
+    margin-bottom: 0;
+}
+
+@media (max-width: 1200px) {
+    .getcited-crawler-groups {
+        grid-template-columns: 1fr;
+    }
+}
+
 .getcited-crawler-list {
     display: flex;
     flex-direction: column;

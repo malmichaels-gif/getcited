@@ -36,6 +36,7 @@
         initMediaUpload();
         initLoadMorePosts();
         initCustomCheckboxes();
+        initDirtyTracking();
     }
 
     // ==========================================================================
@@ -136,6 +137,49 @@
     }
 
     // ==========================================================================
+    // Unsaved Changes Warning
+    // ==========================================================================
+
+    let isDirty = false;
+
+    /**
+     * Initialize dirty state tracking for pages with save buttons
+     */
+    function initDirtyTracking() {
+        const wrap = document.querySelector('.getcited-wrap');
+        const saveBtn = document.querySelector('.getcited-actions .button-primary');
+
+        if (!wrap || !saveBtn) return;
+
+        // Track changes on all form inputs
+        wrap.addEventListener('input', markDirty);
+        wrap.addEventListener('change', markDirty);
+
+        // Warn on page leave if dirty
+        window.addEventListener('beforeunload', function(e) {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+    }
+
+    /**
+     * Mark form as dirty (has unsaved changes)
+     */
+    function markDirty() {
+        isDirty = true;
+    }
+
+    /**
+     * Mark form as clean (changes saved)
+     */
+    function markClean() {
+        isDirty = false;
+    }
+
+    // ==========================================================================
     // Copy to Clipboard
     // ==========================================================================
 
@@ -230,7 +274,11 @@
         }
 
         if (blockAllBtn) {
-            blockAllBtn.addEventListener('click', () => setCrawlersBulk('block'));
+            blockAllBtn.addEventListener('click', () => {
+                if (confirm('Warning: Blocking all AI crawlers will prevent your content from being discovered and cited by AI systems like ChatGPT, Claude, and Perplexity.\n\nThis is not recommended for most sites. Are you sure you want to block all crawlers?')) {
+                    setCrawlersBulk('block');
+                }
+            });
         }
     }
 
@@ -278,6 +326,7 @@
                 custom_crawlers: customCrawlers
             }
         }).then(() => {
+            markClean();
             updateRobotsPreview();
         });
     }
@@ -356,6 +405,7 @@
 
                     if (response.success) {
                         showStatus(statusEl, getcitedAdmin.strings?.saved || 'Saved!', 'success');
+                        markClean();
                         updateRobotsPreview();
                     } else {
                         showStatus(statusEl, getcitedAdmin.strings?.error || 'Error saving', 'error');
@@ -442,6 +492,7 @@
 
                     if (response.success) {
                         showStatus(statusEl, getcitedAdmin.strings.saved, 'success');
+                        markClean();
                     } else {
                         showStatus(statusEl, getcitedAdmin.strings.error, 'error');
                     }
@@ -757,6 +808,7 @@
 
                 if (response.success) {
                     showStatus(statusEl, getcitedAdmin.strings.saved, 'success');
+                    markClean();
                 } else {
                     showStatus(statusEl, getcitedAdmin.strings.error, 'error');
                 }
@@ -1304,6 +1356,52 @@
     // ==========================================================================
 
     function initRobotsRulesActions() {
+        // Auto-write checkbox - when unchecked, remove rules from robots.txt
+        const autoWriteCheckbox = document.getElementById('robots_write_physical');
+        if (autoWriteCheckbox) {
+            autoWriteCheckbox.addEventListener('change', function() {
+                if (!this.checked) {
+                    // User is unchecking - confirm and remove rules
+                    if (!confirm('This will remove GetCited rules from robots.txt. Continue?')) {
+                        // User cancelled - re-check the box
+                        this.checked = true;
+                        // Update custom checkbox visual state
+                        const label = this.closest('.getcited-checkbox-custom');
+                        if (label) label.classList.add('is-checked');
+                        return;
+                    }
+
+                    // User confirmed - remove rules
+                    const statusEl = document.querySelector('.getcited-robots-status');
+
+                    ajax('getcited_remove_robots_rules')
+                        .then(response => {
+                            if (response.success) {
+                                if (statusEl) showStatus(statusEl, response.data.message || 'Rules removed', 'success');
+                                setTimeout(() => window.location.reload(), 1500);
+                            } else {
+                                // Failed - re-check the box
+                                this.checked = true;
+                                const label = this.closest('.getcited-checkbox-custom');
+                                if (label) label.classList.add('is-checked');
+                                if (statusEl) showStatus(statusEl, response.data?.message || 'Failed to remove rules', 'error');
+                            }
+                        })
+                        .catch(() => {
+                            // Failed - re-check the box
+                            this.checked = true;
+                            const label = this.closest('.getcited-checkbox-custom');
+                            if (label) label.classList.add('is-checked');
+                            if (statusEl) showStatus(statusEl, 'Failed to remove rules', 'error');
+                        });
+                } else {
+                    // User is checking - update visual state (rules written on save)
+                    const label = this.closest('.getcited-checkbox-custom');
+                    if (label) label.classList.add('is-checked');
+                }
+            });
+        }
+
         // Write robots.txt file button (on crawlers page)
         document.querySelectorAll('.getcited-write-robots-file').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -2135,9 +2233,10 @@
             }).then(response => {
                 saveBtn.disabled = false;
                 saveBtn.textContent = 'Save Changes';
-                
+
                 if (response.success) {
                     showStatus(statusEl, getcitedAdmin.strings.saved, 'success');
+                    markClean();
                 } else {
                     showStatus(statusEl, getcitedAdmin.strings.error, 'error');
                 }
