@@ -51,6 +51,7 @@ $tips_count  = count( GetCited_Dashboard::get_tips() );
 
 <div class="wrap getcited-wrap">
 	<h1><?php echo esc_html( apply_filters( 'getcited_brand_name', 'GetCited' ) ); ?></h1>
+	<p class="getcited-tagline"><?php esc_html_e( 'Your competitors are still optimizing for Google. You\'re getting cited by ChatGPT, Gemini, and Grok.', 'getcited' ); ?></p>
 
 	<div class="getcited-dashboard">
 

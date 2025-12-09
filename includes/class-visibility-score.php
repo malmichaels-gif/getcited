@@ -407,40 +407,26 @@ class GetCited_Visibility_Score {
 	 * @return string|null Recommendation text or null.
 	 */
 	private function get_recommendation_text( $component, $score, $max ) {
-		$improvement = $max - $score;
-
 		switch ( $component ) {
 			case 'crawler_access':
 				if ( $score < $max ) {
-					return sprintf(
-						/* translators: %d: potential point improvement */
-						__( 'Some major AI crawlers are blocked. Allowing them could improve your score by up to %d points.', 'getcited' ),
-						$improvement
-					);
+					return __( 'Some major AI crawlers are blocked. Allow them so AI systems can discover and cite your content.', 'getcited' );
 				}
 				break;
 
 			case 'llms_health':
 				if ( $score === 0 ) {
-					return __( 'Enable llms.txt to help AI systems understand your site. This could add up to 25 points.', 'getcited' );
+					return __( 'Enable llms.txt to help AI systems understand your site structure and key content.', 'getcited' );
 				} elseif ( $score < $max ) {
-					return sprintf(
-						/* translators: %d: potential point improvement */
-						__( 'Your llms.txt could use more content or formatting. Improve it to gain up to %d points.', 'getcited' ),
-						$improvement
-					);
+					return __( 'Your llms.txt could use more content. Add descriptions and key pages to help AI systems.', 'getcited' );
 				}
 				break;
 
 			case 'schema':
 				if ( $score === 0 ) {
-					return __( 'No schema markup detected. Enable GetCited schema or check your SEO plugin settings for up to 20 points.', 'getcited' );
+					return __( 'No schema markup detected. Enable GetCited schema or check your SEO plugin for better AI understanding.', 'getcited' );
 				} elseif ( $score < $max ) {
-					return sprintf(
-						/* translators: %d: potential point improvement */
-						__( 'Add more schema types (Organization or Article) to improve your score by %d points.', 'getcited' ),
-						$improvement
-					);
+					return __( 'Add Organization or Article schema to help AI systems identify your content and authorship.', 'getcited' );
 				}
 				break;
 
@@ -448,11 +434,7 @@ class GetCited_Visibility_Score {
 				if ( $score < 10 ) {
 					return __( 'Your recent posts have low citability scores. Add clear summaries, headings, and author attribution.', 'getcited' );
 				} elseif ( $score < $max ) {
-					return sprintf(
-						/* translators: %d: potential point improvement */
-						__( 'Improving your content citability could add up to %d points. Check the Citability page for tips.', 'getcited' ),
-						$improvement
-					);
+					return __( 'Improve your content citability with clearer structure and attribution. Check the Citability page for tips.', 'getcited' );
 				}
 				break;
 
@@ -460,10 +442,9 @@ class GetCited_Visibility_Score {
 				if ( $score < $max ) {
 					$days = $score === 0 ? 180 : ( $score === 4 ? 90 : 30 );
 					return sprintf(
-						/* translators: 1: number of days, 2: potential point improvement */
-						__( 'Your most recent post is over %1$d days old. Publishing fresh content could add %2$d points.', 'getcited' ),
-						$days,
-						$improvement
+						/* translators: %d: number of days since last post */
+						__( 'Your most recent post is over %d days old. Fresh content signals active expertise to AI systems.', 'getcited' ),
+						$days
 					);
 				}
 				break;

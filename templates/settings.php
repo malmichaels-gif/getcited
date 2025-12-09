@@ -25,7 +25,7 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
 <div class="wrap getcited-wrap">
     <h1><?php esc_html_e( 'Settings', 'getcited' ); ?></h1>
     <p class="description">
-        <?php esc_html_e( 'Configure general options for GetCited.', 'getcited' ); ?>
+        <?php esc_html_e( 'Configure your site type for tailored recommendations and manage plugin data.', 'getcited' ); ?>
     </p>
 
     <div class="getcited-settings-page">
