@@ -664,6 +664,12 @@ class GetCited_Dashboard {
             return;
         }
 
+        // Don't show in wizard mode.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check.
+        if ( isset( $_GET['wizard'] ) ) {
+            return;
+        }
+
         // Only show on GetCited admin pages.
         $screen = get_current_screen();
         if ( ! $screen || strpos( $screen->id, 'getcited' ) === false ) {
@@ -674,7 +680,7 @@ class GetCited_Dashboard {
         <div class="notice notice-success is-dismissible getcited-citation-nudge" data-nonce="<?php echo esc_attr( wp_create_nonce( 'getcited_admin' ) ); ?>">
             <p>
                 <strong><?php esc_html_e( 'Setup complete!', 'getcited' ); ?></strong>
-                <?php esc_html_e( 'Your AI Citation Guidelines are now active. ChatGPT, Claude, and other AI systems will see how to properly cite your content.', 'getcited' ); ?>
+                <?php esc_html_e( 'Your AI Citation Guidelines are now active. ChatGPT, Gemini, Grok, Perplexity, and other AI systems will see how to properly cite your content.', 'getcited' ); ?>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>">
                     <?php esc_html_e( 'Customize →', 'getcited' ); ?>
                 </a>

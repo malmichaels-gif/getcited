@@ -2174,94 +2174,73 @@
      * Populate wizard Step 5 with scan results
      */
     function populateWizardStep5(wizard, scanData) {
-        var step5 = wizard.querySelector('[data-step="complete"]');
-        if (!step5) return;
+        var completeStep = wizard.querySelector('[data-step="complete"]');
+        if (!completeStep) return;
 
         var llmsTxt = scanData.llms_txt || '';
         var data = scanData.scan_data || {};
 
-        // Find or create the preview container
-        var previewContainer = step5.querySelector('.getcited-wizard-preview');
-        var summaryContainer = step5.querySelector('.getcited-setup-summary');
-        var statsContainer = step5.querySelector('.getcited-scan-stats');
-        var subtitle = step5.querySelector('.wizard-subtitle');
+        if (!llmsTxt) return;
 
-        // If we have llms.txt content, show the preview version
-        if (llmsTxt) {
-            // Update subtitle
-            if (subtitle) {
-                subtitle.textContent = "We scanned your site and created your llms.txt. Here's what AI systems will see:";
-            }
+        // Find the summary card container
+        var summaryCard = completeStep.querySelector('.wizard-summary-card');
+        if (!summaryCard) return;
 
-            // Hide the generic summary if it exists
-            if (summaryContainer) {
-                summaryContainer.style.display = 'none';
-            }
+        // Get site name from scan data
+        var siteInfo = data.site || {};
+        var siteName = siteInfo.name || '';
 
-            // Create or update preview
-            if (!previewContainer) {
-                previewContainer = document.createElement('div');
-                previewContainer.className = 'getcited-wizard-preview';
-                previewContainer.innerHTML = '<div class="preview-header"><span class="dashicons dashicons-media-text"></span><span>Your llms.txt</span></div><pre class="preview-content"></pre>';
+        // Calculate stats from scan data
+        var pages = (data.pages || []).length;
+        var posts = (data.posts || []).length;
+        var categories = (data.categories || []).length;
+        var social = Object.keys(data.social || {}).length;
 
-                var wizardContent = step5.querySelector('.wizard-content');
-                if (wizardContent && subtitle) {
-                    subtitle.insertAdjacentElement('afterend', previewContainer);
-                }
-            }
-            previewContainer.style.display = 'block';
-
-            var preContent = previewContainer.querySelector('.preview-content');
-            if (preContent) {
-                preContent.textContent = llmsTxt;
-            }
-
-            // Create or update stats
-            if (!statsContainer) {
-                statsContainer = document.createElement('div');
-                statsContainer.className = 'getcited-scan-stats';
-                previewContainer.insertAdjacentElement('afterend', statsContainer);
-            }
-            statsContainer.style.display = 'flex';
-
-            var pages = (data.pages || []).length;
-            var categories = (data.categories || []).length;
-            var posts = (data.posts || []).length;
-            var menu = (data.menu || []).length;
-            var social = Object.keys(data.social || {}).length;
-
-            statsContainer.innerHTML =
-                '<div class="stat-item"><span class="stat-number">' + pages + '</span><span class="stat-label">Pages</span></div>' +
-                '<div class="stat-item"><span class="stat-number">' + categories + '</span><span class="stat-label">Categories</span></div>' +
-                '<div class="stat-item"><span class="stat-number">' + posts + '</span><span class="stat-label">Posts</span></div>' +
-                '<div class="stat-item"><span class="stat-number">' + menu + '</span><span class="stat-label">Menu Items</span></div>' +
-                '<div class="stat-item"><span class="stat-number">' + social + '</span><span class="stat-label">Social Links</span></div>';
-
-            // Add description if not present
-            var description = step5.querySelector('.wizard-content > p.description');
-            if (!description) {
-                description = document.createElement('p');
-                description.className = 'description';
-                description.style.textAlign = 'center';
-                description.textContent = 'You can edit this anytime from the llms.txt Editor page.';
-                statsContainer.insertAdjacentElement('afterend', description);
-            }
-
-            // Show the secondary action link
-            var secondaryAction = step5.querySelector('.wizard-secondary-action');
-            if (!secondaryAction) {
-                var wizardActions = step5.querySelector('.wizard-actions');
-                if (wizardActions) {
-                    secondaryAction = document.createElement('p');
-                    secondaryAction.className = 'wizard-secondary-action';
-                    secondaryAction.innerHTML = '<a href="' + (getcitedAdmin.adminUrl || '/wp-admin/') + 'admin.php?page=getcited-llms-txt">or edit your llms.txt first</a>';
-                    wizardActions.appendChild(secondaryAction);
-                }
-            }
-            if (secondaryAction) {
-                secondaryAction.style.display = 'block';
-            }
+        // Build stats HTML - only show non-zero stats
+        var statsHtml = '';
+        if (pages > 0) {
+            statsHtml += '<span class="summary-stat-badge"><strong>' + pages + '</strong> Pages</span>';
         }
+        if (posts > 0) {
+            statsHtml += '<span class="summary-stat-badge"><strong>' + posts + '</strong> Posts</span>';
+        }
+        if (categories > 0) {
+            statsHtml += '<span class="summary-stat-badge"><strong>' + categories + '</strong> Categories</span>';
+        }
+        if (social > 0) {
+            statsHtml += '<span class="summary-stat-badge"><strong>' + social + '</strong> Social Profiles</span>';
+        }
+
+        // Build the full content card HTML
+        var fullContentHtml =
+            '<div class="summary-card-header">' +
+                '<span class="summary-card-title">' + (siteName || 'Your site') + '</span>' +
+            '</div>' +
+            '<div class="summary-card-stats">' + statsHtml + '</div>' +
+            '<details class="wizard-preview-details">' +
+                '<summary>View llms.txt preview</summary>' +
+                '<pre class="wizard-preview-code">' + escapeHtml(llmsTxt) + '</pre>' +
+            '</details>';
+
+        // Replace the summary card content
+        summaryCard.innerHTML = fullContentHtml;
+
+        // Show the "Edit llms.txt" link if not already present
+        var ctaSection = completeStep.querySelector('.wizard-complete-cta');
+        if (ctaSection && !ctaSection.querySelector('.wizard-edit-link')) {
+            var editLink = document.createElement('a');
+            editLink.href = (window.getcited_admin && window.getcited_admin.admin_url || '/wp-admin/') + 'admin.php?page=getcited-llms-txt';
+            editLink.className = 'wizard-edit-link';
+            editLink.textContent = 'Edit llms.txt';
+            ctaSection.appendChild(editLink);
+        }
+    }
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     // ==========================================================================
