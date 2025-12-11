@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.6
+ * Version: 1.9.7
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.6' );
+define( 'GETCITED_VERSION', '1.9.7' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -121,6 +121,7 @@ final class GetCited {
         // Schedule cron
         add_action( 'getcited_daily_cron', array( $this, 'run_daily_tasks' ) );
         add_action( 'getcited_weekly_schema_scan', array( $this, 'run_schema_scan' ) );
+        add_action( 'getcited_weekly_llms_refresh', array( $this, 'run_llms_refresh' ) );
 
         // REST API
         add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
@@ -151,6 +152,11 @@ final class GetCited {
         // Weekly schema detection scan
         if ( ! wp_next_scheduled( 'getcited_weekly_schema_scan' ) ) {
             wp_schedule_event( time(), 'weekly', 'getcited_weekly_schema_scan' );
+        }
+
+        // Weekly llms.txt content refresh (keeps recent posts current)
+        if ( ! wp_next_scheduled( 'getcited_weekly_llms_refresh' ) ) {
+            wp_schedule_event( time(), 'weekly', 'getcited_weekly_llms_refresh' );
         }
 
         // Run initial schema detection
@@ -185,6 +191,11 @@ final class GetCited {
         $timestamp = wp_next_scheduled( 'getcited_weekly_schema_scan' );
         if ( $timestamp ) {
             wp_unschedule_event( $timestamp, 'getcited_weekly_schema_scan' );
+        }
+
+        $timestamp = wp_next_scheduled( 'getcited_weekly_llms_refresh' );
+        if ( $timestamp ) {
+            wp_unschedule_event( $timestamp, 'getcited_weekly_llms_refresh' );
         }
 
         // Flush rewrite rules
@@ -445,6 +456,36 @@ final class GetCited {
 
         // Fire hook for extensions
         do_action( 'getcited_schema_scan' );
+    }
+
+    /**
+     * Run weekly llms.txt content refresh
+     *
+     * Regenerates llms.txt content to keep recent posts section current.
+     * Particularly useful for high-volume sites that publish frequently.
+     */
+    public function run_llms_refresh() {
+        $settings = GetCited_Settings::instance();
+
+        // Only refresh if llms.txt is enabled
+        if ( ! $settings->get( 'llms_txt_enabled' ) ) {
+            return;
+        }
+
+        $llms      = GetCited_Llms_Txt::instance();
+        $site_type = $settings->get( 'site_type' );
+
+        // Regenerate content with fresh recent posts
+        $content = $llms->generate_template( $site_type );
+        $settings->set( 'llms_txt_content', $content );
+
+        // Write physical file if enabled
+        if ( $settings->get( 'llms_write_physical' ) ) {
+            $llms->write_physical_file();
+        }
+
+        // Fire hook for extensions
+        do_action( 'getcited_llms_refresh' );
     }
 
     /**

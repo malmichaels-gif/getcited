@@ -752,6 +752,10 @@ class GetCited_Dashboard {
                 'title'   => __( 'Publish Original Data', 'getcited' ),
                 'content' => __( 'AIs love numbers because they anchor answers. Even small studies work: "We analyzed 23 landing pages..." or "We tested 10 subject lines..."', 'getcited' ),
             ),
+            array(
+                'title'   => __( 'AI Crawlers Visit on Their Schedule', 'getcited' ),
+                'content' => __( 'You can\'t request a scan from ChatGPT or other AI systems. They crawl sites on their own schedule (typically within 1-7 days). GetCited ensures you\'re ready when they arrive.', 'getcited' ),
+            ),
         );
 
         // Dynamic tips based on user's setup.

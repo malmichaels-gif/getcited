@@ -8,6 +8,9 @@
  */
 
 header( 'Content-Type: application/json' );
+
+// CORS: Allow any origin since the plugin runs on any WordPress site.
+// Security is handled via: honeypot, rate limiting, email validation.
 header( 'Access-Control-Allow-Origin: *' );
 header( 'Access-Control-Allow-Methods: POST, OPTIONS' );
 header( 'Access-Control-Allow-Headers: Content-Type' );
@@ -58,7 +61,11 @@ if ( ! empty( $honeypot ) ) {
 }
 
 // Rate limiting - 1 submission per minute per IP.
-// Handle proxies/CDNs (Kinsta uses Cloudflare).
+// IP Detection: Trust Cloudflare/proxy headers since this runs on Kinsta (behind Cloudflare).
+// Note: These headers can be spoofed, but the risk is acceptable here because:
+// 1. Rate limiting only prevents accidental double-submits, not security-critical
+// 2. Real protection comes from honeypot + email validation + UNIQUE constraint
+// 3. Worst case: spam emails in waitlist (low impact, easy to clean)
 $ip = $_SERVER['HTTP_CF_CONNECTING_IP']
 	?? $_SERVER['HTTP_X_FORWARDED_FOR']
 	?? $_SERVER['REMOTE_ADDR'];
@@ -94,7 +101,8 @@ $wpdb->query(
 );
 
 // Get total count (rounded for privacy).
-$count         = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `$table`" );
+// Use esc_sql() for defense in depth, even though $table is internally constructed.
+$count         = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `" . esc_sql( $table ) . "`" );
 $display_count = $count < 10 ? $count : floor( $count / 10 ) * 10;
 
 echo json_encode(

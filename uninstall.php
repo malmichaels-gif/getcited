@@ -35,6 +35,7 @@ function getcited_uninstall() {
         // Remove cron jobs
         wp_clear_scheduled_hook( 'getcited_daily_cron' );
         wp_clear_scheduled_hook( 'getcited_weekly_schema_scan' );
+        wp_clear_scheduled_hook( 'getcited_weekly_llms_refresh' );
 
         return;
     }
@@ -108,6 +109,7 @@ function getcited_uninstall() {
     // 5. Remove cron jobs
     wp_clear_scheduled_hook( 'getcited_daily_cron' );
     wp_clear_scheduled_hook( 'getcited_weekly_schema_scan' );
+    wp_clear_scheduled_hook( 'getcited_weekly_llms_refresh' );
 
     // 6. Remove GetCited rules from physical robots.txt if present
     getcited_cleanup_robots_txt();
