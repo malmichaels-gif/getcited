@@ -718,7 +718,7 @@ class GetCited_Dashboard {
     }
 
     /**
-     * Get AI visibility tips
+     * Get AI visibility tips (includes dynamic tips based on user's setup)
      *
      * @since 1.6.14
      * @return array Array of tips with title and content.
@@ -726,8 +726,10 @@ class GetCited_Dashboard {
     public static function get_tips() {
         $schema_url = admin_url( 'admin.php?page=getcited-schema' );
         $llms_url   = admin_url( 'admin.php?page=getcited-llms-txt' );
+        $settings   = GetCited_Settings::instance();
 
-        return array(
+        // Static tips (always shown).
+        $tips = array(
             array(
                 'title'   => __( 'Write Quotable Content', 'getcited' ),
                 'content' => __( 'Write content that\'s easy for AI to quote. If your paragraph could be read aloud by ChatGPT as a standalone answer, you\'re doing it right.', 'getcited' ),
@@ -744,56 +746,134 @@ class GetCited_Dashboard {
                 'title'   => __( 'Publish Original Data', 'getcited' ),
                 'content' => __( 'AIs love numbers because they anchor answers. Even small studies work: "We analyzed 23 landing pages..." or "We tested 10 subject lines..."', 'getcited' ),
             ),
-            array(
-                'title'   => __( 'Keep Identity Consistent', 'getcited' ),
-                /* translators: %s: URL to Schema settings page */
-                'content' => sprintf( __( 'Use the same name, bio, and expertise signal everywhere. AIs prefer people who look like authorities — <a href="%s">fill out your Organization and Author settings</a>.', 'getcited' ), esc_url( $schema_url ) ),
-            ),
-            array(
-                'title'   => __( 'Optimize Your llms.txt', 'getcited' ),
-                /* translators: %s: URL to llms.txt settings page */
-                'content' => sprintf( __( 'Your llms.txt file tells AI crawlers about your site. <a href="%s">Add your site description and key topics</a> to help AI understand your expertise.', 'getcited' ), esc_url( $llms_url ) ),
-            ),
         );
-    }
 
-    /**
-     * Get current tip index for user
-     *
-     * @since 1.6.14
-     * @return int Current tip index.
-     */
-    public static function get_current_tip_index() {
-        $user_id = get_current_user_id();
-        $index   = get_user_meta( $user_id, 'getcited_tip_index', true );
+        // Dynamic tips based on user's setup.
+        $org = $settings->get( 'organization' );
+        $citation_guidelines = $settings->get( 'citation_guidelines' );
+        $llms_content = $settings->get( 'llms_txt_content' );
 
-        if ( '' === $index ) {
-            $index = 0;
+        // Tip: Organization name configured.
+        if ( ! empty( $org['name'] ) ) {
+            $tips[] = array(
+                'title'   => __( 'Brand Identity Set', 'getcited' ),
+                /* translators: %s: Organization name */
+                'content' => sprintf( __( 'Great! "%s" is configured as your brand. AI systems will use this when citing your content.', 'getcited' ), esc_html( $org['name'] ) ),
+            );
+        } else {
+            $tips[] = array(
+                'title'   => __( 'Add Your Brand Name', 'getcited' ),
+                /* translators: %s: URL to Schema settings page */
+                'content' => sprintf( __( 'AI citations work better with a clear brand identity. <a href="%s">Add your organization name</a> so AI knows how to reference you.', 'getcited' ), esc_url( $schema_url ) ),
+            );
         }
 
-        return absint( $index );
+        // Tip: Social profiles.
+        $social_count = 0;
+        if ( ! empty( $org['social_urls'] ) && is_array( $org['social_urls'] ) ) {
+            $social_count = count( array_filter( $org['social_urls'] ) );
+        }
+        if ( $social_count > 0 ) {
+            $tips[] = array(
+                'title'   => __( 'Social Proof Active', 'getcited' ),
+                /* translators: %d: Number of social profiles */
+                'content' => sprintf( _n( 'You have %d social profile linked. AI systems use these to verify your identity and authority.', 'You have %d social profiles linked. AI systems use these to verify your identity and authority.', $social_count, 'getcited' ), $social_count ),
+            );
+        }
+
+        // Tip: Citation guidelines.
+        if ( ! empty( $citation_guidelines['enabled'] ) ) {
+            $tips[] = array(
+                'title'   => __( 'Citation Guidelines Active', 'getcited' ),
+                'content' => __( 'Your citation guidelines tell AI exactly how to reference your content. This improves accuracy and attribution.', 'getcited' ),
+            );
+        } else {
+            $tips[] = array(
+                'title'   => __( 'Add Citation Guidelines', 'getcited' ),
+                /* translators: %s: URL to llms.txt settings page */
+                'content' => sprintf( __( 'Tell AI how to cite you properly. <a href="%s">Add citation guidelines</a> like preferred format and accuracy requirements.', 'getcited' ), esc_url( $llms_url ) ),
+            );
+        }
+
+        // Tip: llms.txt content analysis.
+        if ( ! empty( $llms_content ) ) {
+            // Count sections/topics in llms.txt.
+            $section_count = substr_count( $llms_content, '##' );
+            if ( $section_count > 3 ) {
+                $tips[] = array(
+                    'title'   => __( 'Well-Structured llms.txt', 'getcited' ),
+                    /* translators: %d: Number of sections */
+                    'content' => sprintf( __( 'Your llms.txt has %d sections — a thorough structure helps AI understand your site\'s expertise areas.', 'getcited' ), $section_count ),
+                );
+            }
+        } else {
+            $tips[] = array(
+                'title'   => __( 'Create Your llms.txt', 'getcited' ),
+                /* translators: %s: URL to llms.txt settings page */
+                'content' => sprintf( __( 'You haven\'t set up llms.txt yet. <a href="%s">Scan your site</a> to generate one — it\'s how AI crawlers learn about your content.', 'getcited' ), esc_url( $llms_url ) ),
+            );
+        }
+
+        return $tips;
     }
 
     /**
-     * Get current tip for display
+     * Get a random tip index (avoiding recently shown tips)
+     *
+     * @since 1.6.14
+     * @return int Random tip index.
+     */
+    public static function get_random_tip_index() {
+        $tips      = self::get_tips();
+        $tip_count = count( $tips );
+        $user_id   = get_current_user_id();
+
+        // Get recently shown tips (avoid repeats).
+        $recent = get_user_meta( $user_id, 'getcited_recent_tips', true );
+        if ( ! is_array( $recent ) ) {
+            $recent = array();
+        }
+
+        // Keep recent list to half of total tips.
+        $max_recent = max( 1, (int) floor( $tip_count / 2 ) );
+
+        // Find available indices (not recently shown).
+        $available = array_diff( range( 0, $tip_count - 1 ), $recent );
+
+        // If all tips shown recently, reset.
+        if ( empty( $available ) ) {
+            $available = range( 0, $tip_count - 1 );
+            $recent    = array();
+        }
+
+        // Pick random from available.
+        $index = $available[ array_rand( $available ) ];
+
+        // Update recent list.
+        $recent[] = $index;
+        if ( count( $recent ) > $max_recent ) {
+            array_shift( $recent );
+        }
+        update_user_meta( $user_id, 'getcited_recent_tips', $recent );
+
+        return $index;
+    }
+
+    /**
+     * Get current tip for display (random selection)
      *
      * @since 1.6.14
      * @return array Current tip with title and content.
      */
     public static function get_current_tip() {
         $tips  = self::get_tips();
-        $index = self::get_current_tip_index();
-
-        // Ensure index is within bounds.
-        if ( $index >= count( $tips ) ) {
-            $index = 0;
-        }
+        $index = self::get_random_tip_index();
 
         return $tips[ $index ];
     }
 
     /**
-     * AJAX: Advance to next tip
+     * AJAX: Get next random tip
      *
      * @since 1.6.14
      */
@@ -804,13 +884,8 @@ class GetCited_Dashboard {
             wp_send_json_error( 'Permission denied' );
         }
 
-        $user_id = get_current_user_id();
-        $tips    = self::get_tips();
-        $index   = self::get_current_tip_index();
-
-        // Advance to next tip, wrap around.
-        $index = ( $index + 1 ) % count( $tips );
-        update_user_meta( $user_id, 'getcited_tip_index', $index );
+        $tips  = self::get_tips();
+        $index = self::get_random_tip_index();
 
         wp_send_json_success( array(
             'tip'   => $tips[ $index ],

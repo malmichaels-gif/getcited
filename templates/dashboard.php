@@ -43,10 +43,8 @@ if ( ! empty( $recent_posts ) ) {
 	}
 }
 
-// Get current tip for display (v1.6.14).
+// Get current tip for display.
 $current_tip = GetCited_Dashboard::get_current_tip();
-$tip_index   = GetCited_Dashboard::get_current_tip_index();
-$tips_count  = count( GetCited_Dashboard::get_tips() );
 ?>
 
 <div class="wrap getcited-wrap">
