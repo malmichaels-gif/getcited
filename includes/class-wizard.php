@@ -95,27 +95,27 @@ class GetCited_Wizard {
     public function get_steps() {
         return array(
             'welcome' => array(
-                'title' => __( 'Welcome to GetCited', 'getcited' ),
+                'title' => __( 'Welcome', 'getcited' ),
                 'description' => __( "Let's make your site visible to AI search engines.", 'getcited' ),
             ),
             'site_type' => array(
-                'title' => __( 'What type of site is this?', 'getcited' ),
+                'title' => __( 'Site Type', 'getcited' ),
                 'description' => __( 'This helps us configure optimal settings for you.', 'getcited' ),
             ),
             'organization' => array(
-                'title' => __( 'Organization Info', 'getcited' ),
+                'title' => __( 'Your Brand', 'getcited' ),
                 'description' => __( 'This information appears in schema markup.', 'getcited' ),
             ),
             'crawlers' => array(
-                'title' => __( 'AI Crawler Access', 'getcited' ),
+                'title' => __( 'AI Access', 'getcited' ),
                 'description' => __( 'Choose which AI systems can access your content.', 'getcited' ),
             ),
             'verify' => array(
-                'title' => __( 'Verifying llms.txt', 'getcited' ),
+                'title' => __( 'Verify', 'getcited' ),
                 'description' => __( 'Making sure AI systems can access your llms.txt file.', 'getcited' ),
             ),
             'complete' => array(
-                'title' => __( 'All Set!', 'getcited' ),
+                'title' => __( 'Done!', 'getcited' ),
                 'description' => __( 'Your site is now optimized for AI visibility.', 'getcited' ),
             ),
         );

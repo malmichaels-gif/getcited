@@ -2473,21 +2473,21 @@
 .getcited-wizard-wrap {
     background: var(--getcited-gray-100);
     margin: -20px 0 0 -20px;
-    padding: var(--getcited-space-2xl);
+    padding: 26px var(--getcited-space-2xl) var(--getcited-space-2xl);
     min-height: calc(100vh - 32px);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    box-sizing: border-box;
 }
 
 .getcited-wizard {
     background: #fff;
     border-radius: var(--getcited-radius-lg);
     box-shadow: var(--getcited-shadow-lg);
-    max-width: 800px; /* Increased from 700px */
+    max-width: 960px;
     width: 100%;
-    overflow: visible; /* Changed from hidden to allow content to render properly */
-    min-height: 400px; /* Ensure minimum height for content */
+    overflow: hidden;
 }
 
 /* v1.8.0 Minimal Progress Bar - Numbered Steps */
@@ -2495,8 +2495,9 @@
     display: flex;
     justify-content: center;
     gap: 0;
-    padding: 32px 48px;
-    background: transparent;
+    padding: 32px 24px;
+    background: #fff;
+    border-bottom: 1px solid var(--getcited-border);
 }
 
 /* No background connector line - using ::after on steps */
@@ -2550,13 +2551,20 @@
 .getcited-wizard-progress .progress-step.completed .step-number {
     border-color: var(--getcited-primary);
     background: var(--getcited-primary);
-    color: white;
+    color: transparent;
+    font-size: 0;
+    position: relative;
 }
 
 .getcited-wizard-progress .progress-step.completed .step-number::after {
     content: '✓';
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /* Connecting line between steps */
@@ -2585,9 +2593,16 @@
 }
 
 .getcited-wizard-step {
-    padding: var(--getcited-space-2xl);
+    padding: var(--getcited-space-md) var(--getcited-space-2xl) var(--getcited-space-2xl);
     display: none; /* Hidden by default, JS will show active step */
     animation: wizard-step-enter 0.4s ease-out;
+    min-height: 480px;
+    flex-direction: column;
+}
+
+/* When step is visible (JS sets display: flex), ensure column layout */
+.getcited-wizard-step[style*="display: flex"] {
+    flex-direction: column;
 }
 
 @keyframes wizard-step-enter {
@@ -2603,7 +2618,7 @@
 
 /* Ensure first step is visible before JS loads */
 .getcited-wizard-step[data-step="welcome"] {
-    display: block;
+    display: flex;
 }
 
 /* Ensure step content is visible when step is shown */
@@ -2616,16 +2631,28 @@
 
 .wizard-content {
     text-align: center;
-    margin-bottom: var(--getcited-space-xl);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.wizard-actions {
+    margin-top: auto;
+    padding-top: var(--getcited-space-lg);
+    text-align: center;
 }
 
 /* v1.8.0 Welcome Step - Typography-Driven, Centered */
 .getcited-wizard-step[data-step="welcome"] .wizard-content {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    max-width: 480px;
-    margin: 0 auto var(--getcited-space-xl);
-    padding: 48px 24px;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 24px 16px;
 }
 
 /* Brand icon - simple star accent */
@@ -2643,7 +2670,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 /* Simplified icon - smaller, less glow */
@@ -2726,19 +2753,15 @@
     margin: 0;
 }
 
-.wizard-actions {
-    text-align: center;
-}
-
 /* v1.8.0 Hero Button - Solid, no gradient */
 .wizard-actions .button-hero,
 .button-hero {
     background: var(--getcited-primary);
     border: none;
-    padding: 14px 32px;
-    font-size: 16px;
+    padding: 20px 48px;
+    font-size: 18px;
     font-weight: 600;
-    border-radius: 10px;
+    border-radius: 12px;
     color: #fff;
     height: auto;
     transition: background var(--getcited-transition);
@@ -2754,6 +2777,30 @@
 .wizard-actions .button-hero:active,
 .button-hero:active {
     background: var(--getcited-primary-hover);
+}
+
+/* Back and Continue buttons - uniform primary style */
+.wizard-actions .getcited-wizard-back,
+.wizard-actions .getcited-wizard-next {
+    background: var(--getcited-primary) !important;
+    border: none !important;
+    padding: 14px 28px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+    height: auto !important;
+    min-width: 140px;
+    line-height: 1.4 !important;
+    box-sizing: border-box;
+    transition: background var(--getcited-transition);
+    cursor: pointer;
+}
+
+.wizard-actions .getcited-wizard-back:hover,
+.wizard-actions .getcited-wizard-next:hover {
+    background: var(--getcited-primary-hover);
+    color: #fff;
 }
 
 /* Responsive */
@@ -2782,27 +2829,198 @@
     color: var(--getcited-gray-700);
 }
 
-/* Stacked wizard actions (completion screen) */
-.wizard-actions-stacked {
+/* Skip setup link - two lines */
+.wizard-skip-link .getcited-wizard-skip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.4;
+}
+
+.wizard-skip-link .getcited-wizard-skip span {
+    font-size: 13px;
+    color: var(--getcited-gray-400);
+}
+
+/* ==============================================
+   Wizard Completion Step - Refined Design
+   ============================================== */
+
+.wizard-complete-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Success Badge */
+.wizard-success-badge {
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.wizard-success-badge .success-checkmark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 50%;
+    color: white;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    animation: successPop 0.4s ease-out;
+}
+
+@keyframes successPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.wizard-complete-content h1 {
+    font-size: 28px;
+    margin-bottom: var(--getcited-space-xs);
+}
+
+.wizard-complete-content .wizard-subtitle {
+    margin-bottom: var(--getcited-space-xl);
+    color: var(--getcited-gray-500);
+}
+
+/* Summary Card */
+.wizard-summary-card {
+    background: var(--getcited-white);
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-lg);
+    padding: var(--getcited-space-lg);
+    text-align: left;
+    margin-bottom: var(--getcited-space-xl);
+}
+
+.summary-card-header {
+    margin-bottom: var(--getcited-space-md);
+}
+
+.summary-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--getcited-gray-500);
+}
+
+.summary-card-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: var(--getcited-space-md);
+}
+
+.summary-stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--getcited-gray-50);
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--getcited-gray-600);
+}
+
+.summary-stat-badge strong {
+    color: var(--getcited-gray-800);
+    font-weight: 600;
+}
+
+/* Collapsible Preview */
+.wizard-preview-details {
+    border-top: 1px solid var(--getcited-gray-100);
+    padding-top: var(--getcited-space-md);
+}
+
+.wizard-preview-details summary {
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--getcited-gray-500);
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.wizard-preview-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.wizard-preview-details summary::before {
+    content: '▸';
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.wizard-preview-details[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.wizard-preview-details summary:hover {
+    color: var(--getcited-gray-700);
+}
+
+.wizard-preview-code {
+    margin-top: var(--getcited-space-md);
+    padding: var(--getcited-space-md);
+    background: var(--getcited-gray-800);
+    border-radius: var(--getcited-radius-sm);
+    color: var(--getcited-gray-300);
+    font-size: 12px;
+    line-height: 1.5;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Checklist (no-scan fallback) */
+.summary-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    font-size: 15px;
+    color: var(--getcited-gray-700);
+}
+
+.checklist-item .dashicons {
+    color: var(--getcited-success);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+/* CTA Section */
+.wizard-complete-cta {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--getcited-space-md);
 }
 
-.wizard-secondary-action {
-    margin: 0;
-    font-size: 16px;
+.wizard-complete-cta .button-hero {
+    min-width: 200px;
 }
 
-.wizard-secondary-action a {
-    color: var(--getcited-neutral);
+.wizard-edit-link {
+    font-size: 14px;
+    color: var(--getcited-gray-500);
     text-decoration: none;
-    font-weight: 500;
 }
 
-.wizard-secondary-action a:hover {
-    color: var(--getcited-neutral-dark);
+.wizard-edit-link:hover {
+    color: var(--getcited-primary);
     text-decoration: underline;
 }
 
@@ -2839,15 +3057,18 @@
 }
 
 .getcited-skip-scan {
-    display: inline-block;
-    margin-left: var(--getcited-space-md);
+    display: block;
+    width: 100%;
+    margin-top: var(--getcited-space-md);
     color: var(--getcited-gray-500);
-    font-size: 15px;
+    font-size: 14px;
     text-decoration: none;
+    text-align: center;
 }
 
 .getcited-skip-scan:hover {
     color: var(--getcited-gray-700);
+    text-decoration: underline;
 }
 
 .getcited-skip-scan.prominent {
@@ -2896,6 +3117,12 @@
     border-radius: var(--getcited-radius-lg);
     text-align: center;
     transition: border-color var(--getcited-transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 130px;
+    box-sizing: border-box;
 }
 
 /* No gradient bar */
@@ -3087,6 +3314,62 @@
     box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.15);
 }
 
+/* Organization Name Input with Scan Status */
+.org-name-input-wrap {
+    position: relative;
+}
+
+.org-name-input-wrap input {
+    padding-right: 16px;
+}
+
+.org-name-status {
+    display: none;
+    margin-top: var(--getcited-space-sm);
+    text-align: center;
+}
+
+.org-scanning {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--getcited-gray-500);
+}
+
+.org-scanning .spinner {
+    margin: 0;
+    float: none;
+}
+
+.org-auto-detected {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: var(--getcited-space-sm);
+    font-size: 13px;
+    color: var(--getcited-success);
+}
+
+.org-auto-detected .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Scanning animation on input */
+.org-name-input-wrap.scanning input {
+    background: linear-gradient(90deg, transparent 0%, rgba(100, 116, 139, 0.05) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: scanPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes scanPulse {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 /* Setup Summary */
 .getcited-setup-summary {
     display: flex;
@@ -3122,7 +3405,81 @@
 }
 
 .verify-state {
-    padding: var(--getcited-space-lg) 0;
+    padding: var(--getcited-space-sm) 0;
+}
+
+.verify-state.verify-needs-fix {
+    padding-top: var(--getcited-space-sm);
+}
+
+/* Verify Action Card */
+.verify-action-card {
+    background: var(--getcited-white);
+    border: 1px solid var(--getcited-gray-200);
+    border-radius: var(--getcited-radius-lg);
+    padding: var(--getcited-space-lg);
+    text-align: left;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.verify-action-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.verify-action-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--getcited-primary) 0%, #e67e22 100%);
+    border-radius: var(--getcited-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verify-action-icon .dashicons {
+    color: var(--getcited-white);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.verify-action-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.verify-action-text strong {
+    display: block;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--getcited-gray-800);
+    margin-bottom: 4px;
+}
+
+.verify-action-text span {
+    display: block;
+    font-size: 14px;
+    color: var(--getcited-gray-500);
+    line-height: 1.4;
+}
+
+.verify-action-card .verify-host-guidance {
+    margin-bottom: var(--getcited-space-md);
+}
+
+.verify-action-buttons {
+    margin-bottom: var(--getcited-space-md);
+}
+
+.verify-action-buttons .getcited-save-file-btn {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .verify-spinner {
@@ -3135,13 +3492,13 @@
 }
 
 .verify-icon {
-    width: 80px;
-    height: 80px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto var(--getcited-space-lg);
+    margin: 0 auto var(--getcited-space-sm);
 }
 
 .verify-icon.success {
@@ -3150,9 +3507,9 @@
 
 .verify-icon.success .dashicons {
     color: var(--getcited-success);
-    font-size: 42px;
-    width: 40px;
-    height: 40px;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
 }
 
 .verify-icon.warning {
@@ -3161,9 +3518,9 @@
 
 .verify-icon.warning .dashicons {
     color: var(--getcited-warning);
-    font-size: 42px;
-    width: 40px;
-    height: 40px;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
 }
 
 .verify-icon.info {
@@ -3172,15 +3529,15 @@
 
 .verify-icon.info .dashicons {
     color: var(--getcited-gray-500);
-    font-size: 42px;
-    width: 40px;
-    height: 40px;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
 }
 
 .verify-state h2 {
-    font-size: 26px;
+    font-size: 22px;
     color: var(--getcited-gray-800);
-    margin: 0 0 var(--getcited-space-md) 0;
+    margin: 0 0 var(--getcited-space-xs) 0;
 }
 
 .verify-url {
@@ -3198,8 +3555,8 @@
 
 .verify-message {
     color: var(--getcited-gray-600);
-    font-size: 16px;
-    margin: 0 0 var(--getcited-space-lg) 0;
+    font-size: 15px;
+    margin: 0 0 var(--getcited-space-sm) 0;
 }
 
 .verify-host-guidance {
@@ -3232,38 +3589,36 @@
     color: var(--getcited-neutral);
 }
 
-.verify-fix-options {
-    text-align: left;
+/* Verify Alternative Options (Inline) */
+.verify-alt-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-top: var(--getcited-space-sm);
+    border-top: 1px solid var(--getcited-gray-100);
 }
 
-.verify-fix-options h3 {
-    font-size: 18px;
-    color: var(--getcited-gray-700);
-    margin: 0 0 var(--getcited-space-md) 0;
+.verify-alt-label {
+    color: var(--getcited-gray-400);
+    font-size: 13px;
 }
 
-.verify-fix-options .getcited-radio-card {
-    margin-bottom: var(--getcited-space-sm);
+.verify-alt-sep {
+    color: var(--getcited-gray-300);
+    font-size: 13px;
 }
 
-.verify-fix-options .radio-card-content {
-    padding: var(--getcited-space-md);
+.verify-alt-link {
+    color: var(--getcited-gray-500);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color var(--getcited-transition);
 }
 
-.verify-fix-options .radio-card-content .dashicons {
-    font-size: 26px;
-    width: 24px;
-    height: 24px;
-}
-
-.verify-fix-options .radio-card-content strong {
-    font-size: 16px;
-}
-
-.verify-fix-options .radio-card-content p {
-    padding-left: 0;
-    margin-top: var(--getcited-space-xs);
-    font-size: 14px;
+.verify-alt-link:hover {
+    color: var(--getcited-primary);
+    text-decoration: underline;
 }
 
 .fixing-message {

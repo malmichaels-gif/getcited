@@ -48,7 +48,7 @@ if ( empty( $org['name'] ) ) {
                 <div class="wizard-hero-text">
                     <h1><?php esc_html_e( 'Welcome to GetCited', 'getcited' ); ?></h1>
                     <p class="wizard-subtitle">
-                        <?php esc_html_e( "Let's make your site visible to AI search engines like ChatGPT, Claude, and Perplexity.", 'getcited' ); ?>
+                        <?php esc_html_e( "Let's make your site visible to AI search engines like ChatGPT, Google Gemini, Grok, Claude, Perplexity, and more.", 'getcited' ); ?>
                     </p>
                     <p>
                         <?php esc_html_e( 'This quick setup takes about 2 minutes.', 'getcited' ); ?>
@@ -59,9 +59,10 @@ if ( empty( $org['name'] ) ) {
                 <button type="button" class="button button-primary button-hero getcited-wizard-next">
                     <?php esc_html_e( 'Get Started', 'getcited' ); ?> →
                 </button>
-                <p>
+                <p class="wizard-skip-link">
                     <a href="#" class="getcited-wizard-skip">
-                        <?php esc_html_e( 'Skip setup (configure manually)', 'getcited' ); ?>
+                        <?php esc_html_e( 'Skip Setup', 'getcited' ); ?>
+                        <span><?php esc_html_e( '(configure manually)', 'getcited' ); ?></span>
                     </a>
                 </p>
             </div>
@@ -72,7 +73,7 @@ if ( empty( $org['name'] ) ) {
             <div class="wizard-content">
                 <h1><?php esc_html_e( 'What type of site is this?', 'getcited' ); ?></h1>
                 <p class="wizard-subtitle">
-                    <?php esc_html_e( 'This helps us configure optimal llms.txt and schema settings.', 'getcited' ); ?>
+                    <?php esc_html_e( "We'll set up the best options for your type of website.", 'getcited' ); ?>
                 </p>
 
                 <div class="getcited-site-types">
@@ -88,14 +89,6 @@ if ( empty( $org['name'] ) ) {
                         </label>
                     <?php endforeach; ?>
                 </div>
-
-                <!-- Scan Progress (hidden by default, shown during async scan) -->
-                <div class="getcited-scan-progress" style="display: none;">
-                    <div class="scan-progress-bar">
-                        <div class="scan-progress-fill"></div>
-                    </div>
-                    <p class="scan-status-text"><?php esc_html_e( 'Scanning your site...', 'getcited' ); ?></p>
-                </div>
             </div>
             <div class="wizard-actions">
                 <button type="button" class="button getcited-wizard-back">
@@ -104,28 +97,37 @@ if ( empty( $org['name'] ) ) {
                 <button type="button" class="button button-primary getcited-wizard-next">
                     <?php esc_html_e( 'Continue', 'getcited' ); ?> →
                 </button>
-                <a href="#" class="getcited-skip-scan" style="display: none;">
-                    <?php esc_html_e( 'Skip scan', 'getcited' ); ?>
-                </a>
             </div>
         </div>
 
         <!-- Step 3: Organization Info -->
         <div class="getcited-wizard-step" data-step="organization" style="display: none;">
             <div class="wizard-content">
-                <h1><?php esc_html_e( 'Organization Info', 'getcited' ); ?></h1>
+                <h1><?php esc_html_e( "What's your site called?", 'getcited' ); ?></h1>
                 <p class="wizard-subtitle">
-                    <?php esc_html_e( 'This information appears in your schema markup to help AI identify your brand.', 'getcited' ); ?>
+                    <?php esc_html_e( 'AI assistants will use this name when talking about your website.', 'getcited' ); ?>
                 </p>
-                
+
                 <div class="getcited-org-form">
                     <div class="form-field">
-                        <label for="wizard_org_name"><?php esc_html_e( 'Organization Name', 'getcited' ); ?></label>
-                        <input type="text"
-                               id="wizard_org_name"
-                               name="organization[name]"
-                               value="<?php echo esc_attr( $org['name'] ); ?>"
-                               placeholder="<?php esc_attr_e( 'Your Site or Company Name', 'getcited' ); ?>">
+                        <label for="wizard_org_name"><?php esc_html_e( 'Your Site or Business Name', 'getcited' ); ?></label>
+                        <div class="org-name-input-wrap">
+                            <input type="text"
+                                   id="wizard_org_name"
+                                   name="organization[name]"
+                                   value=""
+                                   placeholder="<?php esc_attr_e( 'Your Site or Company Name', 'getcited' ); ?>">
+                            <span class="org-name-status">
+                                <span class="org-scanning">
+                                    <span class="spinner is-active"></span>
+                                    <?php esc_html_e( 'Finding your site name...', 'getcited' ); ?>
+                                </span>
+                            </span>
+                            <span class="org-auto-detected" style="display: none;">
+                                <span class="dashicons dashicons-yes-alt"></span>
+                                <?php esc_html_e( 'Auto-detected from your site', 'getcited' ); ?>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -142,20 +144,20 @@ if ( empty( $org['name'] ) ) {
         <!-- Step 4: Crawlers -->
         <div class="getcited-wizard-step" data-step="crawlers" style="display: none;">
             <div class="wizard-content">
-                <h1><?php esc_html_e( 'AI Crawler Access', 'getcited' ); ?></h1>
+                <h1><?php esc_html_e( 'Allow AI to visit your site?', 'getcited' ); ?></h1>
                 <p class="wizard-subtitle">
-                    <?php esc_html_e( 'AI systems like ChatGPT and Perplexity use crawlers to find and cite content.', 'getcited' ); ?>
+                    <?php esc_html_e( 'AI assistants visit websites to learn about them and share your content with users.', 'getcited' ); ?>
                 </p>
-                
+
                 <div class="getcited-crawler-choice">
                     <label class="getcited-radio-card selected">
                         <input type="radio" name="crawler_choice" value="allow_all" checked>
                         <div class="radio-card-content">
                             <span class="card-check"></span>
                             <span class="dashicons dashicons-yes-alt"></span>
-                            <strong><?php esc_html_e( 'Allow all AI crawlers', 'getcited' ); ?></strong>
+                            <strong><?php esc_html_e( 'Yes, allow all AI assistants', 'getcited' ); ?></strong>
                             <span class="recommended-badge"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
-                            <p><?php esc_html_e( 'Maximize visibility to ChatGPT, Claude, Perplexity, and other AI systems.', 'getcited' ); ?></p>
+                            <p><?php esc_html_e( 'Get found by ChatGPT, Claude, Perplexity, Gemini, and others.', 'getcited' ); ?></p>
                         </div>
                     </label>
 
@@ -164,8 +166,8 @@ if ( empty( $org['name'] ) ) {
                         <div class="radio-card-content">
                             <span class="card-check"></span>
                             <span class="dashicons dashicons-admin-generic"></span>
-                            <strong><?php esc_html_e( 'Let me customize', 'getcited' ); ?></strong>
-                            <p><?php esc_html_e( "I'll choose which crawlers to allow after setup.", 'getcited' ); ?></p>
+                            <strong><?php esc_html_e( 'Let me choose later', 'getcited' ); ?></strong>
+                            <p><?php esc_html_e( "I'll pick which AI assistants can visit after setup.", 'getcited' ); ?></p>
                         </div>
                     </label>
                 </div>
@@ -183,9 +185,9 @@ if ( empty( $org['name'] ) ) {
         <!-- Step 5: Verify llms.txt -->
         <div class="getcited-wizard-step" data-step="verify" style="display: none;">
             <div class="wizard-content">
-                <h1><?php esc_html_e( 'Verifying llms.txt', 'getcited' ); ?></h1>
+                <h1><?php esc_html_e( 'Checking Your Setup', 'getcited' ); ?></h1>
                 <p class="wizard-subtitle">
-                    <?php esc_html_e( 'Making sure AI systems can access your llms.txt file.', 'getcited' ); ?>
+                    <?php esc_html_e( 'Making sure AI assistants can find your site information.', 'getcited' ); ?>
                 </p>
 
                 <!-- Verification States -->
@@ -196,7 +198,7 @@ if ( empty( $org['name'] ) ) {
                         <div class="verify-spinner">
                             <span class="spinner is-active"></span>
                         </div>
-                        <p><?php esc_html_e( 'Checking if AI systems can access your llms.txt...', 'getcited' ); ?></p>
+                        <p><?php esc_html_e( 'Checking your setup...', 'getcited' ); ?></p>
                     </div>
 
                     <!-- Success State -->
@@ -204,69 +206,50 @@ if ( empty( $org['name'] ) ) {
                         <div class="verify-icon success">
                             <span class="dashicons dashicons-yes-alt"></span>
                         </div>
-                        <h2><?php esc_html_e( 'Success!', 'getcited' ); ?></h2>
+                        <h2><?php esc_html_e( 'Looking good!', 'getcited' ); ?></h2>
                         <p class="verify-url">
-                            <?php esc_html_e( 'Your llms.txt is live and accessible at:', 'getcited' ); ?><br>
+                            <?php esc_html_e( 'Your site info is ready at:', 'getcited' ); ?><br>
                             <a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" class="llms-url-link">
                                 <?php echo esc_html( home_url( '/llms.txt' ) ); ?>
                             </a>
                         </p>
-                        <p class="verify-message"><?php esc_html_e( 'AI crawlers can now discover and understand your site.', 'getcited' ); ?></p>
+                        <p class="verify-message"><?php esc_html_e( 'AI assistants can now find and share your content with users.', 'getcited' ); ?></p>
                     </div>
 
                     <!-- Needs Fix State -->
                     <div class="verify-state verify-needs-fix" style="display: none;">
-                        <div class="verify-icon warning">
-                            <span class="dashicons dashicons-warning"></span>
-                        </div>
-                        <h2><?php esc_html_e( "We couldn't access your llms.txt", 'getcited' ); ?></h2>
-                        <p class="verify-message">
-                            <?php esc_html_e( "Your hosting may not route .txt files through WordPress. Don't worry - we can fix this!", 'getcited' ); ?>
-                        </p>
-
-                        <!-- Host-specific guidance (shown if detected) -->
-                        <div class="verify-host-guidance" style="display: none;">
-                            <div class="host-guidance-box">
-                                <strong class="host-title"></strong>
-                                <p class="host-message"></p>
-                                <a href="#" class="host-docs-link" target="_blank"><?php esc_html_e( 'View documentation', 'getcited' ); ?></a>
-                            </div>
-                        </div>
-
-                        <!-- Fix Options -->
-                        <div class="verify-fix-options">
-                            <h3><?php esc_html_e( 'Choose how to proceed:', 'getcited' ); ?></h3>
-
-                            <label class="getcited-radio-card verify-option selected" data-option="write_physical">
-                                <input type="radio" name="verify_fix" value="write_physical" checked>
-                                <div class="radio-card-content">
-                                    <span class="card-check"></span>
+                        <div class="verify-action-card">
+                            <div class="verify-action-header">
+                                <span class="verify-action-icon">
                                     <span class="dashicons dashicons-media-text"></span>
-                                    <strong><?php esc_html_e( 'Write a physical file', 'getcited' ); ?></strong>
-                                    <span class="recommended-badge"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
-                                    <p><?php esc_html_e( 'Creates an actual llms.txt file on your server.', 'getcited' ); ?></p>
+                                </span>
+                                <div class="verify-action-text">
+                                    <strong><?php esc_html_e( 'Save your llms.txt file', 'getcited' ); ?></strong>
+                                    <span><?php esc_html_e( 'This lets AI assistants find and cite your content.', 'getcited' ); ?></span>
                                 </div>
-                            </label>
+                            </div>
 
-                            <label class="getcited-radio-card verify-option" data-option="download">
-                                <input type="radio" name="verify_fix" value="download">
-                                <div class="radio-card-content">
-                                    <span class="card-check"></span>
-                                    <span class="dashicons dashicons-download"></span>
-                                    <strong><?php esc_html_e( 'Download and upload manually', 'getcited' ); ?></strong>
-                                    <p><?php esc_html_e( 'Download the file and upload via SFTP/cPanel.', 'getcited' ); ?></p>
+                            <!-- Host-specific guidance (shown if detected) -->
+                            <div class="verify-host-guidance" style="display: none;">
+                                <div class="host-guidance-box">
+                                    <strong class="host-title"></strong>
+                                    <p class="host-message"></p>
+                                    <a href="#" class="host-docs-link" target="_blank"><?php esc_html_e( 'Learn more', 'getcited' ); ?></a>
                                 </div>
-                            </label>
+                            </div>
 
-                            <label class="getcited-radio-card verify-option" data-option="skip">
-                                <input type="radio" name="verify_fix" value="skip">
-                                <div class="radio-card-content">
-                                    <span class="card-check"></span>
-                                    <span class="dashicons dashicons-clock"></span>
-                                    <strong><?php esc_html_e( 'Skip for now', 'getcited' ); ?></strong>
-                                    <p><?php esc_html_e( "I'll fix this later in settings.", 'getcited' ); ?></p>
-                                </div>
-                            </label>
+                            <div class="verify-action-buttons">
+                                <button type="button" class="button button-primary getcited-save-file-btn">
+                                    <?php esc_html_e( 'Save File', 'getcited' ); ?>
+                                </button>
+                            </div>
+
+                            <div class="verify-alt-options">
+                                <span class="verify-alt-label"><?php esc_html_e( 'or', 'getcited' ); ?></span>
+                                <a href="#" class="verify-alt-link" data-action="download"><?php esc_html_e( 'Download manually', 'getcited' ); ?></a>
+                                <span class="verify-alt-sep">·</span>
+                                <a href="#" class="verify-alt-link" data-action="skip"><?php esc_html_e( 'Skip for now', 'getcited' ); ?></a>
+                            </div>
                         </div>
                     </div>
 
@@ -275,7 +258,7 @@ if ( empty( $org['name'] ) ) {
                         <div class="verify-spinner">
                             <span class="spinner is-active"></span>
                         </div>
-                        <p class="fixing-message"><?php esc_html_e( 'Writing physical file...', 'getcited' ); ?></p>
+                        <p class="fixing-message"><?php esc_html_e( 'Saving file...', 'getcited' ); ?></p>
                     </div>
 
                     <!-- Manual Upload State -->
@@ -283,19 +266,19 @@ if ( empty( $org['name'] ) ) {
                         <div class="verify-icon info">
                             <span class="dashicons dashicons-download"></span>
                         </div>
-                        <h2><?php esc_html_e( 'Manual Upload Required', 'getcited' ); ?></h2>
+                        <h2><?php esc_html_e( 'Please upload the file', 'getcited' ); ?></h2>
                         <p class="verify-message">
-                            <?php esc_html_e( 'Your hosting does not allow automatic file creation. Please download the file and upload it to your site root via SFTP or cPanel.', 'getcited' ); ?>
+                            <?php esc_html_e( 'Your web host doesn\'t allow us to save files automatically. Please download this file and upload it to your website.', 'getcited' ); ?>
                         </p>
                         <div class="manual-instructions">
                             <ol>
                                 <li><?php esc_html_e( 'Click the download button below', 'getcited' ); ?></li>
-                                <li><?php esc_html_e( 'Connect to your site via SFTP or cPanel File Manager', 'getcited' ); ?></li>
-                                <li><?php esc_html_e( 'Upload llms.txt to your site root (same folder as wp-config.php)', 'getcited' ); ?></li>
+                                <li><?php esc_html_e( 'Log into your web hosting control panel', 'getcited' ); ?></li>
+                                <li><?php esc_html_e( 'Upload the file to your main website folder', 'getcited' ); ?></li>
                             </ol>
                             <a href="#" class="button button-primary getcited-download-llms">
                                 <span class="dashicons dashicons-download"></span>
-                                <?php esc_html_e( 'Download llms.txt', 'getcited' ); ?>
+                                <?php esc_html_e( 'Download File', 'getcited' ); ?>
                             </a>
                         </div>
                         <p class="wordpress-com-note" style="display: none;">
@@ -315,12 +298,6 @@ if ( empty( $org['name'] ) ) {
                 <button type="button" class="button button-primary getcited-wizard-next verify-continue-btn" style="display: none;">
                     <?php esc_html_e( 'Continue', 'getcited' ); ?> →
                 </button>
-                <button type="button" class="button button-primary getcited-verify-fix-btn" style="display: none;">
-                    <?php esc_html_e( 'Try Selected Option', 'getcited' ); ?> →
-                </button>
-                <button type="button" class="button getcited-verify-skip-btn" style="display: none;">
-                    <?php esc_html_e( 'Skip and finish setup', 'getcited' ); ?> →
-                </button>
             </div>
         </div>
 
@@ -331,84 +308,92 @@ if ( empty( $org['name'] ) ) {
             $has_scan    = $wizard_scan && ! empty( $wizard_scan['llms_txt'] );
             $scan_data   = $has_scan ? $wizard_scan['scan_data'] : array();
             ?>
-            <div class="wizard-content">
-                <div class="wizard-icon success">
-                    <span class="dashicons dashicons-yes"></span>
+            <div class="wizard-content wizard-complete-content">
+                <!-- Success Badge -->
+                <div class="wizard-success-badge">
+                    <span class="success-checkmark">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
                 </div>
-                <h1><?php esc_html_e( 'All Set!', 'getcited' ); ?></h1>
+
+                <h1><?php esc_html_e( 'You\'re all set!', 'getcited' ); ?></h1>
+                <p class="wizard-subtitle">
+                    <?php esc_html_e( 'Your site is now discoverable by AI assistants.', 'getcited' ); ?>
+                </p>
 
                 <?php if ( $has_scan ) : ?>
-                    <p class="wizard-subtitle">
-                        <?php esc_html_e( "We scanned your site and created your llms.txt. Here's what AI systems will see:", 'getcited' ); ?>
-                    </p>
-
-                    <div class="getcited-wizard-preview">
-                        <div class="preview-header">
-                            <span class="dashicons dashicons-media-text"></span>
-                            <span><?php esc_html_e( 'Your llms.txt', 'getcited' ); ?></span>
+                    <!-- Content Summary Card -->
+                    <div class="wizard-summary-card">
+                        <div class="summary-card-header">
+                            <?php $site_name = get_bloginfo( 'name' ); ?>
+                            <span class="summary-card-title"><?php echo esc_html( $site_name ? $site_name : __( 'Your site', 'getcited' ) ); ?></span>
                         </div>
-                        <pre class="preview-content"><?php echo esc_html( $wizard_scan['llms_txt'] ); ?></pre>
+                        <div class="summary-card-stats">
+                            <?php
+                            // Use actual site totals, not scan_data limits
+                            $page_count     = (int) wp_count_posts( 'page' )->publish;
+                            $post_count     = (int) wp_count_posts( 'post' )->publish;
+                            $category_count = (int) wp_count_terms( array( 'taxonomy' => 'category', 'hide_empty' => false ) );
+                            $social_count   = is_array( $scan_data['social'] ?? null ) ? count( $scan_data['social'] ) : 0;
+
+                            $stats = array(
+                                'pages'      => array( 'count' => $page_count, 'label' => __( 'Pages', 'getcited' ) ),
+                                'posts'      => array( 'count' => $post_count, 'label' => __( 'Posts', 'getcited' ) ),
+                                'categories' => array( 'count' => $category_count, 'label' => __( 'Categories', 'getcited' ) ),
+                                'social'     => array( 'count' => $social_count, 'label' => __( 'Social Profiles', 'getcited' ) ),
+                            );
+                            foreach ( $stats as $stat ) :
+                                if ( $stat['count'] > 0 ) :
+                            ?>
+                                <span class="summary-stat-badge">
+                                    <strong><?php echo esc_html( $stat['count'] ); ?></strong> <?php echo esc_html( $stat['label'] ); ?>
+                                </span>
+                            <?php
+                                endif;
+                            endforeach;
+                            ?>
+                        </div>
+
+                        <!-- Collapsible Preview -->
+                        <details class="wizard-preview-details">
+                            <summary><?php esc_html_e( 'View llms.txt preview', 'getcited' ); ?></summary>
+                            <pre class="wizard-preview-code"><?php echo esc_html( $wizard_scan['llms_txt'] ); ?></pre>
+                        </details>
                     </div>
-
-                    <div class="getcited-scan-stats">
-                        <div class="stat-item">
-                            <span class="stat-number"><?php echo count( $scan_data['pages'] ?? array() ); ?></span>
-                            <span class="stat-label"><?php esc_html_e( 'Pages', 'getcited' ); ?></span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number"><?php echo count( $scan_data['categories'] ?? array() ); ?></span>
-                            <span class="stat-label"><?php esc_html_e( 'Categories', 'getcited' ); ?></span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number"><?php echo count( $scan_data['posts'] ?? array() ); ?></span>
-                            <span class="stat-label"><?php esc_html_e( 'Posts', 'getcited' ); ?></span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number"><?php echo count( $scan_data['menu'] ?? array() ); ?></span>
-                            <span class="stat-label"><?php esc_html_e( 'Menu Items', 'getcited' ); ?></span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number"><?php echo count( $scan_data['social'] ?? array() ); ?></span>
-                            <span class="stat-label"><?php esc_html_e( 'Social Links', 'getcited' ); ?></span>
-                        </div>
-                    </div>
-
-                    <p class="description" style="text-align: center;">
-                        <?php esc_html_e( 'You can edit this anytime from the llms.txt Editor page.', 'getcited' ); ?>
-                    </p>
 
                 <?php else : ?>
-                    <p class="wizard-subtitle">
-                        <?php esc_html_e( 'Your site is now optimized for AI visibility.', 'getcited' ); ?>
-                    </p>
-
-                    <div class="getcited-setup-summary">
-                        <div class="summary-item">
-                            <span class="dashicons dashicons-yes"></span>
-                            <span><?php esc_html_e( 'AI crawlers configured', 'getcited' ); ?></span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="dashicons dashicons-yes"></span>
-                            <span><?php esc_html_e( 'llms.txt ready to customize', 'getcited' ); ?></span>
-                        </div>
-                        <div class="summary-item">
-                            <span class="dashicons dashicons-yes"></span>
-                            <span><?php esc_html_e( 'Schema markup enabled', 'getcited' ); ?></span>
+                    <!-- Simple Summary -->
+                    <div class="wizard-summary-card">
+                        <div class="summary-checklist">
+                            <div class="checklist-item">
+                                <span class="dashicons dashicons-yes-alt"></span>
+                                <span><?php esc_html_e( 'AI crawlers allowed', 'getcited' ); ?></span>
+                            </div>
+                            <div class="checklist-item">
+                                <span class="dashicons dashicons-yes-alt"></span>
+                                <span><?php esc_html_e( 'llms.txt file created', 'getcited' ); ?></span>
+                            </div>
+                            <div class="checklist-item">
+                                <span class="dashicons dashicons-yes-alt"></span>
+                                <span><?php esc_html_e( 'Ready for AI discovery', 'getcited' ); ?></span>
+                            </div>
                         </div>
                     </div>
                 <?php endif; ?>
-            </div>
-            <div class="wizard-actions wizard-actions-stacked">
-                <button type="button" class="button button-primary button-hero getcited-wizard-complete">
-                    <?php esc_html_e( 'Go to Dashboard', 'getcited' ); ?> →
-                </button>
-                <?php if ( $has_scan ) : ?>
-                    <p class="wizard-secondary-action">
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>">
-                            <?php esc_html_e( 'or edit your llms.txt first', 'getcited' ); ?>
+
+                <!-- CTA Section -->
+                <div class="wizard-complete-cta">
+                    <button type="button" class="button button-primary button-hero getcited-wizard-complete">
+                        <?php esc_html_e( 'Go to Dashboard', 'getcited' ); ?>
+                    </button>
+                    <?php if ( $has_scan ) : ?>
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>" class="wizard-edit-link">
+                            <?php esc_html_e( 'Edit llms.txt', 'getcited' ); ?>
                         </a>
-                    </p>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 
