@@ -23,7 +23,7 @@ class GetCited_Pro_Teaser {
     /**
      * Waitlist endpoint
      */
-    const WAITLIST_URL = 'https://heytc.com/getcited/api/waitlist';
+    const WAITLIST_URL = 'https://heytc.com/getcited-api/waitlist.php';
 
     /**
      * Get instance
@@ -127,12 +127,11 @@ class GetCited_Pro_Teaser {
 
         // Get actual post titles from the site.
         $recent_posts = get_posts( array(
-            'numberposts'      => 3,
-            'post_status'      => 'publish',
-            'post_type'        => 'post',
-            'orderby'          => 'comment_count',
-            'order'            => 'DESC',
-            'suppress_filters' => true,
+            'numberposts' => 3,
+            'post_status' => 'publish',
+            'post_type'   => 'post',
+            'orderby'     => 'comment_count',
+            'order'       => 'DESC',
         ) );
 
         // Build page titles - use real posts or fallbacks.
@@ -505,44 +504,67 @@ class GetCited_Pro_Teaser {
             ) );
         }
 
-        // For now, since the endpoint doesn't exist, we'll simulate success
-        // In production, this would POST to WAITLIST_URL
-
+        // Post to external waitlist API
         $response = wp_remote_post( self::WAITLIST_URL, array(
             'timeout' => 5,
             'headers' => array(
                 'Content-Type' => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'email' => $email,
+                'email'   => $email,
                 'site_url' => home_url(),
-                'timestamp' => current_time( 'c' ),
+                'website' => '', // Honeypot field (empty for real users)
             ) ),
         ) );
 
-        // Store locally for now
-        $waitlist = get_option( 'getcited_local_waitlist', array() );
-        $waitlist[] = array(
-            'email' => $email,
-            'site_url' => home_url(),
-            'timestamp' => current_time( 'c' ),
-        );
-        update_option( 'getcited_local_waitlist', $waitlist );
+        $api_count = 0;
+        $api_success = false;
+
+        if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+            $body = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( ! empty( $body['success'] ) ) {
+                $api_success = true;
+                $api_count = isset( $body['waitlist_count'] ) ? (int) $body['waitlist_count'] : 0;
+                // Cache the API count for display
+                update_option( 'getcited_waitlist_count', $api_count );
+            }
+        }
+
+        // Store locally as fallback if API failed
+        if ( ! $api_success ) {
+            $waitlist = get_option( 'getcited_local_waitlist', array() );
+            $waitlist[ $email ] = array(
+                'email'     => $email,
+                'site_url'  => home_url(),
+                'timestamp' => current_time( 'c' ),
+            );
+            update_option( 'getcited_local_waitlist', $waitlist );
+        }
 
         // Remember that user has joined waitlist
         $settings = GetCited_Settings::instance();
         $settings->set( 'waitlist_submitted', true );
 
+        // Use API count if available, otherwise local count
+        $display_count = $api_count > 0 ? $api_count : $this->get_waitlist_count();
+
         wp_send_json_success( array(
             'message' => __( "You're on the list! We'll email you when Pro launches.", 'getcited' ),
-            'count' => count( $waitlist ),
+            'count'   => $display_count,
         ) );
     }
 
     /**
-     * Get local waitlist count (fallback)
+     * Get waitlist count (API cached value, or local fallback)
      */
     public function get_waitlist_count() {
+        // First check for cached API count
+        $api_count = get_option( 'getcited_waitlist_count', 0 );
+        if ( $api_count > 0 ) {
+            return $api_count;
+        }
+
+        // Fallback to local waitlist count
         $waitlist = get_option( 'getcited_local_waitlist', array() );
         return count( $waitlist );
     }

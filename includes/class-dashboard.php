@@ -448,27 +448,27 @@ class GetCited_Dashboard {
         // TODO: Remove dummy data after review.
         $dummy_requests = array(
             (object) array(
-                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-2 hours' ) ),
+                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-2 hours' ) ),
                 'bot_name'     => 'ChatGPT-User',
                 'category'     => 'ai_chat',
             ),
             (object) array(
-                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
+                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
                 'bot_name'     => 'Claude-Web',
                 'category'     => 'ai_chat',
             ),
             (object) array(
-                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
+                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
                 'bot_name'     => 'PerplexityBot',
                 'category'     => 'ai_search',
             ),
             (object) array(
-                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
+                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
                 'bot_name'     => 'GPTBot',
                 'category'     => 'ai_training',
             ),
             (object) array(
-                'request_time' => date( 'Y-m-d H:i:s', strtotime( '-4 days' ) ),
+                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-4 days' ) ),
                 'bot_name'     => 'Anthropic-AI',
                 'category'     => 'ai_chat',
             ),
