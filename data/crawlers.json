@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "updated": "2025-11-28",
+  "version": "1.0.1",
+  "updated": "2025-12-11",
   "crawlers": [
     {
       "name": "GPTBot",
@@ -79,7 +79,7 @@
       "company": "Google",
       "user_agent": "GoogleOther",
       "purpose": "Google AI research and development",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://developers.google.com/search/docs/crawling-indexing/googleother"
     },
     {
@@ -87,7 +87,7 @@
       "company": "Google",
       "user_agent": "Google-CloudVertexBot",
       "purpose": "Vertex AI platform",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://cloud.google.com/vertex-ai"
     },
     {
@@ -111,7 +111,7 @@
       "company": "Meta",
       "user_agent": "Meta-ExternalAgent",
       "purpose": "Meta AI training",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://www.facebook.com/robots.txt"
     },
     {
@@ -119,7 +119,7 @@
       "company": "Meta",
       "user_agent": "FacebookBot",
       "purpose": "Meta AI features",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://developers.facebook.com/docs/sharing/webmasters/crawler"
     },
     {
@@ -135,7 +135,7 @@
       "company": "ByteDance",
       "user_agent": "Bytespider",
       "purpose": "TikTok/Doubao AI training",
-      "recommended": false,
+      "recommended": true,
       "docs_url": null
     },
     {
@@ -151,7 +151,7 @@
       "company": "Cohere",
       "user_agent": "cohere-ai",
       "purpose": "Enterprise AI training",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://cohere.com"
     },
     {
@@ -167,7 +167,7 @@
       "company": "DeepSeek",
       "user_agent": "Deepseek",
       "purpose": "DeepSeek AI training",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://deepseek.com"
     },
     {
@@ -175,7 +175,7 @@
       "company": "Mistral",
       "user_agent": "MistralAI-User",
       "purpose": "Mistral AI (European)",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://mistral.ai"
     },
     {
@@ -183,7 +183,7 @@
       "company": "xAI",
       "user_agent": "xAI-Grok-Bot",
       "purpose": "Grok training",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://x.ai"
     },
     {
@@ -191,7 +191,7 @@
       "company": "Diffbot",
       "user_agent": "Diffbot",
       "purpose": "Knowledge graph construction",
-      "recommended": false,
+      "recommended": true,
       "docs_url": "https://www.diffbot.com/company/crawling-policy"
     },
     {
@@ -207,7 +207,7 @@
       "company": "Imagesift",
       "user_agent": "ImagesiftBot",
       "purpose": "Image AI training",
-      "recommended": false,
+      "recommended": true,
       "docs_url": null
     }
   ]

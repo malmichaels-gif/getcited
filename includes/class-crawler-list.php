@@ -28,7 +28,7 @@ class GetCited_Crawler_List {
     /**
      * Remote endpoint URL
      */
-    const REMOTE_URL = 'https://heytc.com/getcited/api/crawlers.json';
+    const REMOTE_URL = 'https://heytc.com/getcited-api/crawlers.json';
 
     /**
      * Cached crawler list
