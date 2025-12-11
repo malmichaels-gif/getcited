@@ -230,12 +230,34 @@ class GetCited_Dashboard {
                 }
                 if ( isset( $data['organization'] ) && is_array( $data['organization'] ) ) {
                     $settings->set( 'organization', $data['organization'] );
+
+                    // Auto-regenerate llms.txt to reflect organization changes.
+                    $llms      = GetCited_Llms_Txt::instance();
+                    $site_type = $settings->get( 'site_type' );
+                    $regenerated_content = $llms->generate_template( $site_type );
+                    $settings->set( 'llms_txt_content', $regenerated_content );
+
+                    if ( $settings->get( 'llms_write_physical' ) ) {
+                        $llms->write_physical_file();
+                    }
                 }
                 break;
 
             case 'advanced':
                 if ( isset( $data['site_type'] ) ) {
+                    $old_site_type = $settings->get( 'site_type' );
                     $settings->set( 'site_type', $data['site_type'] );
+
+                    // Auto-regenerate llms.txt if site type changed.
+                    if ( $old_site_type !== $data['site_type'] ) {
+                        $llms = GetCited_Llms_Txt::instance();
+                        $regenerated_content = $llms->generate_template( $data['site_type'] );
+                        $settings->set( 'llms_txt_content', $regenerated_content );
+
+                        if ( $settings->get( 'llms_write_physical' ) ) {
+                            $llms->write_physical_file();
+                        }
+                    }
                 }
                 if ( isset( $data['debug_mode'] ) ) {
                     $settings->set( 'debug_mode', filter_var( $data['debug_mode'], FILTER_VALIDATE_BOOLEAN ) ?? false );
@@ -445,52 +467,11 @@ class GetCited_Dashboard {
     public function get_llms_activity() {
         $logger = GetCited_Request_Logger::instance();
 
-        // TODO: Remove dummy data after review.
-        $dummy_requests = array(
-            (object) array(
-                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-2 hours' ) ),
-                'bot_name'     => 'ChatGPT-User',
-                'category'     => 'ai_chat',
-            ),
-            (object) array(
-                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
-                'bot_name'     => 'Claude-Web',
-                'category'     => 'ai_chat',
-            ),
-            (object) array(
-                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
-                'bot_name'     => 'PerplexityBot',
-                'category'     => 'ai_search',
-            ),
-            (object) array(
-                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-3 days' ) ),
-                'bot_name'     => 'GPTBot',
-                'category'     => 'ai_training',
-            ),
-            (object) array(
-                'request_time' => gmdate( 'Y-m-d H:i:s', strtotime( '-4 days' ) ),
-                'bot_name'     => 'Anthropic-AI',
-                'category'     => 'ai_chat',
-            ),
-        );
-
-        $dummy_stats = array(
-            'total'       => 23,
-            'unique_bots' => 5,
-        );
-
         return array(
-            'recent'   => $dummy_requests,
-            'stats'    => $dummy_stats,
-            'enabled'  => true,
+            'recent'  => $logger->get_recent_requests( 30, 10 ),
+            'stats'   => $logger->get_request_stats( 30 ),
+            'enabled' => GetCited_Settings::instance()->get( 'request_logging_enabled' ),
         );
-
-        // Original code (commented out for dummy data):
-        // return array(
-        //     'recent'   => $logger->get_recent_requests( 30, 10 ),
-        //     'stats'    => $logger->get_request_stats( 30 ),
-        //     'enabled'  => GetCited_Settings::instance()->get( 'request_logging_enabled' ),
-        // );
     }
 
     /**
