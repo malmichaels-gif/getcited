@@ -45,6 +45,7 @@ function getcited_uninstall() {
     // 1. Delete main settings
     delete_option( 'getcited_settings' );
     delete_option( 'getcited_local_waitlist' );
+    delete_option( 'getcited_auto_analyzed_done' );
 
     // 2. Delete all transients
     delete_transient( 'getcited_crawler_list' );
@@ -87,7 +88,8 @@ function getcited_uninstall() {
              '_getcited_no_schema',
              '_getcited_citability_score',
              '_getcited_last_audit',
-             '_getcited_citation_count'
+             '_getcited_citation_count',
+             '_getcited_auto_analyzed'
          )"
     );
 

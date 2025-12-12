@@ -76,17 +76,8 @@ $crawler_stats = $request_logger->get_request_stats();
                 <h2><?php esc_html_e( 'Quick Stats', 'getcited' ); ?></h2>
                 <?php
                 $total_posts = absint( wp_count_posts( 'post' )->publish );
-                // Count ALL posts with citability scores, not just the displayed ones.
-                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Necessary for accurate count.
-                $analyzed_query = new WP_Query( array(
-                    'post_type'      => 'post',
-                    'post_status'    => 'publish',
-                    'meta_key'       => '_getcited_citability_score',
-                    'posts_per_page' => 10, // Free tier limit
-                    'fields'         => 'ids',
-                    'no_found_rows'  => true,
-                ) );
-                $analyzed_count = $analyzed_query->post_count;
+                // Count manually analyzed posts (excludes auto-analyzed posts which don't count against free tier).
+                $analyzed_count = GetCited_Citability::instance()->get_manual_analyzed_count();
                 $ai_visits = $crawler_stats['ai_crawlers'] ?? 0;
                 $unique_bots = $crawler_stats['unique_bots'] ?? 0;
                 ?>

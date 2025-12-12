@@ -4,7 +4,7 @@ Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.8.1
+Stable tag: 1.9.8.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -105,6 +105,13 @@ The free version runs entirely on your server. The only external request is to f
 
 == Changelog ==
 
+= 1.9.8.3 =
+* Fixed: Auto-analyze now correctly saves score (was storing array instead of number)
+
+= 1.9.8.2 =
+* New: Auto-analyze 5 latest posts on activation for instant visibility score
+* Improved: Auto-analyzed posts don't count against free tier limit
+
 = 1.9.8.1 =
 * Improved: Copy refinements to reduce over-claim language throughout plugin
 * Improved: Pro preview sections now clearly labeled as sample data
@@ -161,5 +168,5 @@ Earlier versions were part of extensive private beta testing.
 
 == Upgrade Notice ==
 
-= 1.9.8.1 =
-Copy refinements for clearer messaging and honest expectation-setting.
+= 1.9.8.3 =
+Fixes auto-analyze score storage bug from 1.9.8.2.

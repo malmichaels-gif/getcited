@@ -144,6 +144,15 @@ class GetCited_Citability {
             'description' => 'Disable schema on this post',
         ) );
 
+        // Auto-analyzed flag (doesn't count against free tier)
+        register_post_meta( 'post', '_getcited_auto_analyzed', array(
+            'type' => 'boolean',
+            'default' => false,
+            'single' => true,
+            'show_in_rest' => false,
+            'description' => 'Post was auto-analyzed on activation',
+        ) );
+
         // Future Pro meta
         register_post_meta( 'post', '_getcited_citation_count', array(
             'type' => 'integer',
@@ -1142,5 +1151,72 @@ class GetCited_Citability {
         }
 
         return round( array_sum( $scores ) / count( $scores ) );
+    }
+
+    /**
+     * Auto-analyze recent posts on activation (doesn't count against free tier)
+     *
+     * @param int $limit Number of posts to analyze.
+     * @return int Number of posts analyzed.
+     */
+    public function auto_analyze_recent_posts( $limit = 5 ) {
+        // Check if already run.
+        if ( get_option( 'getcited_auto_analyzed_done' ) ) {
+            return 0;
+        }
+
+        $posts = get_posts( array(
+            'post_type'      => 'post',
+            'post_status'    => 'publish',
+            'posts_per_page' => $limit,
+            'orderby'        => 'date',
+            'order'          => 'DESC',
+            'meta_query'     => array(
+                array(
+                    'key'     => '_getcited_citability_score',
+                    'compare' => 'NOT EXISTS',
+                ),
+            ),
+        ) );
+
+        $analyzed = 0;
+        foreach ( $posts as $post ) {
+            $result = $this->analyze_post( $post->ID );
+            $score  = $result['score'];
+            if ( $score > 0 ) {
+                update_post_meta( $post->ID, '_getcited_citability_score', $score );
+                update_post_meta( $post->ID, '_getcited_last_audit', current_time( 'c' ) );
+                update_post_meta( $post->ID, '_getcited_auto_analyzed', true );
+                $analyzed++;
+            }
+        }
+
+        // Mark as done so it doesn't run again.
+        update_option( 'getcited_auto_analyzed_done', true );
+
+        return $analyzed;
+    }
+
+    /**
+     * Get count of manually analyzed posts (excludes auto-analyzed)
+     *
+     * @return int Count of manually analyzed posts.
+     */
+    public function get_manual_analyzed_count() {
+        global $wpdb;
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time count query.
+        $count = $wpdb->get_var(
+            "SELECT COUNT(DISTINCT p.ID)
+            FROM {$wpdb->posts} p
+            INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+            LEFT JOIN {$wpdb->postmeta} pm_auto ON p.ID = pm_auto.post_id AND pm_auto.meta_key = '_getcited_auto_analyzed'
+            WHERE p.post_type = 'post'
+            AND p.post_status = 'publish'
+            AND pm.meta_key = '_getcited_citability_score'
+            AND (pm_auto.meta_value IS NULL OR pm_auto.meta_value = '' OR pm_auto.meta_value = '0')"
+        );
+
+        return (int) $count;
     }
 }
