@@ -396,7 +396,7 @@ class GetCited_Pro_Teaser {
         <div id="getcited-sample-modal" class="getcited-modal" style="display: none;">
             <div class="getcited-modal-content">
                 <div class="getcited-modal-header">
-                    <h2><?php esc_html_e( 'What Pro Users See', 'getcited' ); ?></h2>
+                    <h2><?php esc_html_e( 'What Pro Users See', 'getcited' ); ?> <span class="sample-badge"><?php esc_html_e( '(Sample Data)', 'getcited' ); ?></span></h2>
                     <button type="button" class="getcited-modal-close">&times;</button>
                 </div>
                 <div class="getcited-modal-body">
@@ -404,7 +404,7 @@ class GetCited_Pro_Teaser {
                     <div class="getcited-citation-alert">
                         <span class="alert-icon">&#128276;</span>
                         <div class="alert-content">
-                            <strong><?php esc_html_e( 'New Citation Detected!', 'getcited' ); ?></strong>
+                            <strong><?php esc_html_e( 'New AI Reference Detected', 'getcited' ); ?></strong> <span class="sample-badge"><?php esc_html_e( '(Sample)', 'getcited' ); ?></span>
                             <p>
                                 <?php
                                 printf(
@@ -480,7 +480,7 @@ class GetCited_Pro_Teaser {
                     </div>
                 </div>
                 <div class="getcited-modal-footer">
-                    <p><?php esc_html_e( 'Are you getting cited? Find out.', 'getcited' ); ?></p>
+                    <p><?php esc_html_e( 'Is your content being cited? Find out.', 'getcited' ); ?></p>
                     <button type="button" class="button button-primary getcited-join-waitlist">
                         <?php esc_html_e( 'Get Notified When Pro Launches', 'getcited' ); ?>
                     </button>

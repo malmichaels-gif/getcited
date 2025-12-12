@@ -72,6 +72,9 @@ $status = $health->get_status();
                         </span>
                     </span>
                 </label>
+                <p class="description" style="margin-top: var(--getcited-space-sm); font-size: 14px;">
+                    <?php esc_html_e( 'llms.txt is a helpful signal; crawler behavior varies by provider and may change over time.', 'getcited' ); ?>
+                </p>
 
                 <?php if ( $has_existing_file ) : ?>
                     <div class="getcited-source-toggle">

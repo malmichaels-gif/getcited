@@ -136,6 +136,9 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
             <p class="description">
                 <?php esc_html_e( 'Track when AI crawlers and other bots access your llms.txt file.', 'getcited' ); ?>
             </p>
+            <p class="description" style="margin-top: 4px;">
+                <?php esc_html_e( 'We store only what\'s needed: timestamp, user-agent, and request URL. IP addresses are hashed for privacy. You control retention and can purge logs anytime.', 'getcited' ); ?>
+            </p>
 
             <div class="getcited-schema-options-compact">
                 <label class="getcited-checkbox-custom <?php echo $request_logging_enabled ? 'is-checked' : ''; ?>">

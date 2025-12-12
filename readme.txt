@@ -1,14 +1,14 @@
 === GetCited — AI Visibility ===
 Contributors: malcolmmichaels
-Tags: ai, chatgpt, claude, perplexity, llms.txt
+Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.4
+Stable tag: 1.9.8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Get your content cited by ChatGPT, Claude, and Perplexity. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
+Get cited by ChatGPT, Gemini, and Grok. The AI visibility plugin — manage crawlers, generate llms.txt, track citability.
 
 == Description ==
 
@@ -105,6 +105,33 @@ The free version runs entirely on your server. The only external request is to f
 
 == Changelog ==
 
+= 1.9.8.1 =
+* Improved: Copy refinements to reduce over-claim language throughout plugin
+* Improved: Pro preview sections now clearly labeled as sample data
+* Improved: Schema detection now confirms GetCited won't override existing plugins
+* Improved: Privacy explanation added to logging settings
+* Improved: Scoring methodology explained on dashboard
+* Improved: Crawler controls and llms.txt pages include honest expectation-setting
+
+= 1.9.8 =
+* Fixed: Citability "Analyzed" count now correctly shows all analyzed posts, not just initially loaded ones
+
+= 1.9.7 =
+* New: Weekly automatic llms.txt refresh for high-volume publishing sites
+* New: Dashboard tip explaining AI crawler timing expectations
+* Improved: Security hardening for waitlist API endpoint
+
+= 1.9.6 =
+* Fixed: Wizard Step 6 now correctly populates dynamic content
+* Changed: AI branding updated throughout plugin
+
+= 1.9.5 =
+* Fixed: Fatal error from removed get_current_tip_index method
+
+= 1.9.4 =
+* Fixed: Request logging now captures real AI crawler visits
+* Fixed: llms.txt auto-regeneration on settings save
+
 = 1.9.0 =
 * Changed: Navigation menu reordered for better UX flow
 * Changed: llms.txt and Citability moved higher (unique value propositions)
@@ -130,360 +157,9 @@ The free version runs entirely on your server. The only external request is to f
 * Improved: Tips now rotate with "Next" button
 * Improved: Cleaner dashboard layout with tip bar below score components
 
-= 1.8.5 =
-* Improved: AI Crawlers page UX improvements
-
-= 1.8.4 =
-* Improved: Minor UI refinements
-
-= 1.8.3 =
-* Improved: Schema page Organization Details section UI
-* Improved: Better visual hierarchy for schema configuration
-
-= 1.8.2 =
-* Improved: Citability page UI enhancements
-* Improved: Educational content for citability scoring
-
-= 1.8.1 =
-* Changed: Settings page reorganized into cleaner logical groups
-* Improved: UI polish across settings page
-
-= 1.8.0 =
-* New: Complete admin UI redesign with refined minimalist aesthetic
-* New: Plus Jakarta Sans typography for distinctive, professional look
-* New: Simplified color palette with strategic orange restraint (CTAs only)
-* New: Quick Actions section on dashboard for common tasks
-* New: Compact health status display on dashboard
-* New: Score breakdown now collapsible (cleaner default view)
-* New: AI Visibility Tips section now collapsible
-* New: Score circle uses color-coded borders based on score tier (green/yellow/red)
-* Changed: Wizard progress bar redesigned with numbered steps and connecting lines
-* Changed: Wizard welcome screen now centered, typography-focused
-* Changed: Settings page reorganized into logical groups (Site Config, Logging, Developer Tools, Data Management)
-* Changed: llms.txt page reorganized - AI Citation Guidelines now visible by default
-* Changed: Developer Tools section now visible by default on Settings page
-* Removed: Heavy effects (pulse animations, gradient glows, stagger delays)
-* Removed: Orange hover highlights on tables (now neutral gray)
-* Removed: Bounce animations on toggle switches
-* Improved: Consistent 4px spacing scale across all components
-* Improved: Single subtle shadow style for all cards
-* Improved: Simplified button styles (solid colors, no gradients)
-
-= 1.7.3 =
-* New: Premium SaaS-style wizard redesign with modern progress indicator
-* New: Connected dots progress bar with animated fill line (replaces numbered circles)
-* New: Two-column hero layout on wizard welcome screen with large gradient icon
-* New: Elevated card design with top gradient accent bar on selection
-* New: Premium hero button with gradient background and hover lift effect
-* New: Dashboard score display with subtle pulse animation on page load
-* New: Breakdown cards hover effect with 3px lift and layered shadows
-* New: Health check status indicator bar at bottom of each item
-* New: Staggered section entrance animations across all admin pages
-* New: Premium table styling with uppercase headers and hover highlight
-* Improved: Typography refinements with tighter letter-spacing and bolder weights
-* Improved: All animations respect prefers-reduced-motion for accessibility
-
-= 1.7.2 =
-* New: Premium custom checkbox component with 22px styled checkboxes (replacing hard-to-see 13px browser defaults)
-* New: Checkbox cards show orange highlight and checkmark when selected
-* New: Wizard site type and crawler choice cards now lift on hover with selection checkmark
-* New: Step transitions with slide-in animation when navigating wizard
-* New: Progress step pulses when active with highlighted number
-* Improved: All checkboxes across llms.txt, settings, and wizard pages use new component
-* Improved: Radio card selection shows animated checkmark indicator
-* Improved: All animations respect prefers-reduced-motion for accessibility
-
-= 1.7.1 =
-* New: Premium admin UI animations and polish for modern SaaS-like experience
-* New: Score circle animates on page load with subtle glow effect
-* New: Cards lift on hover with layered shadow system
-* New: Section headers feature gradient accent line
-* New: Buttons have gradient backgrounds with lift and press effects
-* New: Toggle switches animate with bounce and glow on activation
-* New: Health warnings/errors pulse to draw attention
-* New: Stat numbers display with gradient text
-* New: Staggered fade-in animation for page sections
-* New: Refined focus-visible states for accessibility
-* New: Empty state component styling
-* Improved: All animations respect prefers-reduced-motion for accessibility
-
-= 1.7.0 =
-* New: Admin UI redesign with refined color palette - orange reserved for primary CTAs and score display
-* New: Neutral slate gray (#64748B) accent for icons, borders, and secondary elements
-* Improved: Softer borders and subtle shadows for modern, professional appearance
-* Improved: Consistent form focus states using neutral gray instead of orange
-* Improved: Dashboard score section and tips card now use unified card styling
-* Improved: Breakdown cards, health check, and wizard steps updated with neutral styling
-
-= 1.6.14 =
-* New: AI Visibility Tips card on dashboard with rotating tips for improving content citability
-* New: Two-column layout on dashboard showing score and tips side by side
-
-= 1.6.13 =
-* Changed: Lowered PHP requirement from 8.0 to 7.4 for broader compatibility
-* Fixed: Uninstall cleanup now removes weekly schema scan cron job
-* Fixed: Uninstall cleanup now removes author profile user meta fields
-* Fixed: Uninstall cleanup now removes all transients (wizard, nudge, throttle)
-
-= 1.6.12 =
-* Improved: "Regenerate" link under Site Type now triggers inline AJAX regeneration with feedback, no page navigation
-
-= 1.6.11 =
-* Improved: Site Type description now clarifies that changing it does not auto-update llms.txt, with link to regenerate
-
-= 1.6.10 =
-* Fixed: "Add Another" button under Social Profiles now matches input field width
-* Fixed: Eye icon in View Full Analysis button now vertically centered with text
-* Improved: Increased all font sizes by 1px for better readability
-
-= 1.6.9 =
-* Removed: Logo URL field from setup wizard (can be configured in Schema > Organization Details)
-* Improved: Upload button on Schema page now uses orange color scheme for visual consistency
-
-= 1.6.8 =
-* Improved: Advanced Options section now uses same collapsible style as Organization Details and Schema Preview
-* Improved: Unified visual consistency across all collapsible sections on Schema page
-
-= 1.6.7 =
-* Added: Admin notice on Permalinks page when rewrite rules need flushing
-* Improved: Users now see clear instruction "Click Save Changes" when visiting Permalinks to fix llms.txt URL
-
-= 1.6.6 =
-* Improved: Schema page now shows positive "All set!" message when SEO plugin handles schema
-* Improved: Schema settings hidden behind "Advanced Options" when another plugin handles schema
-* Improved: Green checkmark for both "handled by plugin" and "GetCited active" states
-* Improved: Renamed "Enable JSON-LD" to "Enable GetCited Schema" for clarity
-
-= 1.6.5 =
-* Improved: Simplified Schema Settings page - renamed "Schema Status" to "Schema Detection"
-* Improved: Consolidated schema controls into single checkbox (removed confusing duplicate)
-* Improved: Warning now shows in Schema Output section when another plugin handles schema
-
-= 1.6.4 =
-* Fixed: View Full Analysis / Hide Details button overlap issue
-* Improved: Toggle button now uses eye icons instead of arrows
-* Improved: Heading structure partial score shows what's needed (2+ H2s and 1+ H3)
-* Improved: Lists structure partial score shows what's needed (add another list or table)
-
-= 1.6.3 =
-* Improved: Citability analysis UI with larger fonts for recommendations and results
-* Improved: View Full Analysis button now uses consistent orange styling
-* Improved: Actionable guidance for partial scores (e.g., "1 internal link — add 2 more for full score")
-* Improved: Schema markup scoring now recognizes SEO plugins handling schema
-
-= 1.6.2 =
-* Fixed: SQL interpolation warnings for WordPress Plugin Check compliance
-* Improved: Registered custom table as $wpdb property for proper PHPCS recognition
-* Improved: Removed all intermediate variables for table names in SQL queries
-
-= 1.6.1 =
-* Fixed: Added esc_sql() escaping to all database table names for Plugin Check compliance
-* Fixed: Inline phpcs comment for input sanitization
-
-= 1.6.0 =
-* Improved: WordPress Plugin Check compliance for WordPress.org submission
-* Fixed: Added missing translators comments for internationalization
-* Fixed: Proper output escaping for all dynamic values
-* Fixed: Nonce verification in author profile fields
-* Fixed: Replaced forbidden wp_get_sidebars_widgets() function
-* Updated: Tested up to WordPress 6.9
-
-= 1.5.10 =
-* Improved: Dashboard score circle reduced to 120px for better proportions
-* Improved: Score circle right-aligned with proper spacing
-
-= 1.5.9 =
-* Improved: Dashboard score circle now uses same solid design as Citability page
-* Removed: SVG progress ring replaced with simpler filled circle design
-
-= 1.5.8 =
-* Added: Dashboard AI Visibility Score circle now has color-coded fills matching Citability
-* Improved: Score thresholds updated to 80+ (green), 51-79 (yellow), <50 (red)
-
-= 1.5.7 =
-* Improved: Average Score display now uses circular design with solid orange ring
-* Improved: Score circle fill color changes based on score
-* Improved: Colors harmonize with orange theme for visual consistency
-
-= 1.5.6 =
-* Added: Green checkmarks for configured fields in Content Settings and AI Citation Guidelines
-* Added: Enhanced Quick Stats with AI Crawler Visits and Unique AI Bots metrics
-* Fixed: Removed blockquote character (>) that caused &gt; display issues in llms.txt
-* Improved: Quick Stats section now shows real AI crawler activity data
-
-= 1.5.5 =
-* Improved: All action buttons now use consistent orange primary styling (Allow All, Block All, Write Now, Scan My Site, etc.)
-* Improved: llms.txt Content section now shows clear "Edit" label with pencil icon
-* Improved: Removed redundant "Load Template" buttons from Content header for cleaner UX
-* Fixed: Preview now properly displays special characters (>, <, &) instead of HTML entities
-* Fixed: Button icons now properly aligned across all pages
-
-= 1.5.4 =
-* Improved: Schema Status message now explains which SEO plugin is handling schema
-* Improved: Organization Details fields show green checkmarks when configured
-* Improved: "Test with Google" button now uses orange primary styling
-* Improved: Citability buttons (Analyze, Load More, Join Waitlist) now use orange primary styling
-* Improved: Increased smaller font sizes throughout plugin for better readability
-* Improved: Health Check Schema now shows green status when SEO plugin handles schema
-* Improved: Health Check badges now have tooltips explaining each check
-* Improved: Rewrites badge tooltip explains Permalinks requirement
-
-= 1.5.3 =
-* Improved: Schema Presence score now gives full credit when SEO plugins are detected
-* Improved: Dashboard shows "via [Plugin Name]" when schema is handled by external SEO plugin
-* Improved: AI Citation Guidelines now enabled by default after Setup Wizard
-* Improved: Saving llms.txt settings auto-regenerates content and writes physical file if enabled
-* Improved: Post-wizard notice updated to success message confirming active citation guidelines
-* Removed: "New" badge from Citation Guidelines (now a default feature)
-
-= 1.5.2 =
-* Improved: Larger font sizes throughout plugin for better readability
-* Improved: Dashboard "Refresh" button shows completion feedback
-* Improved: "Run Check" and "Re-scan" buttons styled consistently with orange primary color
-* Improved: Health Check badges are now clickable links to relevant settings pages
-* Improved: Schema detection now scans both homepage and a sample post
-* Improved: Setup Wizard auto-detects SEO plugins and configures schema accordingly
-* Improved: Citation Guidelines pre-filled with site-type defaults after wizard
-* Added: HeyTC SEO plugin detection for schema compatibility
-* Fixed: Schema Re-scan now detects plugins that only output JSON-LD on posts
-
-= 1.5.1 =
-* New: AI Citation Guidelines — tell AI systems how to cite your content
-* New: Enhanced templates with suggested citation formats for each site type
-* New: Post-setup prompt to configure citation guidelines
-* Improved: llms.txt editor with collapsible Citation Guidelines section
-
-= 1.5.0 =
-* New: Posts marked "noindex" by SEO plugins are now excluded from llms.txt
-* New: Posts with "Exclude from llms.txt" checked are now properly excluded
-* New: WP-CLI command `wp getcited crawler-log` to view, clear, and export crawler activity
-* New: Developer Tools section in Settings showing all WP-CLI commands
-* Added: Support for Yoast, RankMath, SEOPress, AIOSEO, The SEO Framework noindex detection
-* Added: Filter `getcited_is_noindex` for custom noindex logic
-
-= 1.4.6 =
-* Changed: Full UI redesign with HeyTC orange (#FFA500) branding
-* Changed: Dashboard redesign with card-based score breakdown
-* Changed: Score breakdown cards link directly to config pages
-* Changed: Health Check simplified to summary badges
-* Changed: All pages updated with consistent styling
-* Changed: Primary buttons now use orange accent color
-* Changed: Section headers with orange left border accent
-* Fixed: Score circle sizing issue (was too large)
-* Removed: Redundant Status Cards section from Dashboard
-* Removed: Quick Links section (replaced by score navigation)
-
-= 1.4.5 =
-* New: AI Visibility Score - composite 0-100 score showing overall AI readiness
-* New: Score breakdown with 5 factors: Crawler Access, llms.txt Health, Schema Presence, Citability, Freshness
-* New: Actionable recommendations based on lowest-scoring areas
-* New: llms.txt Request Log - track when AI crawlers access your llms.txt file
-* New: Bot classification (AI Crawler, Search Engine, Browser, Unknown)
-* New: Request logging settings with configurable retention period
-* New: Custom database table for efficient request storage
-* Added: Daily cron job for automatic log cleanup based on retention settings
-
-= 1.4.2 =
-* Fixed: Health check calling removed method get_detected_plugins() (now uses Schema Detector)
-
-= 1.4.1 =
-* Fixed: Schema re-scan AJAX could cause deadlock on some hosting (self-referential HTTP request)
-* Changed: Homepage JSON-LD scan now skipped during AJAX, uses cached results instead
-* Changed: Reduced HTTP timeout from 10s to 5s for schema detection
-
-= 1.4.0 =
-* New: Schema smart fallback - auto-disables when SEO plugin detected (Yoast, Rank Math, etc.)
-* New: Homepage JSON-LD scan detects existing schema from any source
-* New: Force-enable option for users who want GetCited schema despite detection
-* New: @id entity graph connecting Organization → Author → Article for AI understanding
-* New: Enhanced Author schema with knowsAbout (expertise topics) and jobTitle
-* New: Author profile fields in WordPress user edit screen (LinkedIn, Twitter, Job Title, Expertise, ORCID)
-* New: Organization sameAs links (LinkedIn Company, Wikipedia, Crunchbase)
-* New: Weekly cron job for automatic schema source re-scanning
-* New: Manual "Re-scan" button on Schema settings page
-* New: Detection status UI shows what source is handling schema
-* Changed: Schema now works as "smart fallback" - fills gaps SEO plugins miss
-* Added: 8 SEO plugin detections (Yoast, Rank Math, AIOSEO, SEOPress, Schema Pro, Squirrly, SEO Framework, SmartCrawl)
-
-= 1.3.0 =
-* Added: Logo URL now supports WordPress Media Library picker (Upload button works)
-* Added: Social profiles auto-populate from Setup Wizard site scan
-* Added: Load More Posts button in Citability (free tier: up to 10 posts)
-* Added: Top 3 recommendations now display in post editor meta box after analysis
-* Improved: FAQ scoring clarifies it checks content, not schema settings
-* Improved: Large post counts now formatted with locale separators (e.g., 153,153)
-
-= 1.1.1 =
-* Fixed: Setup wizard now works correctly when launched from Settings page (was hanging on Step 2)
-* Fixed: Health Check expand buttons now work properly (restructured DOM for reliable toggling)
-* Fixed: Custom Crawlers now save properly with new "Save Changes" button
-* Fixed: Bulk actions (Allow All/Block All) now preserve custom crawler settings
-* Performance: Site scan now runs asynchronously with progress bar UI
-* Performance: Optimized key pages query from 17 individual queries to single batch query
-* Performance: Added 20-item limit to category queries for large sites
-* UX: Added scan progress bar with status text ("Finding your pages...", "Analyzing content...", "Building your llms.txt...")
-* UX: Added "Skip scan" option for users who prefer manual configuration
-* UX: Scan timeout (30 seconds) shows prominent skip option
-* UX: Extended wizard scan cache from 1 hour to 24 hours
-* UX: Added 60-second rate limiting on scan endpoint to prevent abuse
-* Code: Strict equality comparison for menu item parent check
-
-= 1.1.0 =
-* New: Intelligent Site Scanner for llms.txt generation
-* New: Wizard now scans your site and generates personalized llms.txt during setup
-* New: "Scan My Site" button in llms.txt editor for re-scanning
-* New: Scan results preview with stats (pages, posts, categories, menu items, social links)
-* New: Support for Rank Math and SEOPress social link detection
-* New: Support for modern social platforms (X/Twitter, Threads, Mastodon, Bluesky)
-* New: Filter hook `getcited_scanner_generated_content` for customizing generated llms.txt
-* Added: Markdown escaping to prevent broken links from special characters
-* Added: 5-minute scan cache to prevent excessive database queries
-* Changed: Twitter social links now normalized to X branding
-
-= 1.0.4 =
-* New: Expanded site types from 5 to 9 (added Portfolio, Nonprofit, Education, Community)
-* New: Granular schema settings by site type
-* New: llms.txt templates for all 9 site types
-* Fixed: Wizard initialization now properly shows first step on page load
-* Fixed: Health check expand buttons now work correctly with improved fallback logic
-
-= 1.0.3 =
-* Enhanced robots.txt and llms.txt handling
-* Improved conflict detection
-
-= 1.0.2 =
-* Fixed: Save Changes button now works correctly across all settings pages
-* Fixed: Analyze Citability button now works on post editor screens
-* Fixed: Setup wizard auto-redirect now triggers on fresh plugin activation
-* Added: llms.txt template loading from server (Blog, Business, News, etc.)
-* Added: Expandable Health Check details with robots.txt guidance
-* Added: Copy to clipboard functionality for robots.txt rules
-* Added: Meta description detection for SEOPress and The SEO Framework
-* Added: Filter hook `getcited_get_meta_description` for custom SEO plugin support
-* Added: HTML fallback detection for meta descriptions
-* Added: Content-type aware FAQ scoring (news/editorial exempt from FAQ penalty)
-* Added: Filter hook `getcited_faq_exempt` for custom FAQ exemptions
-* Changed: Crawler list health check now shows OK status when using bundled list
-
-= 1.0.1 =
-* Fixed WordPress Plugin Check issues
-* Added IIFE wrappers to templates to prevent global variable pollution
-* Added translator comments for internationalization
-* Added proper input sanitization with wp_unslash()
-* Added phpcs:ignore comments for intentional code patterns
-* Updated tested WordPress version to 6.8
-* Removed manual textdomain loading (handled by WordPress 4.6+)
-
-= 1.0.0 =
-* Initial release
-* AI Crawler Control Panel (26 crawlers)
-* llms.txt generator with templates
-* AI-optimized schema output
-* Content Citability Scoring
-* Setup wizard
-* WP-CLI commands
+Earlier versions were part of extensive private beta testing.
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-Initial release of GetCited. Get your content visible to AI!
+= 1.9.8.1 =
+Copy refinements for clearer messaging and honest expectation-setting.

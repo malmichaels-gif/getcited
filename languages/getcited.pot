@@ -2,7 +2,7 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: GetCited 1.0.0\n"
+"Project-Id-Version: GetCited 1.9.8.1\n"
 "Report-Msgid-Bugs-To: https://heytc.com/getcited\n"
 "POT-Creation-Date: 2025-11-28T00:00:00+00:00\n"
 "MIME-Version: 1.0\n"

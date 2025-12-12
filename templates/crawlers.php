@@ -84,6 +84,9 @@ foreach ( $grouped_crawlers as $crawlers ) {
                         esc_html( $list_updated )
                     ); ?>
                 </p>
+                <p class="description" style="margin-top: var(--getcited-space-sm); font-size: 12px;">
+                    <?php esc_html_e( 'Controls supported/legitimate crawlers. Different crawlers serve different purposes (training, preview, search).', 'getcited' ); ?>
+                </p>
             </div>
 
             <!-- Right Column: robots.txt Settings -->

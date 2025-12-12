@@ -49,7 +49,7 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 
 <div class="wrap getcited-wrap">
 	<h1><?php echo esc_html( apply_filters( 'getcited_brand_name', 'GetCited' ) ); ?></h1>
-	<p class="getcited-tagline"><?php esc_html_e( 'Your competitors are still optimizing for Google. You\'re getting cited by ChatGPT, Gemini, and Grok.', 'getcited' ); ?></p>
+	<p class="getcited-tagline"><?php esc_html_e( 'Your competitors are still optimizing for Google. You\'re set up to be cited by ChatGPT, Gemini, and Grok.', 'getcited' ); ?></p>
 
 	<div class="getcited-dashboard">
 
@@ -58,6 +58,7 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 			<div class="visibility-score-container">
 				<div class="visibility-score-info">
 					<h2><?php esc_html_e( 'AI Visibility Score', 'getcited' ); ?></h2>
+					<p class="score-explainer"><?php esc_html_e( 'Based on crawler access, llms.txt health, schema signals, content structure, and freshness.', 'getcited' ); ?></p>
 					<p class="tier-label tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
 						<?php echo esc_html( $visibility_score['tier']['label'] ); ?>
 					</p>

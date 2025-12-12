@@ -401,7 +401,7 @@ class GetCited_Schema_Detector {
 					'status'  => 'handled',
 					'message' => sprintf(
 						/* translators: %s: plugin name handling schema */
-						__( 'All set! %s is handling your schema markup.', 'getcited' ),
+						__( 'All set! %s is handling your schema markup. GetCited won\'t override it.', 'getcited' ),
 						implode( ', ', $plugin_names )
 					),
 					'source'  => $detection['detected_source'],
@@ -410,7 +410,7 @@ class GetCited_Schema_Detector {
 				// JSON-LD detected but no known plugin.
 				return array(
 					'status'  => 'handled',
-					'message' => __( 'All set! Schema markup detected on your site.', 'getcited' ),
+					'message' => __( 'All set! Schema markup detected on your site. GetCited won\'t override it.', 'getcited' ),
 					'source'  => 'json_ld',
 				);
 			}
