@@ -921,27 +921,35 @@
     // ==========================================================================
 
     function initCitabilityAnalysis() {
-        // Table analyze buttons
-        document.querySelectorAll('.getcited-analyze-post').forEach(btn => {
-            btn.addEventListener('click', function() {
-                analyzePost(this.dataset.postId, this);
-            });
-        });
+        // Use event delegation on the posts table for better reliability
+        const postsTable = document.querySelector('.getcited-posts-table');
+        if (postsTable) {
+            postsTable.addEventListener('click', function(e) {
+                // Handle analyze button clicks
+                const analyzeBtn = e.target.closest('.getcited-analyze-post');
+                if (analyzeBtn) {
+                    e.preventDefault();
+                    analyzePost(analyzeBtn.dataset.postId, analyzeBtn);
+                    return;
+                }
 
-        // View analysis links (post title click)
-        document.querySelectorAll('.getcited-view-analysis').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const postId = this.dataset.postId;
-                const row = document.querySelector(`tr[data-post-id="${postId}"]`);
-                if (row) {
-                    const analyzeBtn = row.querySelector('.getcited-analyze-post');
-                    if (analyzeBtn) {
-                        analyzeBtn.click();
+                // Handle view-analysis link clicks (post title)
+                const viewLink = e.target.closest('.getcited-view-analysis');
+                if (viewLink) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const postId = viewLink.dataset.postId;
+                    const row = postsTable.querySelector(`tr[data-post-id="${postId}"]`);
+                    if (row) {
+                        const btn = row.querySelector('.getcited-analyze-post');
+                        if (btn) {
+                            analyzePost(postId, btn);
+                        }
                     }
+                    return;
                 }
             });
-        });
+        }
 
         // Meta box analyze button
         const metaBoxBtn = document.querySelector('.getcited-meta-box .getcited-analyze-btn');
@@ -2186,69 +2194,21 @@
     }
 
     /**
-     * Populate wizard Step 5 with scan results
+     * Populate wizard Step 6 (complete) with llms.txt preview
      */
     function populateWizardStep5(wizard, scanData) {
         var completeStep = wizard.querySelector('[data-step="complete"]');
         if (!completeStep) return;
 
         var llmsTxt = scanData.llms_txt || '';
-        var data = scanData.scan_data || {};
-
         if (!llmsTxt) return;
 
-        // Find the summary card container
-        var summaryCard = completeStep.querySelector('.wizard-summary-card');
-        if (!summaryCard) return;
+        // Show llms.txt preview if scan data is available
+        var detailsEl = completeStep.querySelector('.wizard-preview-details');
+        var preEl = completeStep.querySelector('.wizard-preview-code');
 
-        // Get site name from scan data
-        var siteInfo = data.site || {};
-        var siteName = siteInfo.name || '';
-
-        // Calculate stats from scan data
-        var pages = (data.pages || []).length;
-        var posts = (data.posts || []).length;
-        var categories = (data.categories || []).length;
-        var social = Object.keys(data.social || {}).length;
-
-        // Build stats HTML - only show non-zero stats
-        var statsHtml = '';
-        if (pages > 0) {
-            statsHtml += '<span class="summary-stat-badge"><strong>' + pages + '</strong> Pages</span>';
-        }
-        if (posts > 0) {
-            statsHtml += '<span class="summary-stat-badge"><strong>' + posts + '</strong> Posts</span>';
-        }
-        if (categories > 0) {
-            statsHtml += '<span class="summary-stat-badge"><strong>' + categories + '</strong> Categories</span>';
-        }
-        if (social > 0) {
-            statsHtml += '<span class="summary-stat-badge"><strong>' + social + '</strong> Social Profiles</span>';
-        }
-
-        // Build the full content card HTML
-        var fullContentHtml =
-            '<div class="summary-card-header">' +
-                '<span class="summary-card-title">' + (siteName || 'Your site') + '</span>' +
-            '</div>' +
-            '<div class="summary-card-stats">' + statsHtml + '</div>' +
-            '<details class="wizard-preview-details">' +
-                '<summary>View llms.txt preview</summary>' +
-                '<pre class="wizard-preview-code">' + escapeHtml(llmsTxt) + '</pre>' +
-            '</details>';
-
-        // Replace the summary card content
-        summaryCard.innerHTML = fullContentHtml;
-
-        // Show the "Edit llms.txt" link if not already present
-        var ctaSection = completeStep.querySelector('.wizard-complete-cta');
-        if (ctaSection && !ctaSection.querySelector('.wizard-edit-link')) {
-            var editLink = document.createElement('a');
-            editLink.href = (window.getcited_admin && window.getcited_admin.admin_url || '/wp-admin/') + 'admin.php?page=getcited-llms-txt';
-            editLink.className = 'wizard-edit-link';
-            editLink.textContent = 'Edit llms.txt';
-            ctaSection.appendChild(editLink);
-        }
+        if (detailsEl) detailsEl.style.display = 'block';
+        if (preEl) preEl.textContent = llmsTxt;
     }
 
     // Helper function to escape HTML
@@ -2644,35 +2604,12 @@
 
     /**
      * Attach analyze handlers to buttons (used after loading more posts)
+     * Note: With event delegation on the table, this is now a no-op.
+     * Kept for backwards compatibility with the Load More flow.
      */
     function attachAnalyzeHandlers() {
-        document.querySelectorAll('.getcited-analyze-post').forEach(btn => {
-            if (btn.dataset.handlerAttached) return;
-            btn.dataset.handlerAttached = 'true';
-
-            btn.addEventListener('click', function() {
-                const postId = this.dataset.postId;
-                analyzePost(postId, this);
-            });
-        });
-
-        // Also attach to view-analysis links
-        document.querySelectorAll('.getcited-view-analysis').forEach(link => {
-            if (link.dataset.handlerAttached) return;
-            link.dataset.handlerAttached = 'true';
-
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const postId = this.dataset.postId;
-                const row = document.querySelector(`tr[data-post-id="${postId}"]`);
-                if (row) {
-                    const analyzeBtn = row.querySelector('.getcited-analyze-post');
-                    if (analyzeBtn) {
-                        analyzeBtn.click();
-                    }
-                }
-            });
-        });
+        // Event delegation on .getcited-posts-table handles all clicks now.
+        // No individual handlers needed for dynamically loaded rows.
     }
 
     // ==========================================================================

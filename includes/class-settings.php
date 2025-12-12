@@ -274,6 +274,9 @@ class GetCited_Settings {
 
         // Clear object cache to ensure other processes get fresh data
         wp_cache_delete( self::OPTION_NAME, 'options' );
+
+        // Invalidate visibility score cache (settings affect score calculation).
+        delete_transient( 'getcited_visibility_score' );
     }
 
     /**

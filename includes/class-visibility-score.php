@@ -283,11 +283,8 @@ class GetCited_Visibility_Score {
 	/**
 	 * Score freshness (0-10 points)
 	 *
-	 * Based on most recent post age:
-	 * - Within 30 days: 10 pts
-	 * - Within 90 days: 7 pts
-	 * - Within 180 days: 4 pts
-	 * - Older: 0 pts
+	 * Site-type aware scoring based on most recent post age.
+	 * Different site types have different freshness expectations.
 	 *
 	 * @return int Points earned.
 	 */
@@ -307,15 +304,56 @@ class GetCited_Visibility_Score {
 		$now         = current_time( 'timestamp' );
 		$days_ago    = ( $now - $post_date ) / DAY_IN_SECONDS;
 
-		if ( $days_ago <= 30 ) {
+		// Get site type for context-aware scoring.
+		$settings  = GetCited_Settings::instance();
+		$site_type = $settings->get( 'site_type' );
+
+		// Portfolio sites: freshness doesn't apply (work samples don't expire).
+		if ( 'portfolio' === $site_type ) {
 			return 10;
-		} elseif ( $days_ago <= 90 ) {
-			return 7;
-		} elseif ( $days_ago <= 180 ) {
-			return 4;
+		}
+
+		// News sites: use strict day-based thresholds.
+		if ( 'news' === $site_type ) {
+			if ( $days_ago <= 1 ) {
+				return 10;
+			} elseif ( $days_ago <= 7 ) {
+				return 5;
+			}
+			return 0;
+		}
+
+		// Get thresholds based on site type (in months).
+		$thresholds = $this->get_freshness_thresholds( $site_type );
+		$months_ago = $days_ago / 30;
+
+		if ( $months_ago <= $thresholds['full'] ) {
+			return 10;
+		} elseif ( $months_ago <= $thresholds['half'] ) {
+			return 5;
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Get freshness thresholds by site type (in months).
+	 *
+	 * @param string $site_type The site type.
+	 * @return array Thresholds with 'full' and 'half' keys.
+	 */
+	private function get_freshness_thresholds( $site_type ) {
+		$thresholds = array(
+			'blog'       => array( 'full' => 6, 'half' => 12 ),
+			'business'   => array( 'full' => 12, 'half' => 24 ),
+			'ecommerce'  => array( 'full' => 6, 'half' => 12 ),
+			'nonprofit'  => array( 'full' => 12, 'half' => 24 ),
+			'education'  => array( 'full' => 24, 'half' => 48 ),
+			'community'  => array( 'full' => 6, 'half' => 12 ),
+			'other'      => array( 'full' => 6, 'half' => 12 ),
+		);
+
+		return isset( $thresholds[ $site_type ] ) ? $thresholds[ $site_type ] : $thresholds['blog'];
 	}
 
 	/**

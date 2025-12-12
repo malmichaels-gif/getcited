@@ -303,11 +303,6 @@ if ( empty( $org['name'] ) ) {
 
         <!-- Step 6: Complete -->
         <div class="getcited-wizard-step" data-step="complete" style="display: none;">
-            <?php
-            $wizard_scan = $wizard->get_scan_data();
-            $has_scan    = $wizard_scan && ! empty( $wizard_scan['llms_txt'] );
-            $scan_data   = $has_scan ? $wizard_scan['scan_data'] : array();
-            ?>
             <div class="wizard-content wizard-complete-content">
                 <!-- Success Badge -->
                 <div class="wizard-success-badge">
@@ -320,79 +315,67 @@ if ( empty( $org['name'] ) ) {
 
                 <h1><?php esc_html_e( 'You\'re all set!', 'getcited' ); ?></h1>
                 <p class="wizard-subtitle">
-                    <?php esc_html_e( 'Your site is now discoverable by AI assistants.', 'getcited' ); ?>
+                    <?php esc_html_e( 'Your site is configured for AI discovery.', 'getcited' ); ?>
                 </p>
 
-                <?php if ( $has_scan ) : ?>
-                    <!-- Content Summary Card -->
-                    <div class="wizard-summary-card">
-                        <div class="summary-card-header">
-                            <?php $site_name = get_bloginfo( 'name' ); ?>
-                            <span class="summary-card-title"><?php echo esc_html( $site_name ? $site_name : __( 'Your site', 'getcited' ) ); ?></span>
-                        </div>
-                        <div class="summary-card-stats">
-                            <?php
-                            // Use actual site totals, not scan_data limits
-                            $page_count     = (int) wp_count_posts( 'page' )->publish;
-                            $post_count     = (int) wp_count_posts( 'post' )->publish;
-                            $category_count = (int) wp_count_terms( array( 'taxonomy' => 'category', 'hide_empty' => false ) );
-                            $social_count   = is_array( $scan_data['social'] ?? null ) ? count( $scan_data['social'] ) : 0;
-
-                            $stats = array(
-                                'pages'      => array( 'count' => $page_count, 'label' => __( 'Pages', 'getcited' ) ),
-                                'posts'      => array( 'count' => $post_count, 'label' => __( 'Posts', 'getcited' ) ),
-                                'categories' => array( 'count' => $category_count, 'label' => __( 'Categories', 'getcited' ) ),
-                                'social'     => array( 'count' => $social_count, 'label' => __( 'Social Profiles', 'getcited' ) ),
-                            );
-                            foreach ( $stats as $stat ) :
-                                if ( $stat['count'] > 0 ) :
-                            ?>
-                                <span class="summary-stat-badge">
-                                    <strong><?php echo esc_html( $stat['count'] ); ?></strong> <?php echo esc_html( $stat['label'] ); ?>
-                                </span>
-                            <?php
-                                endif;
-                            endforeach;
-                            ?>
-                        </div>
-
-                        <!-- Collapsible Preview -->
-                        <details class="wizard-preview-details">
-                            <summary><?php esc_html_e( 'View llms.txt preview', 'getcited' ); ?></summary>
-                            <pre class="wizard-preview-code"><?php echo esc_html( $wizard_scan['llms_txt'] ); ?></pre>
-                        </details>
+                <!-- Summary Card -->
+                <div class="wizard-summary-card">
+                    <?php
+                    $site_name      = get_bloginfo( 'name' );
+                    $page_count     = (int) wp_count_posts( 'page' )->publish;
+                    $post_count     = (int) wp_count_posts( 'post' )->publish;
+                    $category_count = (int) wp_count_terms( array( 'taxonomy' => 'category', 'hide_empty' => false ) );
+                    $settings       = GetCited_Settings::instance();
+                    $org            = $settings->get( 'organization' );
+                    $social_urls    = $org['social_urls'] ?? array();
+                    $social_count   = count( array_filter( $social_urls ) );
+                    ?>
+                    <div class="summary-card-header">
+                        <span class="summary-card-title"><?php echo esc_html( $site_name ? $site_name : __( 'Your site', 'getcited' ) ); ?></span>
+                    </div>
+                    <div class="summary-card-stats">
+                        <?php if ( $page_count > 0 ) : ?>
+                            <span class="summary-stat-badge"><strong><?php echo esc_html( $page_count ); ?></strong> <?php esc_html_e( 'Pages', 'getcited' ); ?></span>
+                        <?php endif; ?>
+                        <?php if ( $post_count > 0 ) : ?>
+                            <span class="summary-stat-badge"><strong><?php echo esc_html( $post_count ); ?></strong> <?php esc_html_e( 'Posts', 'getcited' ); ?></span>
+                        <?php endif; ?>
+                        <?php if ( $category_count > 0 ) : ?>
+                            <span class="summary-stat-badge"><strong><?php echo esc_html( $category_count ); ?></strong> <?php esc_html_e( 'Categories', 'getcited' ); ?></span>
+                        <?php endif; ?>
+                        <?php if ( $social_count > 0 ) : ?>
+                            <span class="summary-stat-badge"><strong><?php echo esc_html( $social_count ); ?></strong> <?php esc_html_e( 'Social Profiles', 'getcited' ); ?></span>
+                        <?php endif; ?>
                     </div>
 
-                <?php else : ?>
-                    <!-- Simple Summary -->
-                    <div class="wizard-summary-card">
-                        <div class="summary-checklist">
-                            <div class="checklist-item">
-                                <span class="dashicons dashicons-yes-alt"></span>
-                                <span><?php esc_html_e( 'AI crawlers allowed', 'getcited' ); ?></span>
-                            </div>
-                            <div class="checklist-item">
-                                <span class="dashicons dashicons-yes-alt"></span>
-                                <span><?php esc_html_e( 'llms.txt file created', 'getcited' ); ?></span>
-                            </div>
-                            <div class="checklist-item">
-                                <span class="dashicons dashicons-yes-alt"></span>
-                                <span><?php esc_html_e( 'Ready for AI discovery', 'getcited' ); ?></span>
-                            </div>
+                    <!-- Checklist -->
+                    <div class="summary-checklist">
+                        <div class="checklist-item">
+                            <span class="dashicons dashicons-yes-alt"></span>
+                            <span><?php esc_html_e( 'AI crawlers allowed', 'getcited' ); ?></span>
+                        </div>
+                        <div class="checklist-item">
+                            <span class="dashicons dashicons-yes-alt"></span>
+                            <span><?php esc_html_e( 'llms.txt file created', 'getcited' ); ?></span>
+                        </div>
+                        <div class="checklist-item">
+                            <span class="dashicons dashicons-yes-alt"></span>
+                            <span><?php esc_html_e( 'Ready for AI discovery', 'getcited' ); ?></span>
                         </div>
                     </div>
-                <?php endif; ?>
+
+                    <!-- llms.txt Preview - populated by JavaScript if scan data available -->
+                    <details class="wizard-preview-details" style="display: none;">
+                        <summary><?php esc_html_e( 'View llms.txt preview', 'getcited' ); ?></summary>
+                        <pre class="wizard-preview-code"></pre>
+                    </details>
+                </div>
 
                 <!-- CTA Section -->
                 <div class="wizard-complete-cta">
                     <button type="button" class="button button-primary button-hero getcited-wizard-complete">
                         <?php esc_html_e( 'Go to Dashboard', 'getcited' ); ?>
                     </button>
-                    <?php if ( $has_scan ) : ?>
-                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>" class="wizard-edit-link">
-                            <?php esc_html_e( 'Edit llms.txt', 'getcited' ); ?>
-                        </a>
-                    <?php endif; ?>
                 </div>
             </div>
         </div>

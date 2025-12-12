@@ -3007,7 +3007,24 @@
     word-wrap: break-word;
 }
 
-/* Checklist (no-scan fallback) */
+/* Loading state for llms.txt preview */
+.wizard-preview-loading {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-md) 0;
+    color: var(--getcited-gray-500);
+    font-size: 14px;
+    border-top: 1px solid var(--getcited-gray-100);
+    margin-top: var(--getcited-space-md);
+}
+
+.wizard-preview-loading .spinner {
+    float: none;
+    margin: 0;
+}
+
+/* Checklist (legacy fallback) */
 .summary-checklist {
     display: flex;
     flex-direction: column;
@@ -5168,6 +5185,13 @@ a.health-status-item.status-warning .status-label {
 /* ==========================================================================
    Score Breakdown Cards - v1.8.0 Simplified
    ========================================================================== */
+
+.score-components-explainer {
+    margin: 0 0 var(--getcited-space-md) 0;
+    font-size: 15px;
+    color: var(--getcited-gray-600);
+    line-height: 1.5;
+}
 
 .getcited-breakdown-cards {
     display: flex;

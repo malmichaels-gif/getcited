@@ -846,38 +846,111 @@ class GetCited_Citability {
     }
 
     /**
-     * Check content freshness
+     * Check content freshness (site-type aware)
+     *
+     * Different site types have different freshness expectations:
+     * - News/Portfolio: Exempt (articles are timestamped records, not meant to be updated)
+     * - Blog: Moderate (months matter)
+     * - Education: Lenient (content can be evergreen)
      */
     private function check_freshness( $post ) {
         $max = $this->rubric['freshness']['max_points'];
 
         $modified = strtotime( $post->post_modified );
         $now = current_time( 'timestamp' );
-        $months_old = ( $now - $modified ) / ( 30 * DAY_IN_SECONDS );
+        $days_old = ( $now - $modified ) / DAY_IN_SECONDS;
+        $months_old = $days_old / 30;
 
-        if ( $months_old <= 6 ) {
+        // Get site type for context-aware scoring.
+        $settings  = GetCited_Settings::instance();
+        $site_type = $settings->get( 'site_type' );
+
+        // Define freshness thresholds by site type (in months).
+        $thresholds = $this->get_freshness_thresholds( $site_type );
+
+        // Portfolio sites: freshness doesn't apply (work samples don't expire).
+        if ( 'portfolio' === $site_type ) {
             return array(
-                'score' => $max,
-                'passed' => true,
+                'score'   => $max,
+                'passed'  => true,
+                'message' => __( 'Portfolio content (freshness not applicable)', 'getcited' ),
+            );
+        }
+
+        // News sites: freshness doesn't apply to individual articles.
+        // News articles are timestamped historical records - the publish date is the value.
+        // Dashboard freshness tracks publishing frequency instead.
+        if ( 'news' === $site_type ) {
+            return array(
+                'score'   => $max,
+                'passed'  => true,
+                'message' => __( 'News article (publish date is the record)', 'getcited' ),
+            );
+        }
+
+        // All other site types: use months.
+        if ( $months_old <= $thresholds['full'] ) {
+            return array(
+                'score'   => $max,
+                'passed'  => true,
                 'message' => __( 'Fresh content', 'getcited' ),
             );
-        } elseif ( $months_old <= 12 ) {
+        } elseif ( $months_old <= $thresholds['half'] ) {
             return array(
-                'score' => round( $max * 0.5 ),
-                'passed' => true,
+                'score'   => round( $max * 0.5 ),
+                'passed'  => true,
                 /* translators: %d: number of months */
                 'message' => sprintf( __( 'Content is %d months old', 'getcited' ), round( $months_old ) ),
                 'recommendation' => __( 'Consider updating this content to improve freshness signals', 'getcited' ),
             );
         } else {
             return array(
-                'score' => 0,
-                'passed' => false,
+                'score'   => 0,
+                'passed'  => false,
                 /* translators: %d: number of months */
                 'message' => sprintf( __( 'Content is %d months old', 'getcited' ), round( $months_old ) ),
                 'recommendation' => __( 'Update this post or add a "Last reviewed" date', 'getcited' ),
             );
         }
+    }
+
+    /**
+     * Get freshness thresholds by site type
+     *
+     * @param string $site_type The site type.
+     * @return array Thresholds with 'full' and 'half' keys (in days for news, months for others).
+     */
+    private function get_freshness_thresholds( $site_type ) {
+        $thresholds = array(
+            // News: 1 day full, 7 days half (in days) - news requires daily freshness.
+            'news'       => array( 'full' => 1, 'half' => 7 ),
+
+            // Blog: 6 months full, 12 months half (default).
+            'blog'       => array( 'full' => 6, 'half' => 12 ),
+
+            // Business: 12 months full, 24 months half (service pages are evergreen).
+            'business'   => array( 'full' => 12, 'half' => 24 ),
+
+            // E-commerce: 6 months full, 12 months half (products need updates).
+            'ecommerce'  => array( 'full' => 6, 'half' => 12 ),
+
+            // Portfolio: Not used (always full points).
+            'portfolio'  => array( 'full' => 999, 'half' => 999 ),
+
+            // Nonprofit: 12 months full, 24 months half (similar to business).
+            'nonprofit'  => array( 'full' => 12, 'half' => 24 ),
+
+            // Education: 24 months full, 48 months half (educational content is evergreen).
+            'education'  => array( 'full' => 24, 'half' => 48 ),
+
+            // Community: 6 months full, 12 months half (community content should stay active).
+            'community'  => array( 'full' => 6, 'half' => 12 ),
+
+            // Other: Default to blog behavior.
+            'other'      => array( 'full' => 6, 'half' => 12 ),
+        );
+
+        return isset( $thresholds[ $site_type ] ) ? $thresholds[ $site_type ] : $thresholds['blog'];
     }
 
     /**

@@ -24,13 +24,12 @@ function getcited_uninstall() {
 
     if ( $keep_settings ) {
         // Only remove transients and cron, keep settings
-        delete_transient( 'getcited_crawler_list' );
-        delete_transient( 'getcited_health_status' );
-        delete_transient( 'getcited_llms_txt_status' );
-        delete_transient( 'getcited_show_citation_nudge' );
-        delete_transient( 'getcited_activation_redirect' );
-        delete_transient( 'getcited_scan_throttle' );
-        delete_transient( 'getcited_wizard_scan' );
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires pattern delete
+        $wpdb->query(
+            "DELETE FROM {$wpdb->options}
+             WHERE option_name LIKE '_transient_getcited%'
+             OR option_name LIKE '_transient_timeout_getcited%'"
+        );
 
         // Remove cron jobs
         wp_clear_scheduled_hook( 'getcited_daily_cron' );
@@ -52,20 +51,12 @@ function getcited_uninstall() {
     delete_transient( 'getcited_health_status' );
     delete_transient( 'getcited_llms_txt_status' );
 
-    // Delete citability cache transients (pattern matching)
+    // Delete ALL getcited transients (catch any we missed)
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires direct query for pattern matching
     $wpdb->query(
         "DELETE FROM {$wpdb->options}
-         WHERE option_name LIKE '_transient_getcited_citability_cache_%'
-         OR option_name LIKE '_transient_timeout_getcited_citability_cache_%'"
-    );
-
-    // Delete request rate limiting transients
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires pattern delete
-    $wpdb->query(
-        "DELETE FROM {$wpdb->options}
-         WHERE option_name LIKE '_transient_getcited_req_%'
-         OR option_name LIKE '_transient_timeout_getcited_req_%'"
+         WHERE option_name LIKE '_transient_getcited%'
+         OR option_name LIKE '_transient_timeout_getcited%'"
     );
 
     // Delete visibility score transient
@@ -88,23 +79,16 @@ function getcited_uninstall() {
              '_getcited_no_schema',
              '_getcited_citability_score',
              '_getcited_last_audit',
-             '_getcited_citation_count'
+             '_getcited_citation_count',
+             '_getcited_has_meta'
          )"
     );
 
-    // 4. Delete user meta (dismissed notices, author fields, tip index)
+    // 4. Delete user meta (dismissed notices, author fields, tip index, etc.)
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Uninstall cleanup requires pattern delete of plugin user meta
     $wpdb->query(
         "DELETE FROM {$wpdb->usermeta}
-         WHERE meta_key LIKE 'getcited_dismissed_%'
-         OR meta_key IN (
-             'getcited_linkedin',
-             'getcited_twitter',
-             'getcited_job_title',
-             'getcited_expertise',
-             'getcited_orcid',
-             'getcited_tip_index'
-         )"
+         WHERE meta_key LIKE 'getcited_%'"
     );
 
     // 5. Remove cron jobs

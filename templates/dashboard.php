@@ -58,7 +58,6 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 			<div class="visibility-score-container">
 				<div class="visibility-score-info">
 					<h2><?php esc_html_e( 'AI Visibility Score', 'getcited' ); ?></h2>
-					<p class="score-explainer"><?php esc_html_e( 'Based on crawler access, llms.txt health, schema signals, content structure, and freshness.', 'getcited' ); ?></p>
 					<p class="tier-label tier-<?php echo esc_attr( $visibility_score['tier']['class'] ); ?>">
 						<?php echo esc_html( $visibility_score['tier']['label'] ); ?>
 					</p>
@@ -93,6 +92,7 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 		<!-- Score Components -->
 		<div class="getcited-section getcited-score-components">
 			<h2><?php esc_html_e( 'Score Components', 'getcited' ); ?></h2>
+			<p class="score-components-explainer"><?php esc_html_e( 'Based on crawler access, llms.txt health, schema signals, content structure, and freshness.', 'getcited' ); ?></p>
 			<div class="getcited-breakdown-cards">
 			<?php foreach ( $visibility_score['breakdown'] as $key => $score ) :
 				$max        = $max_points[ $key ];
