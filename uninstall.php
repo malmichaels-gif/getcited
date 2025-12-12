@@ -88,8 +88,7 @@ function getcited_uninstall() {
              '_getcited_no_schema',
              '_getcited_citability_score',
              '_getcited_last_audit',
-             '_getcited_citation_count',
-             '_getcited_auto_analyzed'
+             '_getcited_citation_count'
          )"
     );
 

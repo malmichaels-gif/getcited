@@ -570,6 +570,12 @@ class GetCited_Wizard {
                 $settings = GetCited_Settings::instance();
                 $settings->set( 'llms_write_physical', true );
 
+                // Save wizard scan llms.txt content to settings before writing
+                $wizard_scan = get_transient( 'getcited_wizard_scan' );
+                if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
+                    $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
+                }
+
                 // Write the physical file
                 $llms   = GetCited_Llms_Txt::instance();
                 $result = $llms->write_physical_file();

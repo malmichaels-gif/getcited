@@ -928,6 +928,21 @@
             });
         });
 
+        // View analysis links (post title click)
+        document.querySelectorAll('.getcited-view-analysis').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const postId = this.dataset.postId;
+                const row = document.querySelector(`tr[data-post-id="${postId}"]`);
+                if (row) {
+                    const analyzeBtn = row.querySelector('.getcited-analyze-post');
+                    if (analyzeBtn) {
+                        analyzeBtn.click();
+                    }
+                }
+            });
+        });
+
         // Meta box analyze button
         const metaBoxBtn = document.querySelector('.getcited-meta-box .getcited-analyze-btn');
         if (metaBoxBtn) {
@@ -2638,6 +2653,24 @@
             btn.addEventListener('click', function() {
                 const postId = this.dataset.postId;
                 analyzePost(postId, this);
+            });
+        });
+
+        // Also attach to view-analysis links
+        document.querySelectorAll('.getcited-view-analysis').forEach(link => {
+            if (link.dataset.handlerAttached) return;
+            link.dataset.handlerAttached = 'true';
+
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const postId = this.dataset.postId;
+                const row = document.querySelector(`tr[data-post-id="${postId}"]`);
+                if (row) {
+                    const analyzeBtn = row.querySelector('.getcited-analyze-post');
+                    if (analyzeBtn) {
+                        analyzeBtn.click();
+                    }
+                }
             });
         });
     }

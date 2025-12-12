@@ -115,6 +115,9 @@ final class GetCited {
         // Admin menu
         add_action( 'admin_menu', array( $this, 'register_admin_menu' ) );
 
+        // Auto-analyze on first admin load (deferred so all plugins are loaded)
+        add_action( 'admin_init', array( $this, 'maybe_auto_analyze' ) );
+
         // Admin assets
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
@@ -161,9 +164,6 @@ final class GetCited {
 
         // Run initial schema detection
         GetCited_Schema_Detector::instance()->run_detection();
-
-        // Auto-analyze 5 recent posts for citability (doesn't count against free tier)
-        GetCited_Citability::instance()->auto_analyze_recent_posts( 5 );
 
         // Create custom database tables
         $this->create_tables();
@@ -489,6 +489,22 @@ final class GetCited {
 
         // Fire hook for extensions
         do_action( 'getcited_llms_refresh' );
+    }
+
+    /**
+     * Auto-analyze recent posts on first admin load
+     *
+     * Deferred from activation hook so all plugins (Yoast, etc.) are loaded
+     * and can provide meta descriptions and schema data.
+     */
+    public function maybe_auto_analyze() {
+        // Only run once
+        if ( get_option( 'getcited_auto_analyzed_done' ) ) {
+            return;
+        }
+
+        // Run the auto-analyze
+        GetCited_Citability::instance()->auto_analyze_recent_posts( 5 );
     }
 
     /**

@@ -144,15 +144,6 @@ class GetCited_Citability {
             'description' => 'Disable schema on this post',
         ) );
 
-        // Auto-analyzed flag (doesn't count against free tier)
-        register_post_meta( 'post', '_getcited_auto_analyzed', array(
-            'type' => 'boolean',
-            'default' => false,
-            'single' => true,
-            'show_in_rest' => false,
-            'description' => 'Post was auto-analyzed on activation',
-        ) );
-
         // Future Pro meta
         register_post_meta( 'post', '_getcited_citation_count', array(
             'type' => 'integer',
@@ -316,7 +307,14 @@ class GetCited_Citability {
             }
 
             $html .= '<tr data-post-id="' . esc_attr( $post->ID ) . '">';
-            $html .= '<td><a href="' . esc_url( get_edit_post_link( $post->ID ) ) . '">' . esc_html( $post->post_title ) . '</a></td>';
+            $html .= '<td>';
+            if ( $score ) {
+                $html .= '<a href="#" class="getcited-view-analysis" data-post-id="' . esc_attr( $post->ID ) . '">' . esc_html( $post->post_title ) . '</a>';
+            } else {
+                $html .= '<span class="getcited-post-title-no-analysis">' . esc_html( $post->post_title ) . '</span>';
+            }
+            $html .= '<a href="' . esc_url( get_edit_post_link( $post->ID ) ) . '" class="getcited-edit-link" title="' . esc_attr__( 'Edit post', 'getcited' ) . '"><span class="dashicons dashicons-external"></span></a>';
+            $html .= '</td>';
             $html .= '<td class="score-cell">';
             if ( $score ) {
                 $html .= '<span class="getcited-score-badge ' . esc_attr( $score_class ) . '">' . esc_html( $score ) . '/100</span>';
@@ -1165,12 +1163,21 @@ class GetCited_Citability {
             return 0;
         }
 
-        $posts = get_posts( array(
+        // Mark as done first (prevents re-running on every admin load).
+        update_option( 'getcited_auto_analyzed_done', true );
+
+        // Get the default "Hello World" post to exclude.
+        $hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
+        $exclude_ids = $hello_world ? array( $hello_world->ID ) : array();
+
+        // Try posts first.
+        $content = get_posts( array(
             'post_type'      => 'post',
             'post_status'    => 'publish',
             'posts_per_page' => $limit,
             'orderby'        => 'date',
             'order'          => 'DESC',
+            'exclude'        => $exclude_ids,
             'meta_query'     => array(
                 array(
                     'key'     => '_getcited_citability_score',
@@ -1179,44 +1186,72 @@ class GetCited_Citability {
             ),
         ) );
 
+        // Fallback to pages if no posts found.
+        if ( empty( $content ) ) {
+            // Exclude common utility pages.
+            $utility_slugs = array( 'privacy-policy', 'terms-of-service', 'terms', 'contact', 'cookie-policy', 'about', 'sample-page' );
+            $exclude_page_ids = array();
+            foreach ( $utility_slugs as $slug ) {
+                $page = get_page_by_path( $slug, OBJECT, 'page' );
+                if ( $page ) {
+                    $exclude_page_ids[] = $page->ID;
+                }
+            }
+
+            $content = get_posts( array(
+                'post_type'      => 'page',
+                'post_status'    => 'publish',
+                'posts_per_page' => $limit,
+                'orderby'        => 'date',
+                'order'          => 'DESC',
+                'exclude'        => $exclude_page_ids,
+                'meta_query'     => array(
+                    array(
+                        'key'     => '_getcited_citability_score',
+                        'compare' => 'NOT EXISTS',
+                    ),
+                ),
+            ) );
+        }
+
+        // No content to analyze.
+        if ( empty( $content ) ) {
+            return 0;
+        }
+
         $analyzed = 0;
-        foreach ( $posts as $post ) {
-            $result = $this->analyze_post( $post->ID );
+        foreach ( $content as $item ) {
+            $result = $this->analyze_post( $item->ID );
             $score  = $result['score'];
             if ( $score > 0 ) {
-                update_post_meta( $post->ID, '_getcited_citability_score', $score );
-                update_post_meta( $post->ID, '_getcited_last_audit', current_time( 'c' ) );
-                update_post_meta( $post->ID, '_getcited_auto_analyzed', true );
+                update_post_meta( $item->ID, '_getcited_citability_score', $score );
+                update_post_meta( $item->ID, '_getcited_last_audit', current_time( 'c' ) );
                 $analyzed++;
             }
         }
-
-        // Mark as done so it doesn't run again.
-        update_option( 'getcited_auto_analyzed_done', true );
 
         return $analyzed;
     }
 
     /**
-     * Get count of manually analyzed posts (excludes auto-analyzed)
+     * Get count of all analyzed posts
      *
-     * @return int Count of manually analyzed posts.
+     * @return int Count of analyzed posts.
      */
-    public function get_manual_analyzed_count() {
-        global $wpdb;
+    public function get_analyzed_count() {
+        $query = new WP_Query( array(
+            'post_type'      => 'post',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Admin-only, optimized, necessary for accurate count.
+                array(
+                    'key'     => '_getcited_citability_score',
+                    'compare' => 'EXISTS',
+                ),
+            ),
+        ) );
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-time count query.
-        $count = $wpdb->get_var(
-            "SELECT COUNT(DISTINCT p.ID)
-            FROM {$wpdb->posts} p
-            INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
-            LEFT JOIN {$wpdb->postmeta} pm_auto ON p.ID = pm_auto.post_id AND pm_auto.meta_key = '_getcited_auto_analyzed'
-            WHERE p.post_type = 'post'
-            AND p.post_status = 'publish'
-            AND pm.meta_key = '_getcited_citability_score'
-            AND (pm_auto.meta_value IS NULL OR pm_auto.meta_value = '' OR pm_auto.meta_value = '0')"
-        );
-
-        return (int) $count;
+        return $query->found_posts;
     }
 }

@@ -107,10 +107,13 @@ The free version runs entirely on your server. The only external request is to f
 
 = 1.9.8.3 =
 * Fixed: Auto-analyze now correctly saves score (was storing array instead of number)
+* Fixed: Auto-analyze deferred to admin_init so all plugins are loaded (accurate scores)
+* Fixed: Wizard "Save File" now writes complete llms.txt content
+* Improved: Clicking post title in Citability shows analysis; edit link icon added
+* Improved: Auto-analyze excludes "Hello World", falls back to pages if no posts exist
 
 = 1.9.8.2 =
 * New: Auto-analyze 5 latest posts on activation for instant visibility score
-* Improved: Auto-analyzed posts don't count against free tier limit
 
 = 1.9.8.1 =
 * Improved: Copy refinements to reduce over-claim language throughout plugin

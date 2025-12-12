@@ -1606,6 +1606,34 @@
     color: var(--getcited-neutral-dark);
 }
 
+.getcited-view-analysis {
+    cursor: pointer;
+}
+
+.getcited-view-analysis:hover {
+    text-decoration: underline;
+}
+
+.getcited-post-title-no-analysis {
+    color: var(--getcited-gray-500);
+}
+
+.getcited-edit-link {
+    margin-left: 6px;
+    color: var(--getcited-gray-400);
+    vertical-align: middle;
+}
+
+.getcited-edit-link:hover {
+    color: var(--getcited-primary);
+}
+
+.getcited-edit-link .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
 .getcited-score-badge {
     display: inline-block;
     padding: 4px 10px;
