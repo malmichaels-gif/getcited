@@ -137,7 +137,7 @@ $crawler_stats = $request_logger->get_request_stats();
                                     <?php else : ?>
                                         <span class="getcited-post-title-no-analysis"><?php echo esc_html( $post->post_title ); ?></span>
                                     <?php endif; ?>
-                                    <a href="<?php echo esc_url( get_edit_post_link( $post->ID ) ); ?>" class="getcited-edit-link" title="<?php esc_attr_e( 'Edit post', 'getcited' ); ?>">
+                                    <a href="<?php echo esc_url( get_edit_post_link( $post->ID ) ); ?>" class="getcited-edit-link" target="_blank" title="<?php esc_attr_e( 'Edit post', 'getcited' ); ?>">
                                         <span class="dashicons dashicons-external"></span>
                                     </a>
                                 </td>

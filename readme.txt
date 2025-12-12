@@ -4,7 +4,7 @@ Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.8.3
+Stable tag: 1.9.8.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,19 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.9.8.5 =
+* Fixed: Auto-analyze now waits for wizard completion (site type affects scoring)
+* Fixed: FAQ detection now includes WordPress core Details and Accordion blocks
+* Improved: Edit post links in Citability open in new tab
+
+= 1.9.8.4 =
+* Fixed: Dashboard freshness scoring now site-type aware (news sites use day-based thresholds)
+* Fixed: Per-post citability exempts news sites from freshness penalties
+* Fixed: Citability post title clicks no longer scroll to top
+* Fixed: Uninstall cleanup now catches all getcited data with pattern matching
+* Improved: Wizard Step 6 simplified to single layout with stats and checkmarks
+* Improved: Scoring explainer moved under Score Components section
 
 = 1.9.8.3 =
 * Fixed: Auto-analyze now correctly saves score (was storing array instead of number)

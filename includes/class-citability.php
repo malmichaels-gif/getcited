@@ -552,10 +552,12 @@ class GetCited_Citability {
         // Check if this is a content type where FAQ is not expected
         $faq_exempt = $this->is_faq_exempt_content( $post_id );
 
-        // Check for Gutenberg FAQ blocks
+        // Check for Gutenberg FAQ blocks (including WP 6.9 Accordion block)
         $has_faq_block = strpos( $content, 'wp:yoast/faq-block' ) !== false ||
                          strpos( $content, 'wp:generateblocks/accordion' ) !== false ||
-                         strpos( $content, 'wp:rank-math/faq-block' ) !== false;
+                         strpos( $content, 'wp:rank-math/faq-block' ) !== false ||
+                         strpos( $content, 'wp:details' ) !== false ||
+                         strpos( $content, 'wp:accordion' ) !== false;
 
         // Check for FAQ heading
         $has_faq_heading = preg_match( '/<h[23][^>]*>.*?(FAQ|Frequently Asked|Common Questions).*?<\/h[23]>/i', $content );

@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.8.3' );
+define( 'GETCITED_VERSION', '1.9.8.5' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -500,6 +500,12 @@ final class GetCited {
     public function maybe_auto_analyze() {
         // Only run once
         if ( get_option( 'getcited_auto_analyzed_done' ) ) {
+            return;
+        }
+
+        // Don't run until wizard is completed (site type affects scoring)
+        $settings = GetCited_Settings::instance();
+        if ( ! $settings->get( 'wizard_completed' ) ) {
             return;
         }
 
