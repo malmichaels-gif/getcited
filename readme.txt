@@ -4,11 +4,11 @@ Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.8.5
+Stable tag: 1.9.8.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Get cited by ChatGPT, Gemini, and Grok. The AI visibility plugin — manage crawlers, generate llms.txt, track citability.
+Optimize for AI search. The AI visibility plugin — manage crawlers, generate llms.txt, track citability.
 
 == Description ==
 
@@ -104,6 +104,12 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.9.8.6 =
+* Improved: Copy refinements for clarity and user-friendliness
+* Changed: Wizard now uses "AI tools" instead of technical jargon
+* Changed: Dashboard messaging softened for realistic expectations
+* Changed: readme.txt tagline updated
 
 = 1.9.8.5 =
 * Fixed: Auto-analyze now waits for wizard completion (site type affects scoring)

@@ -168,7 +168,7 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 					<div class="getcited-activity-empty">
 						<p><?php esc_html_e( 'No requests logged yet.', 'getcited' ); ?></p>
 						<p class="description">
-							<?php esc_html_e( 'AI crawlers typically visit within 1-7 days. Check back soon!', 'getcited' ); ?>
+							<?php esc_html_e( 'AI crawlers visit on their own schedule. Your site is ready!', 'getcited' ); ?>
 						</p>
 					</div>
 

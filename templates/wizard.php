@@ -146,7 +146,7 @@ if ( empty( $org['name'] ) ) {
             <div class="wizard-content">
                 <h1><?php esc_html_e( 'Allow AI to visit your site?', 'getcited' ); ?></h1>
                 <p class="wizard-subtitle">
-                    <?php esc_html_e( 'AI assistants visit websites to learn about them and share your content with users.', 'getcited' ); ?>
+                    <?php esc_html_e( 'AI tools like ChatGPT and Perplexity visit websites to learn about them.', 'getcited' ); ?>
                 </p>
 
                 <div class="getcited-crawler-choice">
@@ -155,7 +155,7 @@ if ( empty( $org['name'] ) ) {
                         <div class="radio-card-content">
                             <span class="card-check"></span>
                             <span class="dashicons dashicons-yes-alt"></span>
-                            <strong><?php esc_html_e( 'Yes, allow all AI assistants', 'getcited' ); ?></strong>
+                            <strong><?php esc_html_e( 'Yes, allow all AI tools', 'getcited' ); ?></strong>
                             <span class="recommended-badge"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
                             <p><?php esc_html_e( 'Get found by ChatGPT, Claude, Perplexity, Gemini, and others.', 'getcited' ); ?></p>
                         </div>
@@ -167,7 +167,7 @@ if ( empty( $org['name'] ) ) {
                             <span class="card-check"></span>
                             <span class="dashicons dashicons-admin-generic"></span>
                             <strong><?php esc_html_e( 'Let me choose later', 'getcited' ); ?></strong>
-                            <p><?php esc_html_e( "I'll pick which AI assistants can visit after setup.", 'getcited' ); ?></p>
+                            <p><?php esc_html_e( "I'll pick which AI tools can visit after setup.", 'getcited' ); ?></p>
                         </div>
                     </label>
                 </div>
