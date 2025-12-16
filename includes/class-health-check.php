@@ -340,8 +340,8 @@ class GetCited_Health_Check {
         if ( ! $is_public ) {
             return array(
                 'status' => 'error',
-                'message' => __( 'Site is set to discourage search engines', 'getcited' ),
-                'details' => __( 'WordPress is blocking all crawlers. Go to Settings → Reading and uncheck "Discourage search engines from indexing this site" to allow AI crawlers.', 'getcited' ),
+                'message' => __( 'Search engine visibility is disabled in WordPress settings', 'getcited' ),
+                'details' => __( 'Uncheck "Discourage search engines" in Settings → Reading to allow AI crawlers.', 'getcited' ),
                 'action_type' => 'settings_link',
                 'action_url' => admin_url( 'options-reading.php' ),
                 'action_label' => __( 'Go to Reading Settings', 'getcited' ),
@@ -879,6 +879,58 @@ class GetCited_Health_Check {
     }
 
     /**
+     * Check if hostname matches staging/development patterns
+     *
+     * Uses precise regex matching to avoid false positives like:
+     * - "developer.example.com" matching ".dev."
+     * - "contest-site.com" matching "test-"
+     *
+     * @param string $host The hostname to check.
+     * @return bool True if matches a staging pattern.
+     */
+    private function matches_staging_hostname( $host ) {
+        if ( empty( $host ) ) {
+            return false;
+        }
+
+        $host = strtolower( $host );
+
+        // Remove port if present.
+        $host = preg_replace( '/:\d+$/', '', $host );
+
+        // Exact matches for localhost/loopback.
+        if ( in_array( $host, array( 'localhost', '127.0.0.1' ), true ) ) {
+            return true;
+        }
+
+        // TLD-based patterns (must end with these).
+        $tld_patterns = array( '.local', '.test', '.localhost' );
+        foreach ( $tld_patterns as $tld ) {
+            if ( substr( $host, -strlen( $tld ) ) === $tld ) {
+                return true;
+            }
+        }
+
+        // Subdomain patterns (must have dots on both sides).
+        $subdomain_patterns = array( '.staging.', '.dev.', '.test.', '.local.' );
+        foreach ( $subdomain_patterns as $pattern ) {
+            if ( strpos( $host, $pattern ) !== false ) {
+                return true;
+            }
+        }
+
+        // Prefix patterns (must be at the start of hostname).
+        $prefix_patterns = array( 'staging-', 'dev-', 'test-', 'staging.', 'dev.', 'local.' );
+        foreach ( $prefix_patterns as $prefix ) {
+            if ( strpos( $host, $prefix ) === 0 ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Detect environment type
      *
      * @return string Environment identifier
@@ -895,24 +947,8 @@ class GetCited_Health_Check {
         // Check common staging URL patterns
         $host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
 
-        $staging_patterns = array(
-            '.staging.',
-            '.dev.',
-            '.test.',
-            '.local.',
-            'staging-',
-            'dev-',
-            'test-',
-            'localhost',
-            '127.0.0.1',
-            '.local',
-            '.test',
-        );
-
-        foreach ( $staging_patterns as $pattern ) {
-            if ( stripos( $host, $pattern ) !== false ) {
-                return 'staging (URL pattern)';
-            }
+        if ( $this->matches_staging_hostname( $host ) ) {
+            return 'staging (URL pattern)';
         }
 
         // Check debug constants combination
@@ -940,27 +976,7 @@ class GetCited_Health_Check {
         // Check URL patterns
         $host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
 
-        $staging_patterns = array(
-            '.staging.',
-            '.dev.',
-            '.test.',
-            '.local.',
-            'staging-',
-            'dev-',
-            'test-',
-            'localhost',
-            '127.0.0.1',
-            '.local',
-            '.test',
-        );
-
-        foreach ( $staging_patterns as $pattern ) {
-            if ( stripos( $host, $pattern ) !== false ) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->matches_staging_hostname( $host );
     }
 
     /**

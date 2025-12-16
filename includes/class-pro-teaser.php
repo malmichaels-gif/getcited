@@ -204,15 +204,8 @@ class GetCited_Pro_Teaser {
         $site_domain = wp_parse_url( home_url(), PHP_URL_HOST );
         $site_domain = preg_replace( '/^www\./', '', $site_domain );
 
-        // Check if domain looks like staging/dev environment.
-        $staging_patterns = array( 'stg', 'staging', 'dev', 'local', 'test', 'kinsta', 'wpengine', 'pantheon', 'flywheel' );
-        $is_staging = false;
-        foreach ( $staging_patterns as $pattern ) {
-            if ( stripos( $site_domain, $pattern ) !== false ) {
-                $is_staging = true;
-                break;
-            }
-        }
+        // Check if domain looks like staging/dev environment using centralized detection.
+        $is_staging = GetCited_Health_Check::instance()->is_staging_environment();
 
         // If staging, use site name instead.
         if ( $is_staging ) {

@@ -226,37 +226,84 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 						'schema'        => admin_url( 'admin.php?page=getcited-schema' ),
 						'rewrite_rules' => admin_url( 'options-permalink.php' ),
 					);
+
+					// Add environment badge if staging/development detected.
+					if ( isset( $health_status['environment'] ) && ! empty( $health_status['environment']['is_staging'] ) ) {
+						$quick_checks['environment'] = __( 'Dev/Staging', 'getcited' );
+						$check_links['environment']  = admin_url( 'options-reading.php' );
+					}
+
 					foreach ( $quick_checks as $key => $label ) :
 						if ( ! isset( $health_status[ $key ] ) ) continue;
 						$check = $health_status[ $key ];
-						$icon  = $check['status'] === 'ok' ? '✓' : ( $check['status'] === 'warning' ? '!' : '✕' );
+						$icon  = $check['status'] === 'ok' ? '✓' : ( $check['status'] === 'warning' ? '!' : ( $check['status'] === 'info' ? 'ⓘ' : '✕' ) );
 						$class = 'status-' . $check['status'];
 						$link  = $check_links[ $key ] ?? '#';
 					?>
-					<a href="<?php echo esc_url( $link ); ?>" class="health-status-item <?php echo esc_attr( $class ); ?>">
+					<a href="<?php echo esc_url( $link ); ?>" class="health-status-item <?php echo esc_attr( $class ); ?>" title="<?php echo esc_attr( $check['message'] ?? '' ); ?>">
 						<span class="status-icon"><?php echo esc_html( $icon ); ?></span>
 						<span class="status-label"><?php echo esc_html( $label ); ?></span>
 					</a>
 					<?php endforeach; ?>
 				</div>
-				<p class="description">
-					<?php
-					$issues = array();
-					foreach ( $quick_checks as $key => $label ) {
-						if ( isset( $health_status[ $key ] ) && $health_status[ $key ]['status'] !== 'ok' ) {
-							$issues[] = $label;
-						}
+				<?php
+				$issue_data = array();
+				foreach ( $quick_checks as $key => $label ) {
+					if ( isset( $health_status[ $key ] ) && ! in_array( $health_status[ $key ]['status'], array( 'ok', 'info' ), true ) ) {
+						$issue_data[] = array(
+							'message' => ! empty( $health_status[ $key ]['message'] ) ? $health_status[ $key ]['message'] : $label,
+							'status'  => $health_status[ $key ]['status'],
+						);
 					}
-					if ( empty( $issues ) ) {
-						esc_html_e( 'All systems healthy. Your site is ready for AI crawlers.', 'getcited' );
-					} else {
-						/* translators: %s: comma-separated list of items needing attention */
-						printf( esc_html__( '%s needs attention. Click to fix.', 'getcited' ), esc_html( implode( ', ', $issues ) ) );
-					}
+				}
+				if ( empty( $issue_data ) ) :
+				?>
+				<p class="description"><?php esc_html_e( 'All systems healthy. Your site is ready for AI crawlers.', 'getcited' ); ?></p>
+				<?php else : ?>
+				<div class="getcited-health-issues">
+					<?php foreach ( $issue_data as $issue ) :
+						$issue_icon = $issue['status'] === 'error' ? '✕' : '!';
+						$issue_class = 'status-' . $issue['status'];
 					?>
-				</p>
+					<div class="getcited-health-issue <?php echo esc_attr( $issue_class ); ?>">
+						<span class="issue-icon"><?php echo esc_html( $issue_icon ); ?></span>
+						<span class="issue-text"><?php echo esc_html( $issue['message'] ); ?></span>
+					</div>
+					<?php endforeach; ?>
+				</div>
+				<?php endif; ?>
 			</div>
 		</div>
+
+		<!-- Plugin Compatibility Notices (only shows when relevant) -->
+		<?php
+		$plugin_checks = array( 'redirection', 'caching_plugins', 'security_plugins', 'jetpack' );
+		$notices       = array();
+		foreach ( $plugin_checks as $key ) {
+			if ( isset( $health_status[ $key ] ) && in_array( $health_status[ $key ]['status'], array( 'warning', 'info' ), true ) ) {
+				$notices[ $key ] = $health_status[ $key ];
+			}
+		}
+		if ( ! empty( $notices ) ) :
+		?>
+		<div class="getcited-plugin-notices">
+			<?php foreach ( $notices as $key => $notice ) :
+				$notice_class = $notice['status'] === 'warning' ? 'notice-warning' : 'notice-info';
+			?>
+			<div class="getcited-notice <?php echo esc_attr( $notice_class ); ?>">
+				<strong><?php echo esc_html( $notice['message'] ); ?></strong>
+				<?php if ( ! empty( $notice['details'] ) ) : ?>
+				<p><?php echo wp_kses( $notice['details'], array( 'code' => array(), 'strong' => array() ) ); ?></p>
+				<?php endif; ?>
+				<?php if ( ! empty( $notice['action_url'] ) ) : ?>
+				<a href="<?php echo esc_url( $notice['action_url'] ); ?>" class="button button-small">
+					<?php echo esc_html( $notice['action_label'] ?? __( 'View Details', 'getcited' ) ); ?>
+				</a>
+				<?php endif; ?>
+			</div>
+			<?php endforeach; ?>
+		</div>
+		<?php endif; ?>
 
 		<!-- Pro Features Section -->
 		<?php $pro_teaser->render_dashboard_teasers(); ?>

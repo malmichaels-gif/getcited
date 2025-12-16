@@ -5182,6 +5182,77 @@ a.health-status-item.status-warning .status-label {
     color: var(--getcited-status-warning);
 }
 
+.health-status-item.status-info .status-icon {
+    background: var(--getcited-status-info);
+}
+
+a.health-status-item.status-info {
+    background: var(--getcited-gray-100);
+}
+
+a.health-status-item.status-info:hover {
+    background: var(--getcited-gray-200);
+}
+
+a.health-status-item.status-info .status-label {
+    color: var(--getcited-status-info);
+}
+
+/* Health Status Issue Notices */
+.getcited-health-issues {
+    margin-top: var(--getcited-space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-xs);
+}
+
+.getcited-health-issue {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) var(--getcited-space-md);
+    border-radius: var(--getcited-radius-sm);
+    font-size: var(--getcited-font-sm);
+    background: var(--getcited-gray-100);
+    color: var(--getcited-text-secondary);
+}
+
+.getcited-health-issue.status-error {
+    background: #fee2e2;
+    color: var(--getcited-status-error);
+}
+
+.getcited-health-issue.status-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.getcited-health-issue .issue-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    background: currentColor;
+    color: white;
+}
+
+.getcited-health-issue.status-error .issue-icon {
+    background: var(--getcited-status-error);
+}
+
+.getcited-health-issue.status-warning .issue-icon {
+    background: var(--getcited-status-warning);
+}
+
+.getcited-health-issue .issue-text {
+    flex: 1;
+}
+
 /* ==========================================================================
    Score Breakdown Cards - v1.8.0 Simplified
    ========================================================================== */
@@ -5394,6 +5465,53 @@ a.health-status-item.status-warning .status-label {
     font-size: 15px;
     width: 14px;
     height: 14px;
+}
+
+/* ==========================================================================
+   Plugin Compatibility Notices
+   ========================================================================== */
+
+.getcited-plugin-notices {
+    display: flex;
+    flex-direction: column;
+    gap: var(--getcited-space-sm);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+.getcited-notice {
+    padding: var(--getcited-space-md) var(--getcited-space-lg);
+    border-radius: var(--getcited-radius-md);
+    border-left: 4px solid;
+    background: var(--getcited-bg-subtle);
+}
+
+.getcited-notice.notice-warning {
+    border-left-color: var(--getcited-status-warning);
+    background: #fffbeb;
+}
+
+.getcited-notice.notice-info {
+    border-left-color: var(--getcited-status-info);
+    background: var(--getcited-bg-subtle);
+}
+
+.getcited-notice strong {
+    display: block;
+    font-size: var(--getcited-font-sm);
+    font-weight: 600;
+    color: var(--getcited-text-primary);
+    margin-bottom: var(--getcited-space-xs);
+}
+
+.getcited-notice p {
+    margin: 0 0 var(--getcited-space-sm) 0;
+    font-size: var(--getcited-font-sm);
+    color: var(--getcited-text-secondary);
+    line-height: 1.5;
+}
+
+.getcited-notice .button-small {
+    margin-top: var(--getcited-space-xs);
 }
 
 /* ==========================================================================
