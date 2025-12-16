@@ -874,13 +874,134 @@ class GetCited_Site_Scanner {
 			return wp_strip_all_tags( strip_shortcodes( $post->post_excerpt ) );
 		}
 
-		// Strip shortcodes and page builder content
+		// Try to get content from page builders first.
+		$builder_content = $this->extract_page_builder_content( $post->ID );
+		if ( ! empty( $builder_content ) ) {
+			return wp_trim_words( $builder_content, 30 );
+		}
+
+		// Fall back to post_content.
 		$content = strip_shortcodes( $post->post_content );
 		$content = preg_replace( '/\[[^\]]*\]/', '', $content );
 		$content = preg_replace( '/[A-Za-z0-9+\/=]{50,}/', '', $content );
 		$content = wp_strip_all_tags( $content );
 
 		return wp_trim_words( $content, 30 );
+	}
+
+	/**
+	 * Extract text content from page builder data
+	 *
+	 * Handles Elementor (JSON in meta) and Divi (shortcodes with content attributes).
+	 *
+	 * @param int $post_id The post ID.
+	 * @return string Extracted text content, or empty string if not a builder page.
+	 */
+	private function extract_page_builder_content( $post_id ) {
+		$text = '';
+
+		// Elementor: Content stored in _elementor_data meta as JSON.
+		$elementor_data = get_post_meta( $post_id, '_elementor_data', true );
+		if ( ! empty( $elementor_data ) ) {
+			$text = $this->extract_elementor_text( $elementor_data );
+			if ( ! empty( $text ) ) {
+				return $text;
+			}
+		}
+
+		// Divi: Check for Divi builder usage.
+		$divi_enabled = get_post_meta( $post_id, '_et_pb_use_builder', true );
+		if ( 'on' === $divi_enabled ) {
+			$post = get_post( $post_id );
+			if ( $post ) {
+				$text = $this->extract_divi_text( $post->post_content );
+				if ( ! empty( $text ) ) {
+					return $text;
+				}
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Extract text from Elementor JSON data
+	 *
+	 * @param string $json_data The Elementor JSON data.
+	 * @return string Extracted text.
+	 */
+	private function extract_elementor_text( $json_data ) {
+		if ( is_string( $json_data ) ) {
+			$data = json_decode( $json_data, true );
+		} else {
+			$data = $json_data;
+		}
+
+		if ( ! is_array( $data ) ) {
+			return '';
+		}
+
+		$texts = array();
+		$this->collect_elementor_text( $data, $texts );
+
+		$content = implode( ' ', $texts );
+		$content = wp_strip_all_tags( $content );
+		$content = preg_replace( '/\s+/', ' ', $content );
+
+		return trim( $content );
+	}
+
+	/**
+	 * Recursively collect text from Elementor data structure
+	 *
+	 * @param array $elements The elements array.
+	 * @param array $texts    Reference to texts array.
+	 */
+	private function collect_elementor_text( $elements, &$texts ) {
+		foreach ( $elements as $element ) {
+			// Extract text from settings.
+			if ( isset( $element['settings'] ) ) {
+				$settings = $element['settings'];
+
+				// Common text fields in Elementor widgets.
+				$text_keys = array( 'title', 'description', 'text', 'content', 'editor', 'heading', 'subtitle', 'caption', 'testimonial_content', 'item_description' );
+				foreach ( $text_keys as $key ) {
+					if ( ! empty( $settings[ $key ] ) && is_string( $settings[ $key ] ) ) {
+						$texts[] = $settings[ $key ];
+					}
+				}
+			}
+
+			// Recurse into nested elements.
+			if ( ! empty( $element['elements'] ) ) {
+				$this->collect_elementor_text( $element['elements'], $texts );
+			}
+		}
+	}
+
+	/**
+	 * Extract text from Divi shortcode content
+	 *
+	 * @param string $content The post content with Divi shortcodes.
+	 * @return string Extracted text.
+	 */
+	private function extract_divi_text( $content ) {
+		// Divi stores text in shortcode content and attributes.
+		// Extract content between Divi shortcodes.
+		$text = preg_replace( '/\[et_pb_[^\]]*\]/', '', $content );
+		$text = preg_replace( '/\[\/et_pb_[^\]]*\]/', '', $text );
+
+		// Also try to get content from common Divi text modules.
+		// Pattern: [et_pb_text ...]content here[/et_pb_text]
+		preg_match_all( '/\[et_pb_(?:text|blurb|cta|slide)[^\]]*\](.*?)\[\/et_pb_/s', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= ' ' . implode( ' ', $matches[1] );
+		}
+
+		$text = wp_strip_all_tags( $text );
+		$text = preg_replace( '/\s+/', ' ', $text );
+
+		return trim( $text );
 	}
 
 	/**

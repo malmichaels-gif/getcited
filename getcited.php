@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.8.8
+ * Version: 1.9.8.9
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.8.8' );
+define( 'GETCITED_VERSION', '1.9.8.9' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -106,6 +106,9 @@ final class GetCited {
         register_activation_hook( __FILE__, array( $this, 'activate' ) );
         register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
 
+        // Multisite: Handle new site creation.
+        add_action( 'wp_initialize_site', array( $this, 'on_new_site' ), 10, 1 );
+
         // Initialize components after plugins loaded
         add_action( 'plugins_loaded', array( $this, 'init_components' ) );
 
@@ -135,8 +138,27 @@ final class GetCited {
 
     /**
      * Plugin activation
+     *
+     * @param bool $network_wide Whether to activate network-wide on multisite.
      */
-    public function activate() {
+    public function activate( $network_wide = false ) {
+        // Handle multisite network activation.
+        if ( is_multisite() && $network_wide ) {
+            $sites = get_sites( array( 'number' => 0 ) );
+            foreach ( $sites as $site ) {
+                switch_to_blog( $site->blog_id );
+                $this->activate_single_site();
+                restore_current_blog();
+            }
+        } else {
+            $this->activate_single_site();
+        }
+    }
+
+    /**
+     * Activate plugin for a single site
+     */
+    private function activate_single_site() {
         // Initialize default settings
         $settings = GetCited_Settings::instance();
         $settings->init_defaults();
@@ -182,9 +204,43 @@ final class GetCited {
     }
 
     /**
-     * Plugin deactivation
+     * Handle new site creation on multisite
+     *
+     * @param WP_Site $new_site New site object.
      */
-    public function deactivate() {
+    public function on_new_site( $new_site ) {
+        if ( ! is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) {
+            return;
+        }
+
+        switch_to_blog( $new_site->blog_id );
+        $this->activate_single_site();
+        restore_current_blog();
+    }
+
+    /**
+     * Plugin deactivation
+     *
+     * @param bool $network_wide Whether deactivating network-wide on multisite.
+     */
+    public function deactivate( $network_wide = false ) {
+        // Handle multisite network deactivation.
+        if ( is_multisite() && $network_wide ) {
+            $sites = get_sites( array( 'number' => 0 ) );
+            foreach ( $sites as $site ) {
+                switch_to_blog( $site->blog_id );
+                $this->deactivate_single_site();
+                restore_current_blog();
+            }
+        } else {
+            $this->deactivate_single_site();
+        }
+    }
+
+    /**
+     * Deactivate plugin for a single site
+     */
+    private function deactivate_single_site() {
         // Remove cron jobs
         $timestamp = wp_next_scheduled( 'getcited_daily_cron' );
         if ( $timestamp ) {
@@ -586,39 +642,23 @@ final class GetCited {
     }
 
     /**
-     * API: Status endpoint
+     * API: Status endpoint (public, minimal info)
+     *
+     * Returns only basic info safe for public consumption.
+     * Detailed config requires authentication via /settings endpoint.
      */
     public function api_status() {
-        $settings = GetCited_Settings::instance()->get_all();
-        $crawlers = GetCited_Crawler_List::instance()->get_all();
-        $health = GetCited_Health_Check::instance()->get_status();
+        $settings = GetCited_Settings::instance();
+        $health   = GetCited_Health_Check::instance()->get_status();
 
-        $allowed = 0;
-        $blocked = 0;
-        foreach ( $settings['crawlers'] as $status ) {
-            if ( $status === 'allow' ) {
-                $allowed++;
-            } else {
-                $blocked++;
-            }
-        }
-
+        // Public response: only basic operational status, no internal config.
         return rest_ensure_response( array(
-            'version' => GETCITED_VERSION,
-            'crawlers' => array(
-                'allowed' => $allowed,
-                'blocked' => $blocked,
-                'total' => count( $crawlers ),
-            ),
+            'version'  => GETCITED_VERSION,
             'llms_txt' => array(
-                'enabled' => $settings['llms_txt_enabled'],
-                'status' => $health['llms_txt'] ?? 'unknown',
+                'enabled' => (bool) $settings->get( 'llms_txt_enabled' ),
+                'url'     => $settings->get( 'llms_txt_enabled' ) ? home_url( '/llms.txt' ) : null,
             ),
-            'schema' => array(
-                'enabled' => $settings['schema_enabled'],
-                'types' => $settings['schema_types'],
-            ),
-            'license_status' => $settings['license_status'],
+            'status'   => ! empty( $health['llms_txt'] ) && 'ok' === $health['llms_txt'] ? 'active' : 'configured',
         ) );
     }
 
