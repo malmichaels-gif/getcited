@@ -206,8 +206,18 @@ class GetCited_Site_Scanner {
 				'posts_per_page' => 20,
 				'orderby'        => 'date',
 				'order'          => 'DESC',
+				'has_password'   => false, // Exclude password-protected posts.
 			)
 		);
+
+		if ( empty( $posts ) ) {
+			return array();
+		}
+
+		// Prime caches to avoid N+1 queries in the loop.
+		$post_ids = wp_list_pluck( $posts, 'ID' );
+		update_meta_cache( 'post', $post_ids );
+		update_object_term_cache( $post_ids, 'post' );
 
 		$result = array();
 		foreach ( $posts as $post ) {
@@ -328,11 +338,16 @@ class GetCited_Site_Scanner {
 
 		$result = array();
 		foreach ( $menu_items as $item ) {
-			if ( (int) $item->menu_item_parent === 0 ) { // Top-level items only
+			if ( (int) $item->menu_item_parent === 0 ) { // Top-level items only.
 				$result[] = array(
 					'title' => $item->title,
 					'url'   => $item->url,
 				);
+
+				// Limit to 20 top-level menu items for performance.
+				if ( count( $result ) >= 20 ) {
+					break;
+				}
 			}
 		}
 
@@ -597,13 +612,18 @@ class GetCited_Site_Scanner {
 	 * @return array Updated social links.
 	 */
 	private function scan_menus_for_social( $social, $social_patterns ) {
-		// Get all menus
-		$menus = wp_get_nav_menus();
+		// Get all menus (limit to first 5 for performance).
+		$menus = wp_get_nav_menus( array( 'number' => 5 ) );
 		if ( ! $menus ) {
 			return $social;
 		}
 
 		foreach ( $menus as $menu ) {
+			// Stop scanning once we have enough social links.
+			if ( count( $social ) >= 8 ) {
+				break;
+			}
+
 			$menu_items = wp_get_nav_menu_items( $menu->term_id );
 			if ( ! $menu_items ) {
 				continue;
@@ -615,10 +635,10 @@ class GetCited_Site_Scanner {
 					continue;
 				}
 
-				// Check URL against known social patterns
+				// Check URL against known social patterns.
 				foreach ( $social_patterns as $platform => $patterns ) {
 					if ( isset( $social[ $platform ] ) ) {
-						continue; // Already found this platform
+						continue; // Already found this platform.
 					}
 
 					$patterns_array = is_array( $patterns ) ? $patterns : array( $patterns );
@@ -771,11 +791,33 @@ class GetCited_Site_Scanner {
 
 			$count = wp_count_posts( $type->name );
 			if ( isset( $count->publish ) && $count->publish > 0 ) {
-				$result[ $type->name ] = array(
+				$cpt_data = array(
 					'label'       => $type->label,
 					'count'       => $count->publish,
 					'archive_url' => $archive_url,
+					'recent'      => array(),
 				);
+
+				// Fetch a few recent items from this CPT for llms.txt content.
+				$recent_items = get_posts(
+					array(
+						'post_type'      => $type->name,
+						'post_status'    => 'publish',
+						'posts_per_page' => 3,
+						'orderby'        => 'date',
+						'order'          => 'DESC',
+						'has_password'   => false,
+					)
+				);
+
+				foreach ( $recent_items as $item ) {
+					$cpt_data['recent'][] = array(
+						'title' => $item->post_title,
+						'url'   => get_permalink( $item ),
+					);
+				}
+
+				$result[ $type->name ] = $cpt_data;
 			}
 		}
 
@@ -844,29 +886,45 @@ class GetCited_Site_Scanner {
 	/**
 	 * Get content preview with HTML and shortcodes stripped
 	 *
+	 * Handles content from various page builders (Elementor, Divi, WPBakery, etc.)
+	 * by removing their markup patterns before extracting readable text.
+	 *
 	 * @param string $content The content to preview.
 	 * @param int    $length  Maximum length.
 	 * @return string Clean content preview.
 	 */
 	private function get_content_preview( $content, $length = 500 ) {
-		// Strip shortcodes first (including page builder shortcodes)
+		// Strip shortcodes first (including page builder shortcodes).
 		$text = strip_shortcodes( $content );
 
-		// Remove common page builder patterns that look like shortcodes but aren't caught
-		// Matches [anything_with_underscores ...] style shortcodes
+		// Remove Gutenberg block comments (<!-- wp:* --> patterns).
+		$text = preg_replace( '/<!--\s*\/?wp:[^>]*-->/s', '', $text );
+
+		// Remove inline styles and scripts.
+		$text = preg_replace( '/<style[^>]*>.*?<\/style>/is', '', $text );
+		$text = preg_replace( '/<script[^>]*>.*?<\/script>/is', '', $text );
+
+		// Remove common page builder patterns that look like shortcodes but aren't caught.
+		// Matches [anything_with_underscores ...] style shortcodes (Divi, WPBakery, etc.).
 		$text = preg_replace( '/\[[^\]]*\]/', '', $text );
 
-		// Remove base64-encoded content (common in page builders)
+		// Remove base64-encoded content (common in page builders).
 		$text = preg_replace( '/[A-Za-z0-9+\/=]{50,}/', '', $text );
 
-		// Strip HTML tags
+		// Remove JSON-like data blocks (Elementor stores data this way).
+		$text = preg_replace( '/\{[^{}]*"[^{}]*"[^{}]*\}/', '', $text );
+
+		// Remove data attributes content that may have leaked.
+		$text = preg_replace( '/data-[a-z-]+="[^"]*"/i', '', $text );
+
+		// Strip HTML tags.
 		$text = wp_strip_all_tags( $text );
 
-		// Normalize whitespace
+		// Normalize whitespace.
 		$text = preg_replace( '/\s+/', ' ', $text );
 		$text = trim( $text );
 
-		// If result is too short or empty after cleaning, return empty
+		// If result is too short or empty after cleaning, return empty.
 		if ( mb_strlen( $text ) < 20 ) {
 			return '';
 		}
@@ -1004,6 +1062,13 @@ class GetCited_Site_Scanner {
 			$content .= "## Content Collections\n\n";
 			foreach ( $scan_data['custom_post_types'] as $type_name => $type ) {
 				$content .= '- [' . $this->escape_markdown( $type['label'] ) . '](' . esc_url( $type['archive_url'] ) . ') — ' . absint( $type['count'] ) . " items\n";
+
+				// Include recent items from this CPT.
+				if ( ! empty( $type['recent'] ) ) {
+					foreach ( $type['recent'] as $item ) {
+						$content .= '  - [' . $this->escape_markdown( $item['title'] ) . '](' . esc_url( $item['url'] ) . ")\n";
+					}
+				}
 			}
 			$content .= "\n";
 		}

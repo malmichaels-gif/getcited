@@ -639,8 +639,9 @@ class GetCited_Llms_Txt {
         // Fetch extra posts to account for noindex filtering.
         $posts = get_posts(
             array(
-                'numberposts' => $count * 2,
-                'post_status' => 'publish',
+                'numberposts'  => $count * 2,
+                'post_status'  => 'publish',
+                'has_password' => false, // Exclude password-protected posts from llms.txt.
             )
         );
 

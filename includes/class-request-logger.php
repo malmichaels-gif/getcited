@@ -109,6 +109,47 @@ class GetCited_Request_Logger {
 	}
 
 	/**
+	 * Get client IP address, accounting for CDN/proxy headers
+	 *
+	 * Checks common proxy headers in order of trust. For sites behind
+	 * Cloudflare, Nginx, or other reverse proxies, this ensures we get
+	 * the actual client IP instead of the proxy's IP.
+	 *
+	 * @return string Client IP address.
+	 */
+	private function get_client_ip() {
+		// Headers to check, in order of preference.
+		// More specific/trusted headers first.
+		$headers = array(
+			'HTTP_CF_CONNECTING_IP', // Cloudflare.
+			'HTTP_X_REAL_IP',        // Nginx proxy.
+			'HTTP_X_FORWARDED_FOR',  // Generic proxy (may contain multiple IPs).
+			'REMOTE_ADDR',           // Direct connection fallback.
+		);
+
+		foreach ( $headers as $header ) {
+			if ( ! empty( $_SERVER[ $header ] ) ) {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- IP is validated below.
+				$ip = wp_unslash( $_SERVER[ $header ] );
+
+				// X-Forwarded-For may contain multiple IPs (client, proxy1, proxy2).
+				// The first one is the original client.
+				if ( strpos( $ip, ',' ) !== false ) {
+					$ips = explode( ',', $ip );
+					$ip  = trim( $ips[0] );
+				}
+
+				// Validate IP format before using.
+				if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+					return $ip;
+				}
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Hash the client IP for rate limiting
 	 *
 	 * We hash IPs to avoid storing PII while still enabling rate limiting.
@@ -116,8 +157,7 @@ class GetCited_Request_Logger {
 	 * @return string
 	 */
 	private function hash_ip() {
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- IP is hashed, not displayed
-		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? wp_unslash( $_SERVER['REMOTE_ADDR'] ) : '';
+		$ip = $this->get_client_ip();
 
 		// Use site-specific salt for privacy.
 		$salt = wp_salt( 'auth' );
