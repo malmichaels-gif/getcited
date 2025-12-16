@@ -644,6 +644,14 @@ class GetCited_Llms_Txt {
             )
         );
 
+        if ( empty( $posts ) ) {
+            return array();
+        }
+
+        // Prime the meta cache for all posts in one query (avoids N+1 queries in loop).
+        $post_ids = wp_list_pluck( $posts, 'ID' );
+        update_meta_cache( 'post', $post_ids );
+
         $result = array();
         foreach ( $posts as $post ) {
             // Skip noindex posts.

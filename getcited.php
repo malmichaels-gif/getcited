@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.8.6
+ * Version: 1.9.8.7
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.8.6' );
+define( 'GETCITED_VERSION', '1.9.8.7' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -446,6 +446,18 @@ final class GetCited {
         if ( class_exists( 'GetCited_Request_Logger' ) ) {
             GetCited_Request_Logger::instance()->cleanup_old_requests();
         }
+
+        // Clean up expired request duplicate-detection transients.
+        // These have 1-hour TTL but WordPress doesn't auto-clean expired transients
+        // without an external object cache, causing options table bloat over time.
+        global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Batch cleanup of expired transients requires direct query.
+        $wpdb->query(
+            "DELETE a, b FROM {$wpdb->options} a
+             LEFT JOIN {$wpdb->options} b ON b.option_name = REPLACE(a.option_name, '_transient_timeout_', '_transient_')
+             WHERE a.option_name LIKE '_transient_timeout_getcited_req_%'
+             AND a.option_value < UNIX_TIMESTAMP()"
+        );
 
         // Fire hook for extensions
         do_action( 'getcited_daily_tasks' );

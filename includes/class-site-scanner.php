@@ -790,13 +790,14 @@ class GetCited_Site_Scanner {
 			return array();
 		}
 
-		// Get product categories
+		// Get product categories (limited to top 6 by sales volume).
 		$categories = get_terms(
 			array(
 				'taxonomy'   => 'product_cat',
 				'hide_empty' => true,
 				'orderby'    => 'count',
 				'order'      => 'DESC',
+				'number'     => 6,
 			)
 		);
 
