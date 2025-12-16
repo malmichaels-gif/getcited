@@ -65,6 +65,8 @@ class GetCited_Health_Check {
             'caching_plugins' => $this->check_caching_plugins(),
             'security_plugins' => $this->check_security_plugins(),
             'environment' => $this->check_environment(),
+            'redirection' => $this->check_redirection_plugin(),
+            'jetpack' => $this->check_jetpack_plugin(),
             'last_checked' => current_time( 'c' ),
         );
 
@@ -962,10 +964,184 @@ class GetCited_Health_Check {
     }
 
     /**
+     * Check for Redirection plugin and conflicting rules
+     */
+    private function check_redirection_plugin() {
+        // Check if Redirection plugin is active
+        if ( ! is_plugin_active( 'redirection/redirection.php' ) ) {
+            return array(
+                'status' => 'ok',
+                'message' => __( 'Redirection plugin not detected', 'getcited' ),
+            );
+        }
+
+        // Plugin is active - check for conflicting rules
+        global $wpdb;
+
+        // Redirection stores rules in wp_redirection_items table
+        $table_name = $wpdb->prefix . 'redirection_items';
+
+        // Check if table exists
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Checking external plugin table
+        $table_exists = $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s',
+                DB_NAME,
+                $table_name
+            )
+        );
+
+        if ( ! $table_exists ) {
+            return array(
+                'status' => 'info',
+                'message' => __( 'Redirection plugin detected', 'getcited' ),
+                'details' => __( 'Ensure no redirect rules exist for /llms.txt to avoid breaking AI crawler access.', 'getcited' ),
+                'plugin' => array(
+                    'name' => 'Redirection',
+                    'slug' => 'redirection',
+                    'docs' => 'https://redirection.me/support/',
+                ),
+            );
+        }
+
+        // Check for rules matching llms.txt (enabled rules only, status=enabled)
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Checking external plugin table for conflicts
+        $conflicting_rules = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT id, url, action_data, action_type FROM {$table_name} WHERE status = 'enabled' AND (url LIKE %s OR url LIKE %s OR url = %s)",
+                '%llms.txt%',
+                '%llms%txt%',
+                '/llms.txt'
+            )
+        );
+
+        if ( ! empty( $conflicting_rules ) ) {
+            return array(
+                'status' => 'warning',
+                'message' => __( 'Redirection rule may affect llms.txt', 'getcited' ),
+                'details' => sprintf(
+                    /* translators: %d: number of conflicting rules */
+                    __( 'Found %d redirect rule(s) that may affect /llms.txt. This could prevent AI crawlers from accessing your llms.txt file. Review your Redirection settings.', 'getcited' ),
+                    count( $conflicting_rules )
+                ),
+                'plugin' => array(
+                    'name' => 'Redirection',
+                    'slug' => 'redirection',
+                    'docs' => 'https://redirection.me/support/',
+                ),
+                'conflicting_rules' => array_map( function( $rule ) {
+                    return array(
+                        'id' => $rule->id,
+                        'url' => $rule->url,
+                        'target' => $rule->action_data,
+                    );
+                }, $conflicting_rules ),
+                'action_type' => 'settings_link',
+                'action_url' => admin_url( 'tools.php?page=redirection.php' ),
+                'action_label' => __( 'Review Redirection Rules', 'getcited' ),
+            );
+        }
+
+        return array(
+            'status' => 'ok',
+            'message' => __( 'Redirection plugin detected, no llms.txt conflicts', 'getcited' ),
+            'plugin' => array(
+                'name' => 'Redirection',
+                'slug' => 'redirection',
+                'docs' => 'https://redirection.me/support/',
+            ),
+        );
+    }
+
+    /**
+     * Check for Jetpack plugin and potential conflicts
+     */
+    private function check_jetpack_plugin() {
+        // Check if Jetpack is active
+        if ( ! defined( 'JETPACK__VERSION' ) && ! is_plugin_active( 'jetpack/jetpack.php' ) ) {
+            return array(
+                'status' => 'ok',
+                'message' => __( 'Jetpack not detected', 'getcited' ),
+            );
+        }
+
+        $concerns = array();
+        $modules_active = array();
+
+        // Check for active modules that might conflict
+        if ( class_exists( 'Jetpack' ) && method_exists( 'Jetpack', 'is_module_active' ) ) {
+            // SEO Tools module (paid feature, but check anyway)
+            if ( Jetpack::is_module_active( 'seo-tools' ) ) {
+                $modules_active[] = 'SEO Tools';
+                $concerns[] = __( 'SEO Tools module is active - may add schema markup', 'getcited' );
+            }
+
+            // Sitemaps module
+            if ( Jetpack::is_module_active( 'sitemaps' ) ) {
+                $modules_active[] = 'Sitemaps';
+                // Sitemaps don't conflict directly, just informational
+            }
+
+            // Photon CDN
+            if ( Jetpack::is_module_active( 'photon' ) ) {
+                $modules_active[] = 'Photon CDN';
+                // CDN doesn't affect llms.txt, just informational
+            }
+
+            // Search module
+            if ( Jetpack::is_module_active( 'search' ) ) {
+                $modules_active[] = 'Search';
+            }
+        }
+
+        // Build response based on what we found
+        if ( ! empty( $concerns ) ) {
+            return array(
+                'status' => 'info',
+                'message' => __( 'Jetpack detected with active modules', 'getcited' ),
+                'details' => implode( '. ', $concerns ) . '. ' . __( 'GetCited schema detection should handle this automatically, but monitor for duplicate schema if issues arise.', 'getcited' ),
+                'plugin' => array(
+                    'name' => 'Jetpack',
+                    'slug' => 'jetpack',
+                    'docs' => 'https://jetpack.com/support/',
+                ),
+                'modules_active' => $modules_active,
+            );
+        }
+
+        if ( ! empty( $modules_active ) ) {
+            return array(
+                'status' => 'ok',
+                'message' => sprintf(
+                    /* translators: %s: comma-separated list of active Jetpack modules */
+                    __( 'Jetpack detected (%s)', 'getcited' ),
+                    implode( ', ', $modules_active )
+                ),
+                'plugin' => array(
+                    'name' => 'Jetpack',
+                    'slug' => 'jetpack',
+                    'docs' => 'https://jetpack.com/support/',
+                ),
+                'modules_active' => $modules_active,
+            );
+        }
+
+        return array(
+            'status' => 'ok',
+            'message' => __( 'Jetpack detected', 'getcited' ),
+            'plugin' => array(
+                'name' => 'Jetpack',
+                'slug' => 'jetpack',
+                'docs' => 'https://jetpack.com/support/',
+            ),
+        );
+    }
+
+    /**
      * Calculate overall status
      */
     private function calculate_overall( $status ) {
-        $checks = array( 'llms_txt', 'robots_txt', 'schema', 'rewrite_rules', 'crawler_list', 'caching_plugins', 'security_plugins', 'environment' );
+        $checks = array( 'llms_txt', 'robots_txt', 'schema', 'rewrite_rules', 'crawler_list', 'caching_plugins', 'security_plugins', 'environment', 'redirection', 'jetpack' );
         
         $has_error = false;
         $has_warning = false;
