@@ -62,6 +62,9 @@ class GetCited_Health_Check {
             'schema' => $this->check_schema(),
             'rewrite_rules' => $this->check_rewrite_rules(),
             'crawler_list' => $this->check_crawler_list(),
+            'caching_plugins' => $this->check_caching_plugins(),
+            'security_plugins' => $this->check_security_plugins(),
+            'environment' => $this->check_environment(),
             'last_checked' => current_time( 'c' ),
         );
 
@@ -652,10 +655,317 @@ class GetCited_Health_Check {
     }
 
     /**
+     * Check for caching plugins and provide guidance
+     */
+    private function check_caching_plugins() {
+        $detected = array();
+
+        // WP Super Cache
+        if ( defined( 'WPCACHEHOME' ) || is_plugin_active( 'wp-super-cache/wp-cache.php' ) ) {
+            $detected[] = array(
+                'name' => 'WP Super Cache',
+                'slug' => 'wp-super-cache',
+                'docs' => 'https://developer.wordpress.org/plugins/wp-super-cache/',
+            );
+        }
+
+        // W3 Total Cache
+        if ( defined( 'W3TC' ) || is_plugin_active( 'w3-total-cache/w3-total-cache.php' ) ) {
+            $detected[] = array(
+                'name' => 'W3 Total Cache',
+                'slug' => 'w3-total-cache',
+                'docs' => 'https://www.boldgrid.com/w3-total-cache/',
+            );
+        }
+
+        // WP Rocket
+        if ( defined( 'WP_ROCKET_VERSION' ) || is_plugin_active( 'wp-rocket/wp-rocket.php' ) ) {
+            $detected[] = array(
+                'name' => 'WP Rocket',
+                'slug' => 'wp-rocket',
+                'docs' => 'https://docs.wp-rocket.me/',
+            );
+        }
+
+        // LiteSpeed Cache
+        if ( defined( 'LSCWP_V' ) || is_plugin_active( 'litespeed-cache/litespeed-cache.php' ) ) {
+            $detected[] = array(
+                'name' => 'LiteSpeed Cache',
+                'slug' => 'litespeed-cache',
+                'docs' => 'https://docs.litespeedtech.com/lscache/lscwp/',
+            );
+        }
+
+        // SG Optimizer (SiteGround)
+        if ( defined( 'SG_CACHEPRESS_VERSION' ) || is_plugin_active( 'sg-cachepress/sg-cachepress.php' ) ) {
+            $detected[] = array(
+                'name' => 'SG Optimizer',
+                'slug' => 'sg-optimizer',
+                'docs' => 'https://www.siteground.com/kb/sg-optimizer/',
+            );
+        }
+
+        // WP Fastest Cache
+        if ( defined( 'WPFC_WP_PLUGIN_DIR' ) || is_plugin_active( 'wp-fastest-cache/wpFastestCache.php' ) ) {
+            $detected[] = array(
+                'name' => 'WP Fastest Cache',
+                'slug' => 'wp-fastest-cache',
+                'docs' => 'https://www.wpfastestcache.com/',
+            );
+        }
+
+        // Autoptimize
+        if ( defined( 'AUTOPTIMIZE_PLUGIN_VERSION' ) || is_plugin_active( 'autoptimize/autoptimize.php' ) ) {
+            $detected[] = array(
+                'name' => 'Autoptimize',
+                'slug' => 'autoptimize',
+                'docs' => 'https://developer.wordpress.org/plugins/autoptimize/',
+            );
+        }
+
+        // Breeze (Cloudways)
+        if ( defined( 'BREEZE_VERSION' ) || is_plugin_active( 'breeze/breeze.php' ) ) {
+            $detected[] = array(
+                'name' => 'Breeze',
+                'slug' => 'breeze',
+                'docs' => 'https://developer.wordpress.org/plugins/breeze/',
+            );
+        }
+
+        if ( empty( $detected ) ) {
+            return array(
+                'status' => 'ok',
+                'message' => __( 'No caching plugins detected', 'getcited' ),
+            );
+        }
+
+        $names = array_column( $detected, 'name' );
+
+        return array(
+            'status' => 'info',
+            'message' => sprintf(
+                /* translators: %s: comma-separated list of caching plugin names */
+                __( 'Caching plugin detected: %s', 'getcited' ),
+                implode( ', ', $names )
+            ),
+            'details' => __( 'If llms.txt is not updating after changes, exclude /llms.txt from page caching in your cache plugin settings. GetCited already sets appropriate Cache-Control headers.', 'getcited' ),
+            'plugins' => $detected,
+        );
+    }
+
+    /**
+     * Check for security plugins and provide guidance
+     */
+    private function check_security_plugins() {
+        $detected = array();
+
+        // Wordfence
+        if ( defined( 'WORDFENCE_VERSION' ) || is_plugin_active( 'wordfence/wordfence.php' ) ) {
+            $detected[] = array(
+                'name' => 'Wordfence',
+                'slug' => 'wordfence',
+                'docs' => 'https://www.wordfence.com/help/',
+                'whitelist_setting' => 'Rate Limiting → Whitelist',
+            );
+        }
+
+        // Sucuri
+        if ( defined( 'SUCURISCAN_VERSION' ) || is_plugin_active( 'sucuri-scanner/sucuri.php' ) ) {
+            $detected[] = array(
+                'name' => 'Sucuri',
+                'slug' => 'sucuri',
+                'docs' => 'https://docs.sucuri.net/',
+                'whitelist_setting' => 'Firewall → Whitelist',
+            );
+        }
+
+        // iThemes Security / Solid Security
+        if ( defined( 'ITSEC_Core' ) || is_plugin_active( 'better-wp-security/better-wp-security.php' ) || is_plugin_active( 'ithemes-security-pro/ithemes-security-pro.php' ) ) {
+            $detected[] = array(
+                'name' => 'Solid Security (iThemes)',
+                'slug' => 'solid-security',
+                'docs' => 'https://developer.wordpress.org/plugins/better-wp-security/',
+                'whitelist_setting' => 'Security → Lockouts → Whitelist',
+            );
+        }
+
+        // All In One WP Security
+        if ( defined( 'AIO_WP_SECURITY_VERSION' ) || is_plugin_active( 'all-in-one-wp-security-and-firewall/wp-security.php' ) ) {
+            $detected[] = array(
+                'name' => 'All In One WP Security',
+                'slug' => 'aio-wp-security',
+                'docs' => 'https://developer.wordpress.org/plugins/all-in-one-wp-security-and-firewall/',
+                'whitelist_setting' => 'WP Security → Brute Force → Bot Prevention',
+            );
+        }
+
+        // Shield Security
+        if ( defined( 'ICWP_DS' ) || is_plugin_active( 'wp-simple-firewall/icwp-wpsf.php' ) ) {
+            $detected[] = array(
+                'name' => 'Shield Security',
+                'slug' => 'shield-security',
+                'docs' => 'https://getshieldsecurity.com/documentation/',
+                'whitelist_setting' => 'Configuration → Traffic → Whitelist',
+            );
+        }
+
+        // NinjaFirewall
+        if ( defined( 'NFW_ENGINE_VERSION' ) || is_plugin_active( 'ninjafirewall/ninjafirewall.php' ) ) {
+            $detected[] = array(
+                'name' => 'NinjaFirewall',
+                'slug' => 'ninjafirewall',
+                'docs' => 'https://nintechnet.com/ninjafirewall/wp-edition/',
+                'whitelist_setting' => 'NinjaFirewall → Access Control',
+            );
+        }
+
+        if ( empty( $detected ) ) {
+            return array(
+                'status' => 'ok',
+                'message' => __( 'No security plugins detected', 'getcited' ),
+            );
+        }
+
+        $names = array_column( $detected, 'name' );
+
+        // Common AI crawler user-agents
+        $ai_crawlers = array(
+            'Googlebot', 'Bingbot', 'GPTBot', 'ChatGPT-User', 'Claude-Web',
+            'anthropic-ai', 'Perplexity', 'CCBot', 'YouBot', 'cohere-ai',
+        );
+
+        return array(
+            'status' => 'info',
+            'message' => sprintf(
+                /* translators: %s: comma-separated list of security plugin names */
+                __( 'Security plugin detected: %s', 'getcited' ),
+                implode( ', ', $names )
+            ),
+            'details' => __( 'If AI crawlers are blocked, consider whitelisting their user-agents in your security plugin. Common AI crawlers include: GPTBot, ChatGPT-User, Claude-Web, anthropic-ai, Perplexity.', 'getcited' ),
+            'plugins' => $detected,
+            'ai_crawlers' => $ai_crawlers,
+        );
+    }
+
+    /**
+     * Check environment (staging/development detection)
+     */
+    private function check_environment() {
+        $env_type = $this->detect_environment_type();
+        $is_staging = $this->is_staging_environment();
+
+        if ( $is_staging ) {
+            return array(
+                'status' => 'info',
+                'message' => sprintf(
+                    /* translators: %s: environment type */
+                    __( 'Staging/development environment detected: %s', 'getcited' ),
+                    $env_type
+                ),
+                'details' => __( 'Some features like external llms.txt verification may be skipped on staging environments. Request logging can also be disabled for development.', 'getcited' ),
+                'environment_type' => $env_type,
+                'is_staging' => true,
+            );
+        }
+
+        return array(
+            'status' => 'ok',
+            'message' => __( 'Production environment', 'getcited' ),
+            'environment_type' => $env_type,
+            'is_staging' => false,
+        );
+    }
+
+    /**
+     * Detect environment type
+     *
+     * @return string Environment identifier
+     */
+    private function detect_environment_type() {
+        // WordPress 5.5+ environment type
+        if ( function_exists( 'wp_get_environment_type' ) ) {
+            $env = wp_get_environment_type();
+            if ( in_array( $env, array( 'local', 'development', 'staging' ), true ) ) {
+                return $env;
+            }
+        }
+
+        // Check common staging URL patterns
+        $host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+
+        $staging_patterns = array(
+            '.staging.',
+            '.dev.',
+            '.test.',
+            '.local.',
+            'staging-',
+            'dev-',
+            'test-',
+            'localhost',
+            '127.0.0.1',
+            '.local',
+            '.test',
+        );
+
+        foreach ( $staging_patterns as $pattern ) {
+            if ( stripos( $host, $pattern ) !== false ) {
+                return 'staging (URL pattern)';
+            }
+        }
+
+        // Check debug constants combination
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+            return 'development (debug enabled)';
+        }
+
+        return 'production';
+    }
+
+    /**
+     * Check if current environment is staging/development
+     *
+     * @return bool True if staging/development environment
+     */
+    public function is_staging_environment() {
+        // WordPress 5.5+ environment type
+        if ( function_exists( 'wp_get_environment_type' ) ) {
+            $env = wp_get_environment_type();
+            if ( in_array( $env, array( 'local', 'development', 'staging' ), true ) ) {
+                return true;
+            }
+        }
+
+        // Check URL patterns
+        $host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+
+        $staging_patterns = array(
+            '.staging.',
+            '.dev.',
+            '.test.',
+            '.local.',
+            'staging-',
+            'dev-',
+            'test-',
+            'localhost',
+            '127.0.0.1',
+            '.local',
+            '.test',
+        );
+
+        foreach ( $staging_patterns as $pattern ) {
+            if ( stripos( $host, $pattern ) !== false ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Calculate overall status
      */
     private function calculate_overall( $status ) {
-        $checks = array( 'llms_txt', 'robots_txt', 'schema', 'rewrite_rules', 'crawler_list' );
+        $checks = array( 'llms_txt', 'robots_txt', 'schema', 'rewrite_rules', 'crawler_list', 'caching_plugins', 'security_plugins', 'environment' );
         
         $has_error = false;
         $has_warning = false;

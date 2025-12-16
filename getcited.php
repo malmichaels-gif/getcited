@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.9.0
+ * Version: 1.9.9.1
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.9.0' );
+define( 'GETCITED_VERSION', '1.9.9.1' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -592,6 +592,13 @@ final class GetCited {
             'permission_callback' => '__return_true',
         ) );
 
+        // Public llms.txt endpoint (for headless WordPress / JAMstack sites)
+        register_rest_route( 'getcited/v1', '/llms-txt', array(
+            'methods' => 'GET',
+            'callback' => array( $this, 'api_llms_txt' ),
+            'permission_callback' => '__return_true',
+        ) );
+
         // Citability endpoint
         register_rest_route( 'getcited/v1', '/citability/(?P<id>\d+)', array(
             'methods' => 'GET',
@@ -660,6 +667,50 @@ final class GetCited {
             ),
             'status'   => ! empty( $health['llms_txt'] ) && 'ok' === $health['llms_txt'] ? 'active' : 'configured',
         ) );
+    }
+
+    /**
+     * API: llms.txt content (for headless WordPress / JAMstack)
+     *
+     * Returns llms.txt content as plain text with appropriate headers.
+     * Useful for decoupled frontends that need to serve llms.txt.
+     */
+    public function api_llms_txt() {
+        $settings = GetCited_Settings::instance();
+
+        // Check if llms.txt is enabled
+        if ( ! $settings->get( 'llms_txt_enabled' ) ) {
+            return new WP_Error(
+                'llms_txt_disabled',
+                __( 'llms.txt is disabled', 'getcited' ),
+                array( 'status' => 404 )
+            );
+        }
+
+        $content = $settings->get( 'llms_txt_content' );
+
+        if ( empty( $content ) ) {
+            return new WP_Error(
+                'llms_txt_empty',
+                __( 'llms.txt content is empty', 'getcited' ),
+                array( 'status' => 404 )
+            );
+        }
+
+        // Log this request as an AI crawler visit
+        if ( class_exists( 'GetCited_Request_Logger' ) ) {
+            GetCited_Request_Logger::instance()->log_llms_request();
+        }
+
+        // Return as plain text with appropriate headers
+        $response = new WP_REST_Response( $content );
+        $response->set_headers( array(
+            'Content-Type' => 'text/plain; charset=utf-8',
+            'Cache-Control' => 'public, max-age=86400',
+            'X-Robots-Tag' => 'noindex',
+        ) );
+
+        return $response;
     }
 
     /**
