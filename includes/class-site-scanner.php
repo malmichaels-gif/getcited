@@ -892,13 +892,14 @@ class GetCited_Site_Scanner {
 	/**
 	 * Extract text content from page builder data
 	 *
-	 * Handles Elementor (JSON in meta) and Divi (shortcodes with content attributes).
+	 * Supports: Elementor, Divi, Beaver Builder, WPBakery, Oxygen, Bricks, Brizy.
 	 *
 	 * @param int $post_id The post ID.
 	 * @return string Extracted text content, or empty string if not a builder page.
 	 */
 	private function extract_page_builder_content( $post_id ) {
 		$text = '';
+		$post = get_post( $post_id );
 
 		// Elementor: Content stored in _elementor_data meta as JSON.
 		$elementor_data = get_post_meta( $post_id, '_elementor_data', true );
@@ -911,13 +912,65 @@ class GetCited_Site_Scanner {
 
 		// Divi: Check for Divi builder usage.
 		$divi_enabled = get_post_meta( $post_id, '_et_pb_use_builder', true );
-		if ( 'on' === $divi_enabled ) {
-			$post = get_post( $post_id );
-			if ( $post ) {
-				$text = $this->extract_divi_text( $post->post_content );
+		if ( 'on' === $divi_enabled && $post ) {
+			$text = $this->extract_divi_text( $post->post_content );
+			if ( ! empty( $text ) ) {
+				return $text;
+			}
+		}
+
+		// Beaver Builder: Content stored in _fl_builder_data meta (serialized).
+		$beaver_data = get_post_meta( $post_id, '_fl_builder_data', true );
+		if ( ! empty( $beaver_data ) ) {
+			$text = $this->extract_beaver_builder_text( $beaver_data );
+			if ( ! empty( $text ) ) {
+				return $text;
+			}
+		}
+
+		// WPBakery (Visual Composer): Uses [vc_*] shortcodes in post_content.
+		if ( $post && strpos( $post->post_content, '[vc_' ) !== false ) {
+			$text = $this->extract_wpbakery_text( $post->post_content );
+			if ( ! empty( $text ) ) {
+				return $text;
+			}
+		}
+
+		// Oxygen Builder: Content stored in ct_builder_shortcodes meta.
+		$oxygen_data = get_post_meta( $post_id, 'ct_builder_shortcodes', true );
+		if ( ! empty( $oxygen_data ) ) {
+			$text = $this->extract_oxygen_text( $oxygen_data );
+			if ( ! empty( $text ) ) {
+				return $text;
+			}
+		}
+
+		// Bricks Builder: Content stored in _bricks_page_content_2 meta (JSON).
+		$bricks_data = get_post_meta( $post_id, '_bricks_page_content_2', true );
+		if ( ! empty( $bricks_data ) ) {
+			$text = $this->extract_bricks_text( $bricks_data );
+			if ( ! empty( $text ) ) {
+				return $text;
+			}
+		}
+
+		// Brizy: Content stored in brizy-post-content meta.
+		$brizy_data = get_post_meta( $post_id, 'brizy_post_uid', true );
+		if ( ! empty( $brizy_data ) ) {
+			$brizy_content = get_post_meta( $post_id, 'brizy-post-content', true );
+			if ( ! empty( $brizy_content ) ) {
+				$text = $this->extract_brizy_text( $brizy_content );
 				if ( ! empty( $text ) ) {
 					return $text;
 				}
+			}
+		}
+
+		// Avada (Fusion Builder): Uses [fusion_*] shortcodes.
+		if ( $post && strpos( $post->post_content, '[fusion_' ) !== false ) {
+			$text = $this->extract_fusion_text( $post->post_content );
+			if ( ! empty( $text ) ) {
+				return $text;
 			}
 		}
 
@@ -998,6 +1051,220 @@ class GetCited_Site_Scanner {
 			$text .= ' ' . implode( ' ', $matches[1] );
 		}
 
+		$text = wp_strip_all_tags( $text );
+		$text = preg_replace( '/\s+/', ' ', $text );
+
+		return trim( $text );
+	}
+
+	/**
+	 * Extract text from Beaver Builder data
+	 *
+	 * @param mixed $data The Beaver Builder data (serialized array).
+	 * @return string Extracted text.
+	 */
+	private function extract_beaver_builder_text( $data ) {
+		if ( ! is_array( $data ) ) {
+			return '';
+		}
+
+		$texts = array();
+		$this->collect_beaver_builder_text( $data, $texts );
+
+		$content = implode( ' ', $texts );
+		$content = wp_strip_all_tags( $content );
+		$content = preg_replace( '/\s+/', ' ', $content );
+
+		return trim( $content );
+	}
+
+	/**
+	 * Recursively collect text from Beaver Builder data
+	 *
+	 * @param array $nodes The nodes array.
+	 * @param array $texts Reference to texts array.
+	 */
+	private function collect_beaver_builder_text( $nodes, &$texts ) {
+		foreach ( $nodes as $node ) {
+			if ( ! is_object( $node ) && ! is_array( $node ) ) {
+				continue;
+			}
+
+			$node = (array) $node;
+
+			// Check settings for text content.
+			if ( isset( $node['settings'] ) ) {
+				$settings   = (array) $node['settings'];
+				$text_keys  = array( 'text', 'heading', 'content', 'title', 'description', 'html', 'editor' );
+				foreach ( $text_keys as $key ) {
+					if ( ! empty( $settings[ $key ] ) && is_string( $settings[ $key ] ) ) {
+						$texts[] = $settings[ $key ];
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Extract text from WPBakery (Visual Composer) shortcodes
+	 *
+	 * @param string $content The post content with vc_* shortcodes.
+	 * @return string Extracted text.
+	 */
+	private function extract_wpbakery_text( $content ) {
+		// Extract content from text-related shortcodes.
+		$text = '';
+
+		// vc_column_text contains the main text content.
+		preg_match_all( '/\[vc_column_text[^\]]*\](.*?)\[\/vc_column_text\]/s', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= implode( ' ', $matches[1] );
+		}
+
+		// vc_custom_heading for headings.
+		preg_match_all( '/\[vc_custom_heading[^\]]*text="([^"]*)"/', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= ' ' . implode( ' ', $matches[1] );
+		}
+
+		// vc_cta (call to action) headings and descriptions.
+		preg_match_all( '/\[vc_cta[^\]]*h2="([^"]*)"/', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= ' ' . implode( ' ', $matches[1] );
+		}
+
+		// Strip remaining shortcodes and clean up.
+		$text = preg_replace( '/\[[^\]]*\]/', '', $text );
+		$text = wp_strip_all_tags( $text );
+		$text = preg_replace( '/\s+/', ' ', $text );
+
+		return trim( $text );
+	}
+
+	/**
+	 * Extract text from Oxygen Builder shortcodes
+	 *
+	 * @param string $content The Oxygen shortcode content.
+	 * @return string Extracted text.
+	 */
+	private function extract_oxygen_text( $content ) {
+		// Oxygen uses ct_* shortcodes.
+		$text = '';
+
+		// Extract text from ct_text_block and ct_headline.
+		preg_match_all( '/\[ct_(?:text_block|headline)[^\]]*\](.*?)\[\/ct_/s', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= implode( ' ', $matches[1] );
+		}
+
+		// Extract content_* attributes.
+		preg_match_all( '/content(?:_[a-z]+)?="([^"]*)"/', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= ' ' . implode( ' ', $matches[1] );
+		}
+
+		// Strip remaining shortcodes.
+		$text = preg_replace( '/\[ct_[^\]]*\]/', '', $text );
+		$text = preg_replace( '/\[\/ct_[^\]]*\]/', '', $text );
+		$text = wp_strip_all_tags( $text );
+		$text = preg_replace( '/\s+/', ' ', $text );
+
+		return trim( $text );
+	}
+
+	/**
+	 * Extract text from Bricks Builder JSON data
+	 *
+	 * @param mixed $data The Bricks data (JSON or array).
+	 * @return string Extracted text.
+	 */
+	private function extract_bricks_text( $data ) {
+		if ( is_string( $data ) ) {
+			$data = json_decode( $data, true );
+		}
+
+		if ( ! is_array( $data ) ) {
+			return '';
+		}
+
+		$texts = array();
+		foreach ( $data as $element ) {
+			if ( ! is_array( $element ) ) {
+				continue;
+			}
+
+			// Check settings for text content.
+			if ( isset( $element['settings'] ) ) {
+				$settings  = $element['settings'];
+				$text_keys = array( 'text', 'title', 'content', 'heading', 'description', 'subtitle' );
+				foreach ( $text_keys as $key ) {
+					if ( ! empty( $settings[ $key ] ) && is_string( $settings[ $key ] ) ) {
+						$texts[] = $settings[ $key ];
+					}
+				}
+			}
+		}
+
+		$content = implode( ' ', $texts );
+		$content = wp_strip_all_tags( $content );
+		$content = preg_replace( '/\s+/', ' ', $content );
+
+		return trim( $content );
+	}
+
+	/**
+	 * Extract text from Brizy content
+	 *
+	 * @param string $content The Brizy post content.
+	 * @return string Extracted text.
+	 */
+	private function extract_brizy_text( $content ) {
+		// Brizy stores content as HTML with data attributes.
+		// Decode if base64 encoded.
+		if ( preg_match( '/^[A-Za-z0-9+\/=]+$/', $content ) ) {
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Brizy stores content base64 encoded.
+			$decoded = base64_decode( $content );
+			if ( $decoded ) {
+				$content = $decoded;
+			}
+		}
+
+		$text = wp_strip_all_tags( $content );
+		$text = preg_replace( '/\s+/', ' ', $text );
+
+		return trim( $text );
+	}
+
+	/**
+	 * Extract text from Avada (Fusion Builder) shortcodes
+	 *
+	 * @param string $content The post content with fusion_* shortcodes.
+	 * @return string Extracted text.
+	 */
+	private function extract_fusion_text( $content ) {
+		$text = '';
+
+		// fusion_text contains main text content.
+		preg_match_all( '/\[fusion_text[^\]]*\](.*?)\[\/fusion_text\]/s', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= implode( ' ', $matches[1] );
+		}
+
+		// fusion_title for headings.
+		preg_match_all( '/\[fusion_title[^\]]*\](.*?)\[\/fusion_title\]/s', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= ' ' . implode( ' ', $matches[1] );
+		}
+
+		// fusion_content_boxes descriptions.
+		preg_match_all( '/\[fusion_content_box[^\]]*\](.*?)\[\/fusion_content_box\]/s', $content, $matches );
+		if ( ! empty( $matches[1] ) ) {
+			$text .= ' ' . implode( ' ', $matches[1] );
+		}
+
+		// Strip remaining shortcodes.
+		$text = preg_replace( '/\[fusion_[^\]]*\]/', '', $text );
+		$text = preg_replace( '/\[\/fusion_[^\]]*\]/', '', $text );
 		$text = wp_strip_all_tags( $text );
 		$text = preg_replace( '/\s+/', ' ', $text );
 
