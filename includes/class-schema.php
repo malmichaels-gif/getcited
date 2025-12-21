@@ -141,11 +141,11 @@ class GetCited_Schema {
 			return;
 		}
 
-		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_HEX_TAG );
 
 		echo "\n<!-- GetCited Schema -->\n";
 		echo '<script type="application/ld+json">' . "\n";
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-LD requires unescaped JSON, wp_json_encode is safe.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-LD output; JSON_HEX_TAG prevents script injection.
 		echo $json . "\n";
 		echo '</script>' . "\n";
 	}

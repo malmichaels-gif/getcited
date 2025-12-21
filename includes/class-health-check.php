@@ -995,7 +995,7 @@ class GetCited_Health_Check {
         global $wpdb;
 
         // Redirection stores rules in wp_redirection_items table
-        $table_name = $wpdb->prefix . 'redirection_items';
+        $table_name = esc_sql( $wpdb->prefix . 'redirection_items' );
 
         // Check if table exists
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Checking external plugin table
@@ -1022,6 +1022,7 @@ class GetCited_Health_Check {
 
         // Check for rules matching llms.txt (enabled rules only, status=enabled)
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Checking external plugin table for conflicts
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is sanitized with esc_sql() at assignment, cannot use placeholder for table names
         $conflicting_rules = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT id, url, action_data, action_type FROM {$table_name} WHERE status = 'enabled' AND (url LIKE %s OR url LIKE %s OR url = %s)",

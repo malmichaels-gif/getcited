@@ -1245,15 +1245,15 @@ class GetCited_Citability {
         $hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
         $exclude_ids = $hello_world ? array( $hello_world->ID ) : array();
 
-        // Try posts first.
+        // Try posts first (runs on-demand, not on page load).
         $content = get_posts( array(
             'post_type'      => 'post',
             'post_status'    => 'publish',
             'posts_per_page' => $limit,
             'orderby'        => 'date',
             'order'          => 'DESC',
-            'exclude'        => $exclude_ids,
-            'meta_query'     => array(
+            'exclude'        => $exclude_ids, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+            'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
                 array(
                     'key'     => '_getcited_citability_score',
                     'compare' => 'NOT EXISTS',
@@ -1279,8 +1279,8 @@ class GetCited_Citability {
                 'posts_per_page' => $limit,
                 'orderby'        => 'date',
                 'order'          => 'DESC',
-                'exclude'        => $exclude_page_ids,
-                'meta_query'     => array(
+                'exclude'        => $exclude_page_ids, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
+                'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
                     array(
                         'key'     => '_getcited_citability_score',
                         'compare' => 'NOT EXISTS',
