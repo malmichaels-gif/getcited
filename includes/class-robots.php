@@ -151,10 +151,10 @@ class GetCited_Robots {
         // Generate new GetCited rules
         $getcited_rules = $this->generate_rules();
 
-        // Combine: GetCited rules FIRST, then existing content
-        // AI crawlers should be at top for visibility
+        // Combine: existing content first, then GetCited rules
+        // This follows WordPress convention and keeps general rules at top
         if ( ! empty( $existing ) ) {
-            $new_content = $getcited_rules . "\n\n" . $existing . "\n";
+            $new_content = $existing . "\n\n" . $getcited_rules . "\n";
         } else {
             $new_content = $getcited_rules . "\n";
         }
@@ -468,9 +468,9 @@ class GetCited_Robots {
             $content = preg_replace( '/' . preg_quote( $marker_start, '/' ) . '.*?' . preg_quote( $marker_end, '/' ) . '\s*/s', '', $content );
             $content = trim( $content );
 
-            // Prepend GetCited rules, then existing content
+            // Append GetCited rules after existing content
             if ( ! empty( $content ) ) {
-                $new_content = $rules . "\n\n" . $content;
+                $new_content = $content . "\n\n" . $rules;
             } else {
                 $new_content = $rules;
             }
