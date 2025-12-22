@@ -242,6 +242,10 @@ class GetCited_Wizard {
         $citation_defaults['enabled'] = true; // Enabled by default.
         $settings->set( 'citation_guidelines', $citation_defaults );
 
+        // Pre-fill Use Cases for AI with site-type defaults (v1.9.9.12).
+        $use_cases_default = $llms_txt->get_default_use_cases( $site_type );
+        $settings->set( 'llms_use_cases', $use_cases_default );
+
         return true;
     }
 
@@ -586,14 +590,14 @@ class GetCited_Wizard {
                 $settings = GetCited_Settings::instance();
                 $settings->set( 'llms_write_physical', true );
 
-                // Save wizard scan llms.txt content to settings before writing
-                $wizard_scan = get_transient( 'getcited_wizard_scan' );
-                if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
-                    $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
-                }
+                // Regenerate llms.txt content fresh to include all current settings (v1.9.9.12)
+                // This ensures Use Cases and other defaults are included
+                $llms      = GetCited_Llms_Txt::instance();
+                $site_type = $settings->get( 'site_type' );
+                $fresh_content = $llms->generate_template( $site_type );
+                $settings->set( 'llms_txt_content', $fresh_content );
 
                 // Write the physical file
-                $llms   = GetCited_Llms_Txt::instance();
                 $result = $llms->write_physical_file();
 
                 if ( ! $result['success'] ) {

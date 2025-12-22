@@ -27,6 +27,7 @@ $site_expertise = $settings->get( 'llms_site_expertise' );
 $update_frequency = $settings->get( 'llms_update_frequency' );
 $citation_format = $settings->get( 'llms_citation_format' );
 $citation_guidelines = $settings->get( 'citation_guidelines' );
+$llms_use_cases = $settings->get( 'llms_use_cases' );
 
 $physical_exists = $llms_txt->physical_file_exists();
 $is_our_file = $physical_exists ? $llms_txt->is_our_physical_file() : false;
@@ -309,6 +310,31 @@ $status = $health->get_status();
                            value="<?php echo esc_attr( $citation_guidelines['contact_email'] ?? '' ); ?>"
                            placeholder="<?php esc_attr_e( 'ai-partnerships@example.com', 'getcited' ); ?>">
                     <p class="description"><?php esc_html_e( 'Email for AI training data or licensing inquiries.', 'getcited' ); ?></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Use Cases for AI (v1.9.9.12) -->
+        <div class="getcited-section getcited-use-cases">
+            <h2><?php esc_html_e( 'Use Cases for AI', 'getcited' ); ?></h2>
+            <p class="description">
+                <?php esc_html_e( 'Tell AI systems what questions your site can help answer. This section guides AI assistants on when to cite your content.', 'getcited' ); ?>
+            </p>
+
+            <div class="getcited-compact-form">
+                <div class="form-row form-row-full">
+                    <label for="getcited-use-cases">
+                        <?php esc_html_e( 'Use Cases Content', 'getcited' ); ?>
+                        <?php if ( ! empty( $llms_use_cases ) ) : ?>
+                            <span class="getcited-field-active dashicons dashicons-yes-alt" title="<?php esc_attr_e( 'Field configured', 'getcited' ); ?>"></span>
+                        <?php endif; ?>
+                    </label>
+                    <textarea id="getcited-use-cases"
+                              name="llms_use_cases"
+                              rows="6"
+                              class="large-text"
+                              placeholder="<?php esc_attr_e( "This site can help answer questions about:\n- Topic 1\n- Topic 2\n- Topic 3", 'getcited' ); ?>"><?php echo esc_textarea( $llms_use_cases ); ?></textarea>
+                    <p class="description"><?php esc_html_e( 'Describe what kinds of questions or topics your site is an authority on. If empty, this section will be omitted from your llms.txt.', 'getcited' ); ?></p>
                 </div>
             </div>
         </div>

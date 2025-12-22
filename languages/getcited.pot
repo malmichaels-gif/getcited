@@ -579,3 +579,29 @@ msgstr ""
 #: includes/class-citability.php
 msgid "Has custom meta description"
 msgstr ""
+
+#: includes/class-llms-txt.php includes/class-site-scanner.php
+msgid "%d article"
+msgid_plural "%d articles"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/llms-txt.php
+msgid "Use Cases for AI"
+msgstr ""
+
+#: templates/llms-txt.php
+msgid "Tell AI systems what questions your site can help answer. This section guides AI assistants on when to cite your content."
+msgstr ""
+
+#: templates/llms-txt.php
+msgid "Use Cases Content"
+msgstr ""
+
+#: templates/llms-txt.php
+msgid "This site can help answer questions about:\n- Topic 1\n- Topic 2\n- Topic 3"
+msgstr ""
+
+#: templates/llms-txt.php
+msgid "Describe what kinds of questions or topics your site is an authority on. If empty, this section will be omitted from your llms.txt."
+msgstr ""

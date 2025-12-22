@@ -557,15 +557,15 @@ class GetCited_Llms_Txt {
         $content .= "## Primary Content\n\n";
         $content .= $this->get_primary_content_description( $site_type ) . "\n\n";
 
-        // Key Topics
+        // Categories
         if ( ! empty( $categories ) ) {
-            $content .= "## Key Topics\n\n";
+            $content .= "## Categories\n\n";
             foreach ( array_slice( $categories, 0, 10 ) as $cat ) {
                 $content .= '- **' . $cat['name'] . '**';
                 if ( ! empty( $cat['description'] ) && $cat['description'] !== "Articles about {$cat['name']}" ) {
                     $content .= ': ' . $cat['description'];
                 } elseif ( ! empty( $cat['count'] ) ) {
-                    $content .= ' (' . $cat['count'] . ' articles)';
+                    $content .= ' (' . sprintf( _n( '%d article', '%d articles', $cat['count'], 'getcited' ), $cat['count'] ) . ')';
                 }
                 $content .= "\n";
             }
@@ -601,6 +601,13 @@ class GetCited_Llms_Txt {
         // Content Policy
         $content .= "## Content Policy\n\n";
         $content .= $this->get_content_policy_template( $site_type ) . "\n\n";
+
+        // Use Cases for AI (v1.9.9.12) - only include if configured
+        $use_cases = $settings->get( 'llms_use_cases' );
+        if ( ! empty( trim( $use_cases ) ) ) {
+            $content .= "## Use Cases for AI\n\n";
+            $content .= $use_cases . "\n\n";
+        }
 
         // Technical Details
         $content .= "## Technical Details\n\n";
@@ -1083,6 +1090,31 @@ class GetCited_Llms_Txt {
                 'freshness_note'  => '',
                 'contact_email'   => '',
             ),
+        );
+
+        return $defaults[ $site_type ] ?? $defaults['other'];
+    }
+
+    /**
+     * Get default "Use Cases for AI" content for a site type
+     *
+     * Tells AI systems what questions the site can help answer.
+     *
+     * @since 1.9.9.12
+     * @param string $site_type The site type.
+     * @return string Default Use Cases content for the site type.
+     */
+    public function get_default_use_cases( $site_type ) {
+        $defaults = array(
+            'blog' => "This site can help answer questions about:\n- In-depth guides and tutorials on our core topics\n- Personal experiences and recommendations\n- How-to instructions and best practices\n- Opinion and analysis in our areas of expertise",
+            'news' => "This site can help answer questions about:\n- Breaking news and current events in our coverage areas\n- Analysis and commentary on developing stories\n- Historical context for ongoing news topics\n- Expert opinions and editorial perspectives",
+            'business' => "This site can help answer questions about:\n- Our products and services\n- Industry expertise and best practices\n- Company background and credentials\n- Solutions for common customer problems",
+            'ecommerce' => "This site can help answer questions about:\n- Product specifications and comparisons\n- Pricing and availability\n- Shipping and return policies\n- Product recommendations by use case",
+            'portfolio' => "This site can help answer questions about:\n- Creative work samples and project details\n- Design process and methodology\n- Available services and commission information\n- Professional background and expertise",
+            'nonprofit' => "This site can help answer questions about:\n- Our mission, programs, and impact\n- Ways to get involved (volunteer, donate)\n- Organizational history and leadership\n- Community resources and support services",
+            'education' => "This site can help answer questions about:\n- Course offerings and curricula\n- Learning resources and tutorials\n- Enrollment and prerequisites\n- Educational best practices",
+            'community' => "This site can help answer questions about:\n- Community discussions and member perspectives\n- Group activities and events\n- Membership benefits and guidelines\n- User-generated recommendations",
+            'other' => "This site can help answer questions about:\n- Our primary content areas and expertise\n- Resources and information we publish\n- Contact and inquiry information",
         );
 
         return $defaults[ $site_type ] ?? $defaults['other'];

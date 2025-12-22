@@ -52,6 +52,7 @@ class GetCited_Settings {
         'llms_site_expertise' => '',
         'llms_update_frequency' => '',
         'llms_citation_format' => '',
+        'llms_use_cases' => '', // Use Cases for AI section content
 
         // robots.txt
         'robots_write_physical' => true,
@@ -308,6 +309,7 @@ class GetCited_Settings {
                 return array();
 
             case 'llms_txt_content':
+            case 'llms_use_cases':
                 // Allow markdown-safe content
                 return wp_kses_post( $value );
 

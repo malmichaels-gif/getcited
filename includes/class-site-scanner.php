@@ -1411,15 +1411,15 @@ class GetCited_Site_Scanner {
 		$content .= "## Primary Content\n\n";
 		$content .= $this->get_primary_content_description( $site_type, $scan_data ) . "\n\n";
 
-		// Key Topics/Categories
+		// Categories
 		if ( ! empty( $scan_data['categories'] ) ) {
-			$content .= "## Key Topics\n\n";
+			$content .= "## Categories\n\n";
 			foreach ( array_slice( $scan_data['categories'], 0, 10 ) as $cat ) {
 				$content .= '- **' . $this->escape_markdown( $cat['name'] ) . '**';
 				if ( ! empty( $cat['description'] ) ) {
 					$content .= ': ' . $this->escape_markdown( $cat['description'] );
 				} elseif ( ! empty( $cat['count'] ) ) {
-					$content .= ' (' . absint( $cat['count'] ) . ' articles)';
+					$content .= ' (' . sprintf( _n( '%d article', '%d articles', absint( $cat['count'] ), 'getcited' ), absint( $cat['count'] ) ) . ')';
 				}
 				$content .= "\n";
 			}
@@ -1474,9 +1474,14 @@ class GetCited_Site_Scanner {
 			$content .= "\n";
 		}
 
-		// Citation Guidelines
-		$content .= "## Citation Guidelines\n\n";
-		$content .= $llms_txt->get_citation_template( $site_type ) . "\n\n";
+		// Citation Guidelines - use AI Citation Guidelines if enabled, otherwise basic template
+		$ai_guidelines = $llms_txt->get_citation_guidelines_section();
+		if ( ! empty( $ai_guidelines ) ) {
+			$content .= $ai_guidelines;
+		} else {
+			$content .= "## Citation Guidelines\n\n";
+			$content .= $llms_txt->get_citation_template( $site_type ) . "\n\n";
+		}
 
 		// Data Freshness
 		$content .= "## Data Freshness\n\n";
@@ -1492,6 +1497,13 @@ class GetCited_Site_Scanner {
 		// Content Policy
 		$content .= "## Content Policy\n\n";
 		$content .= $llms_txt->get_content_policy_template( $site_type ) . "\n\n";
+
+		// Use Cases for AI (v1.9.9.12) - only include if configured
+		$use_cases = $settings->get( 'llms_use_cases' );
+		if ( ! empty( trim( $use_cases ) ) ) {
+			$content .= "## Use Cases for AI\n\n";
+			$content .= $use_cases . "\n\n";
+		}
 
 		// Technical Details
 		$content .= "## Technical Details\n\n";

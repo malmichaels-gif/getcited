@@ -197,6 +197,10 @@ class GetCited_Dashboard {
                 if ( isset( $data['llms_citation_format'] ) ) {
                     $settings->set( 'llms_citation_format', $data['llms_citation_format'] );
                 }
+                // Save Use Cases for AI (v1.9.9.12+).
+                if ( isset( $data['llms_use_cases'] ) ) {
+                    $settings->set( 'llms_use_cases', $data['llms_use_cases'] );
+                }
                 // Save citation guidelines (v1.5.1+).
                 if ( isset( $data['citation_guidelines'] ) && is_array( $data['citation_guidelines'] ) ) {
                     $citation_guidelines = array(
