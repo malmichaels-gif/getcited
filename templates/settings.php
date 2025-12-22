@@ -103,8 +103,8 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                                <?php checked( $keep_on_delete ); ?>>
                         <span class="check-box"></span>
                         <span class="check-content">
-                            <strong><?php esc_html_e( 'Keep Settings on Uninstall', 'getcited' ); ?></strong>
-                            <span class="check-description"><?php esc_html_e( 'Preserve config when deleting the plugin', 'getcited' ); ?></span>
+                            <strong><?php esc_html_e( 'Keep Data on Uninstall', 'getcited' ); ?></strong>
+                            <span class="check-description"><?php esc_html_e( 'Preserve settings, llms.txt file, and robots.txt rules when deleting the plugin', 'getcited' ); ?></span>
                         </span>
                     </label>
                 </div>

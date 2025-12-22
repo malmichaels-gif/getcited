@@ -478,6 +478,12 @@ class GetCited_Wizard {
         $settings = GetCited_Settings::instance();
         $settings->set( 'wizard_completed', true );
 
+        // Clear existing file detection if skipping while using existing file (v1.9.9.15).
+        if ( 'existing' === $settings->get( 'llms_txt_source' ) ) {
+            $settings->set( 'existing_llms_txt_detected', false );
+            $settings->set( 'existing_llms_txt_assessment', '' );
+        }
+
         wp_send_json_success();
     }
 
@@ -506,6 +512,10 @@ class GetCited_Wizard {
         } else {
             // Clean up scan transient even if not used
             delete_transient( 'getcited_wizard_scan' );
+
+            // Clear detection flag - user implicitly accepted existing file by completing wizard (v1.9.9.15).
+            $settings->set( 'existing_llms_txt_detected', false );
+            $settings->set( 'existing_llms_txt_assessment', '' );
         }
 
         $settings->set( 'wizard_completed', true );
