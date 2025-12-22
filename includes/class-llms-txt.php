@@ -565,6 +565,7 @@ class GetCited_Llms_Txt {
                 if ( ! empty( $cat['description'] ) && $cat['description'] !== "Articles about {$cat['name']}" ) {
                     $content .= ': ' . $cat['description'];
                 } elseif ( ! empty( $cat['count'] ) ) {
+                    // translators: %d is the number of articles in this category.
                     $content .= ' (' . sprintf( _n( '%d article', '%d articles', $cat['count'], 'getcited' ), $cat['count'] ) . ')';
                 }
                 $content .= "\n";

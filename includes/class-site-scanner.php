@@ -1419,6 +1419,7 @@ class GetCited_Site_Scanner {
 				if ( ! empty( $cat['description'] ) ) {
 					$content .= ': ' . $this->escape_markdown( $cat['description'] );
 				} elseif ( ! empty( $cat['count'] ) ) {
+					// translators: %d is the number of articles in this category.
 					$content .= ' (' . sprintf( _n( '%d article', '%d articles', absint( $cat['count'] ), 'getcited' ), absint( $cat['count'] ) ) . ')';
 				}
 				$content .= "\n";
