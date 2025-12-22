@@ -494,6 +494,16 @@
                     if (response.success) {
                         showStatus(statusEl, getcitedAdmin.strings.saved, 'success');
                         markClean();
+
+                        // Update textarea and preview with regenerated content (v1.9.9.14).
+                        if (response.data && response.data.llms_txt_content) {
+                            textarea.value = response.data.llms_txt_content;
+                            // Update preview if it exists
+                            const previewEl = document.getElementById('llms_txt_preview');
+                            if (previewEl) {
+                                previewEl.textContent = response.data.llms_txt_content;
+                            }
+                        }
                     } else {
                         showStatus(statusEl, getcitedAdmin.strings.error, 'error');
                     }

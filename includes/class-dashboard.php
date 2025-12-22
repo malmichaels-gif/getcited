@@ -198,8 +198,9 @@ class GetCited_Dashboard {
                     $settings->set( 'llms_citation_format', $data['llms_citation_format'] );
                 }
                 // Save Use Cases for AI (v1.9.9.12+).
-                if ( isset( $data['llms_use_cases'] ) ) {
-                    $settings->set( 'llms_use_cases', $data['llms_use_cases'] );
+                // Use $raw_data with sanitize_textarea_field to preserve line breaks.
+                if ( isset( $raw_data['llms_use_cases'] ) ) {
+                    $settings->set( 'llms_use_cases', sanitize_textarea_field( $raw_data['llms_use_cases'] ) );
                 }
                 // Save citation guidelines (v1.5.1+).
                 if ( isset( $data['citation_guidelines'] ) && is_array( $data['citation_guidelines'] ) ) {
@@ -224,7 +225,13 @@ class GetCited_Dashboard {
                 if ( $settings->get( 'llms_write_physical' ) ) {
                     $llms->write_physical_file();
                 }
-                break;
+
+                // Return early with regenerated content so UI can update (v1.9.9.14).
+                wp_send_json_success( array(
+                    'message'          => __( 'Settings saved', 'getcited' ),
+                    'llms_txt_content' => $regenerated_content,
+                ) );
+                return; // Explicit return to prevent fall-through to generic response.
 
             case 'schema':
                 if ( isset( $data['schema_enabled'] ) ) {
