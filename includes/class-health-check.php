@@ -124,6 +124,7 @@ class GetCited_Health_Check {
         $settings = GetCited_Settings::instance();
         $detector = GetCited_Conflict_Detector::instance();
         $summary = $detector->get_llms_txt_summary();
+        $llms_source = $settings->get( 'llms_txt_source' );
 
         if ( ! $settings->get( 'llms_txt_enabled' ) ) {
             return array(
@@ -157,7 +158,17 @@ class GetCited_Health_Check {
                 );
             }
 
-            // Physical file exists but not ours
+            // Physical file exists but not ours - check if user chose to keep existing
+            if ( 'existing' === $llms_source ) {
+                return array(
+                    'status' => 'ok',
+                    'message' => __( 'llms.txt active (custom file)', 'getcited' ),
+                    'url' => home_url( '/llms.txt' ),
+                    'is_custom' => true,
+                );
+            }
+
+            // Physical file exists but not ours and user hasn't made a choice
             $source = $content ? $this->identify_llms_txt_source( $content ) : false;
 
             return array(

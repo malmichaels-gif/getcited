@@ -206,12 +206,16 @@ class GetCited_Wizard {
         // Set site type
         $settings->set( 'site_type', $site_type );
 
-        // Generate appropriate llms.txt only if not already customized
-        $existing_content = $settings->get( 'llms_txt_content' );
-        if ( empty( $existing_content ) ) {
-            $llms_txt = GetCited_Llms_Txt::instance();
-            $content = $llms_txt->generate_template( $site_type );
-            $settings->set( 'llms_txt_content', $content );
+        // Skip llms.txt generation if user chose to keep existing file
+        $llms_source = $settings->get( 'llms_txt_source' );
+        if ( 'existing' !== $llms_source ) {
+            // Generate appropriate llms.txt only if not already customized
+            $existing_content = $settings->get( 'llms_txt_content' );
+            if ( empty( $existing_content ) ) {
+                $llms_txt = GetCited_Llms_Txt::instance();
+                $content = $llms_txt->generate_template( $site_type );
+                $settings->set( 'llms_txt_content', $content );
+            }
         }
 
         // Run SEO plugin detection and auto-configure schema.
@@ -485,12 +489,18 @@ class GetCited_Wizard {
 
         $settings = GetCited_Settings::instance();
 
-        // Save the generated llms.txt content from the scan
-        $wizard_scan = get_transient( 'getcited_wizard_scan' );
-        if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
-            $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
+        // Save the generated llms.txt content from the scan (only if not using existing file)
+        $llms_source = $settings->get( 'llms_txt_source' );
+        if ( 'existing' !== $llms_source ) {
+            $wizard_scan = get_transient( 'getcited_wizard_scan' );
+            if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
+                $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
 
-            // Clean up the transient
+                // Clean up the transient
+                delete_transient( 'getcited_wizard_scan' );
+            }
+        } else {
+            // Clean up scan transient even if not used
             delete_transient( 'getcited_wizard_scan' );
         }
 
@@ -537,6 +547,12 @@ class GetCited_Wizard {
 
         // Check if we can write a physical file
         $result['can_write_physical'] = GetCited_Llms_Txt::instance()->can_write_physical_file();
+
+        // Check if using custom existing file
+        $settings = GetCited_Settings::instance();
+        if ( 'existing' === $settings->get( 'llms_txt_source' ) ) {
+            $result['is_custom'] = true;
+        }
 
         // Generate download URL
         $result['download_url'] = wp_nonce_url(

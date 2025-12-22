@@ -216,6 +216,21 @@ if ( empty( $org['name'] ) ) {
                         <p class="verify-message"><?php esc_html_e( 'AI assistants can now find and share your content with users.', 'getcited' ); ?></p>
                     </div>
 
+                    <!-- Using Existing File State -->
+                    <div class="verify-state verify-using-existing" style="display: none;">
+                        <div class="verify-icon success">
+                            <span class="dashicons dashicons-yes-alt"></span>
+                        </div>
+                        <h2><?php esc_html_e( 'Using your custom llms.txt', 'getcited' ); ?></h2>
+                        <p class="verify-url">
+                            <?php esc_html_e( 'Your existing file is accessible at:', 'getcited' ); ?><br>
+                            <a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" class="llms-url-link">
+                                <?php echo esc_html( home_url( '/llms.txt' ) ); ?>
+                            </a>
+                        </p>
+                        <p class="verify-message"><?php esc_html_e( 'You can switch to GetCited management anytime in Settings.', 'getcited' ); ?></p>
+                    </div>
+
                     <!-- Needs Fix State -->
                     <div class="verify-state verify-needs-fix" style="display: none;">
                         <div class="verify-action-card">

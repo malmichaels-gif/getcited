@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.9.7
+ * Version: 1.9.9.11
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.9.7' );
+define( 'GETCITED_VERSION', '1.9.9.11' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -187,6 +187,9 @@ final class GetCited {
         // Run initial schema detection
         GetCited_Schema_Detector::instance()->run_detection();
 
+        // Detect existing llms.txt file
+        $this->detect_existing_llms_txt( $settings );
+
         // Create custom database tables
         $this->create_tables();
 
@@ -201,6 +204,56 @@ final class GetCited {
 
         // Fire activation hook
         do_action( 'getcited_activated' );
+    }
+
+    /**
+     * Detect existing llms.txt file on activation
+     *
+     * Checks if a non-GetCited llms.txt file exists and handles it based on assessment:
+     * - Basic files (auto-generated or < 300 chars): Auto-import silently
+     * - Moderate/Substantial files: Set detection flag for user choice
+     *
+     * @param GetCited_Settings $settings Settings instance.
+     */
+    private function detect_existing_llms_txt( $settings ) {
+        $llms_txt = GetCited_Llms_Txt::instance();
+
+        // Check if physical file exists
+        if ( ! $llms_txt->physical_file_exists() ) {
+            return;
+        }
+
+        // Check if it's already our file
+        if ( $llms_txt->is_our_physical_file() ) {
+            return;
+        }
+
+        // Get content and assess
+        $content = $llms_txt->get_physical_file_content();
+        if ( empty( $content ) ) {
+            return;
+        }
+
+        $assessment = $llms_txt->assess_llms_txt( $content );
+
+        if ( 'basic' === $assessment ) {
+            // Auto-import basic files silently
+            $settings->set( 'llms_txt_content', $content );
+            $settings->set( 'llms_txt_source', 'getcited' );
+
+            // Write file with GetCited marker
+            $llms_txt->write_physical_file();
+
+            // Set transient for post-setup notice
+            set_transient( 'getcited_llms_imported_notice', true, DAY_IN_SECONDS );
+        } else {
+            // Moderate or substantial - set flag for user choice
+            $settings->set( 'existing_llms_txt_detected', true );
+            $settings->set( 'existing_llms_txt_assessment', $assessment );
+
+            // Default to serving existing file until user decides
+            $settings->set( 'llms_txt_source', 'existing' );
+        }
     }
 
     /**

@@ -1808,6 +1808,7 @@
             // Get state containers
             var checkingState = verifyStep.querySelector('.verify-checking');
             var successState = verifyStep.querySelector('.verify-success');
+            var usingExistingState = verifyStep.querySelector('.verify-using-existing');
             var needsFixState = verifyStep.querySelector('.verify-needs-fix');
             var fixingState = verifyStep.querySelector('.verify-fixing');
             var manualState = verifyStep.querySelector('.verify-manual');
@@ -1818,7 +1819,7 @@
             var skipBtn = verifyStep.querySelector('.getcited-verify-skip-btn');
 
             // Hide all states first
-            [checkingState, successState, needsFixState, fixingState, manualState].forEach(function(el) {
+            [checkingState, successState, usingExistingState, needsFixState, fixingState, manualState].forEach(function(el) {
                 if (el) el.style.display = 'none';
             });
 
@@ -1839,8 +1840,12 @@
                         if (checkingState) checkingState.style.display = 'none';
 
                         if (response.data.accessible) {
-                            // Success!
-                            if (successState) successState.style.display = 'block';
+                            // Check if using existing custom file
+                            if (response.data.is_custom && usingExistingState) {
+                                usingExistingState.style.display = 'block';
+                            } else if (successState) {
+                                successState.style.display = 'block';
+                            }
                             if (continueBtn) continueBtn.style.display = 'inline-block';
                         } else {
                             // Needs fix
