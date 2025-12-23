@@ -44,7 +44,6 @@ class GetCited_Settings {
         'llms_txt_content' => '',
         'llms_txt_enabled' => true,
         'llms_txt_source' => 'getcited', // 'getcited' or 'existing' - which llms.txt to use
-        'llms_write_physical' => true,
         'existing_llms_txt_detected' => false, // Flag: existing non-GetCited llms.txt found on activation
         'existing_llms_txt_assessment' => '', // 'basic', 'moderate', or 'substantial'
         'llms_founder_name' => '',
@@ -314,7 +313,6 @@ class GetCited_Settings {
                 return wp_kses_post( $value );
 
             case 'llms_txt_enabled':
-            case 'llms_write_physical':
             case 'robots_write_physical':
             case 'schema_enabled':
             case 'schema_force_enabled':

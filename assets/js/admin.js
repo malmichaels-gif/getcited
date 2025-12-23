@@ -442,7 +442,6 @@
         const preview = document.getElementById('llms_txt_preview');
         const saveBtn = document.querySelector('.getcited-save-llms-txt');
         const enabledToggle = document.getElementById('llms_txt_enabled');
-        const writePhysicalToggle = document.getElementById('llms_write_physical');
         const templateBtns = document.querySelectorAll('.getcited-load-template');
 
         if (!textarea) return;
@@ -464,10 +463,11 @@
                 saveBtn.textContent = getcitedAdmin.strings.saving;
 
                 // Collect all llms.txt related settings
+                const sourceRadio = document.querySelector('input[name="llms_txt_source"]:checked');
                 const data = {
                     llms_txt_enabled: enabledToggle ? enabledToggle.checked : true,
                     llms_txt_content: textarea.value,
-                    llms_write_physical: writePhysicalToggle ? writePhysicalToggle.checked : false,
+                    llms_txt_source: sourceRadio ? sourceRadio.value : 'getcited',
                     llms_founder_name: document.getElementById('llms_founder_name')?.value || '',
                     llms_founder_title: document.getElementById('llms_founder_title')?.value || '',
                     llms_site_expertise: document.getElementById('llms_site_expertise')?.value || '',

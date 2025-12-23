@@ -45,7 +45,6 @@ class GetCited_Dashboard {
         add_action( 'wp_ajax_getcited_remove_robots_rules', array( $this, 'ajax_remove_robots_rules' ) );
 
         // llms.txt file management handlers
-        add_action( 'wp_ajax_getcited_write_llms_file', array( $this, 'ajax_write_llms_file' ) );
         add_action( 'wp_ajax_getcited_delete_llms_file', array( $this, 'ajax_delete_llms_file' ) );
 
         // Schema detection handlers
@@ -179,8 +178,23 @@ class GetCited_Dashboard {
                 if ( isset( $data['llms_txt_content'] ) ) {
                     $settings->set( 'llms_txt_content', $data['llms_txt_content'] );
                 }
-                if ( isset( $data['llms_write_physical'] ) ) {
-                    $settings->set( 'llms_write_physical', filter_var( $data['llms_write_physical'], FILTER_VALIDATE_BOOLEAN ) ?? false );
+                // Handle llms_txt_source change with backup/restore (v1.9.9.18).
+                if ( isset( $data['llms_txt_source'] ) ) {
+                    $new_source = $data['llms_txt_source'];
+                    $old_source = $settings->get( 'llms_txt_source' );
+                    $llms       = GetCited_Llms_Txt::instance();
+
+                    if ( $new_source !== $old_source ) {
+                        if ( 'getcited' === $new_source ) {
+                            // Switching to GetCited - backup any existing physical file.
+                            $llms->backup_physical_file();
+                        } elseif ( 'existing' === $new_source && $llms->backup_exists() ) {
+                            // Switching back to existing - restore from backup.
+                            $llms->restore_physical_file();
+                        }
+                    }
+
+                    $settings->set( 'llms_txt_source', $new_source );
                 }
                 if ( isset( $data['llms_founder_name'] ) ) {
                     $settings->set( 'llms_founder_name', $data['llms_founder_name'] );
@@ -221,11 +235,6 @@ class GetCited_Dashboard {
                 $regenerated_content = $llms->generate_template( $site_type );
                 $settings->set( 'llms_txt_content', $regenerated_content );
 
-                // If physical file writing is enabled, write the file.
-                if ( $settings->get( 'llms_write_physical' ) ) {
-                    $llms->write_physical_file();
-                }
-
                 // Return early with regenerated content so UI can update (v1.9.9.14).
                 wp_send_json_success( array(
                     'message'          => __( 'Settings saved', 'getcited' ),
@@ -256,10 +265,6 @@ class GetCited_Dashboard {
                     $site_type = $settings->get( 'site_type' );
                     $regenerated_content = $llms->generate_template( $site_type );
                     $settings->set( 'llms_txt_content', $regenerated_content );
-
-                    if ( $settings->get( 'llms_write_physical' ) ) {
-                        $llms->write_physical_file();
-                    }
                 }
                 break;
 
@@ -273,10 +278,6 @@ class GetCited_Dashboard {
                         $llms = GetCited_Llms_Txt::instance();
                         $regenerated_content = $llms->generate_template( $data['site_type'] );
                         $settings->set( 'llms_txt_content', $regenerated_content );
-
-                        if ( $settings->get( 'llms_write_physical' ) ) {
-                            $llms->write_physical_file();
-                        }
                     }
                 }
                 if ( isset( $data['debug_mode'] ) ) {
@@ -371,26 +372,6 @@ class GetCited_Dashboard {
     }
 
     /**
-     * AJAX: Write llms.txt physical file
-     */
-    public function ajax_write_llms_file() {
-        check_ajax_referer( 'getcited_admin', 'nonce' );
-
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => 'Permission denied' ) );
-        }
-
-        $llms = GetCited_Llms_Txt::instance();
-        $result = $llms->write_physical_file();
-
-        if ( $result['success'] ) {
-            wp_send_json_success( $result );
-        } else {
-            wp_send_json_error( $result );
-        }
-    }
-
-    /**
      * AJAX: Delete llms.txt physical file
      */
     public function ajax_delete_llms_file() {
@@ -429,11 +410,6 @@ class GetCited_Dashboard {
         // Regenerate content using current site type.
         $content = $llms->generate_template( $site_type );
         $settings->set( 'llms_txt_content', $content );
-
-        // Write physical file if enabled.
-        if ( $settings->get( 'llms_write_physical' ) ) {
-            $llms->write_physical_file();
-        }
 
         wp_send_json_success( array( 'message' => __( 'llms.txt regenerated!', 'getcited' ) ) );
     }

@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.9.15
+ * Version: 1.9.9.18
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.9.15' );
+define( 'GETCITED_VERSION', '1.9.9.18' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -237,14 +237,11 @@ final class GetCited {
         $assessment = $llms_txt->assess_llms_txt( $content );
 
         if ( 'basic' === $assessment ) {
-            // Auto-import basic files silently
+            // Auto-import basic files silently.
             $settings->set( 'llms_txt_content', $content );
             $settings->set( 'llms_txt_source', 'getcited' );
 
-            // Write file with GetCited marker
-            $llms_txt->write_physical_file();
-
-            // Set transient for post-setup notice
+            // Set transient for post-setup notice.
             set_transient( 'getcited_llms_imported_notice', true, DAY_IN_SECONDS );
         } else {
             // Moderate or substantial - set flag for user choice
@@ -599,16 +596,11 @@ final class GetCited {
         $llms      = GetCited_Llms_Txt::instance();
         $site_type = $settings->get( 'site_type' );
 
-        // Regenerate content with fresh recent posts
+        // Regenerate content with fresh recent posts.
         $content = $llms->generate_template( $site_type );
         $settings->set( 'llms_txt_content', $content );
 
-        // Write physical file if enabled
-        if ( $settings->get( 'llms_write_physical' ) ) {
-            $llms->write_physical_file();
-        }
-
-        // Fire hook for extensions
+        // Fire hook for extensions.
         do_action( 'getcited_llms_refresh' );
     }
 
@@ -875,6 +867,29 @@ final class GetCited {
         if ( version_compare( $db_version, '1.4.7', '<' ) ) {
             $this->add_category_index();
             $settings->set( 'db_version', '1.4.7' );
+        }
+
+        // v1.9.9.18: Remove physical llms.txt files (now served dynamically).
+        if ( version_compare( $db_version, '1.9.9.18', '<' ) ) {
+            $this->migrate_remove_physical_llms_txt();
+            $settings->set( 'db_version', '1.9.9.18' );
+        }
+    }
+
+    /**
+     * Migration: Remove physical llms.txt file if it was created by GetCited
+     *
+     * As of v1.9.9.18, llms.txt is always served dynamically via WordPress.
+     * Physical files would be served by nginx/Apache directly, bypassing updates.
+     *
+     * @since 1.9.9.18
+     */
+    private function migrate_remove_physical_llms_txt() {
+        $llms = GetCited_Llms_Txt::instance();
+
+        // Only delete if file exists and was created by us.
+        if ( $llms->physical_file_exists() && $llms->is_our_physical_file() ) {
+            $llms->delete_physical_file();
         }
     }
 

@@ -20,7 +20,6 @@ $enabled = $settings->get( 'llms_txt_enabled' );
 $content = $settings->get( 'llms_txt_content' );
 $site_type = $settings->get( 'site_type' );
 $llms_source = $settings->get( 'llms_txt_source' );
-$write_physical = $settings->get( 'llms_write_physical' );
 $founder_name = $settings->get( 'llms_founder_name' );
 $founder_title = $settings->get( 'llms_founder_title' );
 $site_expertise = $settings->get( 'llms_site_expertise' );
@@ -31,7 +30,6 @@ $llms_use_cases = $settings->get( 'llms_use_cases' );
 
 $physical_exists = $llms_txt->physical_file_exists();
 $is_our_file = $physical_exists ? $llms_txt->is_our_physical_file() : false;
-$can_write = $llms_txt->can_write_physical_file();
 $has_existing_file = $physical_exists && ! $is_our_file;
 
 $validation = $llms_txt->validate( $content );
@@ -49,106 +47,55 @@ $status = $health->get_status();
         <!-- Pro Teaser Banner -->
         <?php $pro_teaser->render_page_teaser( 'llms' ); ?>
 
-        <!-- Two-Column Settings Grid -->
-        <div class="getcited-settings-grid">
-            <!-- Left Column: Enable + Source -->
-            <div class="getcited-section getcited-llms-toggle">
-                <h2><?php esc_html_e( 'Enable llms.txt', 'getcited' ); ?></h2>
-                <label class="getcited-checkbox-custom <?php echo $enabled ? 'is-checked' : ''; ?>">
-                    <input type="checkbox"
-                           name="llms_txt_enabled"
-                           id="llms_txt_enabled"
-                           value="1"
-                           <?php checked( $enabled ); ?>>
-                    <span class="check-box"></span>
-                    <span class="check-content">
-                        <strong><?php esc_html_e( 'Serve llms.txt', 'getcited' ); ?></strong>
-                        <span class="check-description">
-                            <?php
-                            printf(
-                                /* translators: %s: URL to the llms.txt file */
-                                esc_html__( 'Available at %s', 'getcited' ),
-                                '<a href="' . esc_url( $llms_txt->get_url() ) . '" target="_blank">' . esc_html( $llms_txt->get_url() ) . '</a>'
-                            ); ?>
-                        </span>
+        <!-- Enable llms.txt -->
+        <div class="getcited-section getcited-llms-toggle">
+            <h2><?php esc_html_e( 'Enable llms.txt', 'getcited' ); ?></h2>
+            <label class="getcited-checkbox-custom <?php echo $enabled ? 'is-checked' : ''; ?>">
+                <input type="checkbox"
+                       name="llms_txt_enabled"
+                       id="llms_txt_enabled"
+                       value="1"
+                       <?php checked( $enabled ); ?>>
+                <span class="check-box"></span>
+                <span class="check-content">
+                    <strong><?php esc_html_e( 'Serve llms.txt', 'getcited' ); ?></strong>
+                    <span class="check-description">
+                        <?php
+                        printf(
+                            /* translators: %s: URL to the llms.txt file */
+                            esc_html__( 'Available at %s', 'getcited' ),
+                            '<a href="' . esc_url( $llms_txt->get_url() ) . '" target="_blank">' . esc_html( $llms_txt->get_url() ) . '</a>'
+                        ); ?>
                     </span>
-                </label>
-                <p class="description" style="margin-top: var(--getcited-space-sm); font-size: 14px;">
-                    <?php esc_html_e( 'llms.txt is a helpful signal; crawler behavior varies by provider and may change over time.', 'getcited' ); ?>
-                </p>
+                </span>
+            </label>
+            <p class="description" style="margin-top: var(--getcited-space-sm); font-size: 14px;">
+                <?php esc_html_e( 'llms.txt is a helpful signal; crawler behavior varies by provider and may change over time.', 'getcited' ); ?>
+            </p>
 
-                <?php if ( $has_existing_file ) : ?>
-                    <div class="getcited-source-toggle">
-                        <h3><?php esc_html_e( 'Content Source', 'getcited' ); ?></h3>
-                        <label class="getcited-radio-option">
-                            <input type="radio"
-                                   name="llms_txt_source"
-                                   value="existing"
-                                   <?php checked( $llms_source, 'existing' ); ?>>
-                            <span><?php esc_html_e( 'Use existing llms.txt file', 'getcited' ); ?></span>
-                        </label>
-                        <label class="getcited-radio-option">
-                            <input type="radio"
-                                   name="llms_txt_source"
-                                   value="getcited"
-                                   <?php checked( $llms_source, 'getcited' ); ?>>
-                            <span><?php esc_html_e( 'Use GetCited llms.txt', 'getcited' ); ?></span>
-                            <span class="getcited-badge recommended"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
-                        </label>
-                        <p class="description">
-                            <?php esc_html_e( 'An existing llms.txt was found. Choose which version to serve.', 'getcited' ); ?>
-                        </p>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- Right Column: File Settings -->
-            <div class="getcited-section getcited-llms-file-settings">
-                <h2><?php esc_html_e( 'File Settings', 'getcited' ); ?></h2>
-
-                <label class="getcited-checkbox-custom <?php echo $write_physical ? 'is-checked' : ''; ?> <?php echo ! $can_write ? 'is-disabled' : ''; ?>">
-                    <input type="checkbox"
-                           name="llms_write_physical"
-                           id="llms_write_physical"
-                           value="1"
-                           <?php checked( $write_physical ); ?>
-                           <?php disabled( ! $can_write ); ?>>
-                    <span class="check-box"></span>
-                    <span class="check-content">
-                        <strong><?php esc_html_e( 'Write physical file', 'getcited' ); ?></strong>
-                        <span class="check-description"><?php esc_html_e( 'Auto-write to site root for best compatibility.', 'getcited' ); ?></span>
-                    </span>
-                </label>
-
-                <?php if ( ! $can_write ) : ?>
-                    <p class="getcited-notice getcited-notice-warning">
-                        <span class="dashicons dashicons-warning"></span>
-                        <?php esc_html_e( 'Cannot write to site root.', 'getcited' ); ?>
+            <?php if ( $has_existing_file ) : ?>
+                <div class="getcited-source-toggle">
+                    <h3><?php esc_html_e( 'Content Source', 'getcited' ); ?></h3>
+                    <label class="getcited-radio-option">
+                        <input type="radio"
+                               name="llms_txt_source"
+                               value="existing"
+                               <?php checked( $llms_source, 'existing' ); ?>>
+                        <span><?php esc_html_e( 'Use existing llms.txt file', 'getcited' ); ?></span>
+                    </label>
+                    <label class="getcited-radio-option">
+                        <input type="radio"
+                               name="llms_txt_source"
+                               value="getcited"
+                               <?php checked( $llms_source, 'getcited' ); ?>>
+                        <span><?php esc_html_e( 'Use GetCited llms.txt', 'getcited' ); ?></span>
+                        <span class="getcited-badge recommended"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
+                    </label>
+                    <p class="description">
+                        <?php esc_html_e( 'An existing llms.txt was found. Choose which version to serve.', 'getcited' ); ?>
                     </p>
-                <?php endif; ?>
-
-                <?php if ( $physical_exists ) : ?>
-                    <p class="getcited-file-status">
-                        <?php if ( $is_our_file ) : ?>
-                            <span class="dashicons dashicons-yes-alt" style="color: #46b450;"></span>
-                            <?php esc_html_e( 'Managed by GetCited', 'getcited' ); ?>
-                        <?php else : ?>
-                            <span class="dashicons dashicons-info" style="color: #0073aa;"></span>
-                            <?php esc_html_e( 'External file detected', 'getcited' ); ?>
-                        <?php endif; ?>
-                    </p>
-                <?php endif; ?>
-
-                <?php if ( $can_write ) : ?>
-                    <div class="getcited-manual-write">
-                        <button type="button" class="button getcited-write-llms-file">
-                            <span class="dashicons dashicons-media-text"></span>
-                            <?php esc_html_e( 'Write Now', 'getcited' ); ?>
-                        </button>
-                        <span class="getcited-write-status"></span>
-                    </div>
-                <?php endif; ?>
-            </div>
+                </div>
+            <?php endif; ?>
         </div>
 
         <!-- Content Settings (Collapsible) -->
@@ -396,7 +343,7 @@ $status = $health->get_status();
                     </div>
                     <pre class="getcited-preview-code" id="llms_txt_preview"><?php echo esc_html( html_entity_decode( $content, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ); ?></pre>
                     <p class="description getcited-copy-hint">
-                        <?php esc_html_e( 'Copy and paste into llms.txt in your site root if auto-write is unavailable.', 'getcited' ); ?>
+                        <?php esc_html_e( 'Copy the content above to share or backup your llms.txt configuration.', 'getcited' ); ?>
                     </p>
                 </div>
             </div>

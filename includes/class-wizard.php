@@ -502,6 +502,10 @@ class GetCited_Wizard {
         // Save the generated llms.txt content from the scan (only if not using existing file)
         $llms_source = $settings->get( 'llms_txt_source' );
         if ( 'existing' !== $llms_source ) {
+            // Backup any existing physical file since user is using GetCited (v1.9.9.18).
+            $llms = GetCited_Llms_Txt::instance();
+            $llms->backup_physical_file();
+
             $wizard_scan = get_transient( 'getcited_wizard_scan' );
             if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
                 $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
@@ -582,7 +586,7 @@ class GetCited_Wizard {
      * AJAX: Fix llms.txt accessibility issue
      *
      * Handles actions to fix llms.txt accessibility:
-     * - write_physical: Write llms.txt as a physical file
+     * - regenerate: Regenerate llms.txt content (served dynamically via WordPress)
      * - skip: Mark as skipped, continue with setup
      */
     public function ajax_fix_llms() {
@@ -592,45 +596,30 @@ class GetCited_Wizard {
             wp_send_json_error( array( 'message' => 'Permission denied' ) );
         }
 
-        $action = isset( $_POST['fix_action'] ) ? sanitize_text_field( wp_unslash( $_POST['fix_action'] ) ) : 'write_physical';
+        $action = isset( $_POST['fix_action'] ) ? sanitize_text_field( wp_unslash( $_POST['fix_action'] ) ) : 'regenerate';
 
         switch ( $action ) {
-            case 'write_physical':
-                // Enable physical file writing in settings
-                $settings = GetCited_Settings::instance();
-                $settings->set( 'llms_write_physical', true );
-
-                // Regenerate llms.txt content fresh to include all current settings (v1.9.9.12)
-                // This ensures Use Cases and other defaults are included
+            case 'write_physical': // Legacy - now treated as regenerate.
+            case 'regenerate':
+                // Regenerate llms.txt content fresh to include all current settings.
+                $settings  = GetCited_Settings::instance();
                 $llms      = GetCited_Llms_Txt::instance();
                 $site_type = $settings->get( 'site_type' );
                 $fresh_content = $llms->generate_template( $site_type );
                 $settings->set( 'llms_txt_content', $fresh_content );
 
-                // Write the physical file
-                $result = $llms->write_physical_file();
-
-                if ( ! $result['success'] ) {
-                    wp_send_json_error( array(
-                        'message'   => $result['message'],
-                        'details'   => $result['details'] ?? null,
-                        'need_manual' => true,
-                    ) );
-                }
-
-                // Verify it's now accessible
+                // Verify it's accessible (served dynamically via WordPress).
                 $health_check   = GetCited_Health_Check::instance();
                 $verify_result  = $health_check->verify_llms_txt_accessible();
 
                 if ( $verify_result['accessible'] ) {
                     wp_send_json_success( array(
-                        'message'    => __( 'Physical file written and verified!', 'getcited' ),
+                        'message'    => __( 'llms.txt is now accessible!', 'getcited' ),
                         'accessible' => true,
                     ) );
                 } else {
-                    // File written but still not accessible (unusual case)
                     wp_send_json_success( array(
-                        'message'    => __( 'File written, but verification pending. It may take a moment to propagate.', 'getcited' ),
+                        'message'    => __( 'llms.txt regenerated. Verification pending.', 'getcited' ),
                         'accessible' => false,
                         'retry'      => true,
                     ) );
@@ -638,7 +627,7 @@ class GetCited_Wizard {
                 break;
 
             case 'skip':
-                // Mark as skipped for dashboard reminder
+                // Mark as skipped for dashboard reminder.
                 $settings = GetCited_Settings::instance();
                 $settings->set( 'llms_verification_skipped', true );
 
