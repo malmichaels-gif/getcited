@@ -19,7 +19,6 @@ $pro_teaser = GetCited_Pro_Teaser::instance();
 $enabled = $settings->get( 'llms_txt_enabled' );
 $content = $settings->get( 'llms_txt_content' );
 $site_type = $settings->get( 'site_type' );
-$llms_source = $settings->get( 'llms_txt_source' );
 $founder_name = $settings->get( 'llms_founder_name' );
 $founder_title = $settings->get( 'llms_founder_title' );
 $site_expertise = $settings->get( 'llms_site_expertise' );
@@ -27,10 +26,6 @@ $update_frequency = $settings->get( 'llms_update_frequency' );
 $citation_format = $settings->get( 'llms_citation_format' );
 $citation_guidelines = $settings->get( 'citation_guidelines' );
 $llms_use_cases = $settings->get( 'llms_use_cases' );
-
-$physical_exists = $llms_txt->physical_file_exists();
-$is_our_file = $physical_exists ? $llms_txt->is_our_physical_file() : false;
-$has_existing_file = $physical_exists && ! $is_our_file;
 
 $validation = $llms_txt->validate( $content );
 $status = $health->get_status();
@@ -72,30 +67,6 @@ $status = $health->get_status();
             <p class="description" style="margin-top: var(--getcited-space-sm); font-size: 14px;">
                 <?php esc_html_e( 'llms.txt is a helpful signal; crawler behavior varies by provider and may change over time.', 'getcited' ); ?>
             </p>
-
-            <?php if ( $has_existing_file ) : ?>
-                <div class="getcited-source-toggle">
-                    <h3><?php esc_html_e( 'Content Source', 'getcited' ); ?></h3>
-                    <label class="getcited-radio-option">
-                        <input type="radio"
-                               name="llms_txt_source"
-                               value="existing"
-                               <?php checked( $llms_source, 'existing' ); ?>>
-                        <span><?php esc_html_e( 'Use existing llms.txt file', 'getcited' ); ?></span>
-                    </label>
-                    <label class="getcited-radio-option">
-                        <input type="radio"
-                               name="llms_txt_source"
-                               value="getcited"
-                               <?php checked( $llms_source, 'getcited' ); ?>>
-                        <span><?php esc_html_e( 'Use GetCited llms.txt', 'getcited' ); ?></span>
-                        <span class="getcited-badge recommended"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
-                    </label>
-                    <p class="description">
-                        <?php esc_html_e( 'An existing llms.txt was found. Choose which version to serve.', 'getcited' ); ?>
-                    </p>
-                </div>
-            <?php endif; ?>
         </div>
 
         <!-- Content Settings (Collapsible) -->

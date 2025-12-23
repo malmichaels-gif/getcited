@@ -72,14 +72,12 @@ class GetCited_Dashboard {
         // Admin notices for citation nudge (v1.5.1)
         add_action( 'admin_notices', array( $this, 'maybe_show_citation_nudge' ) );
 
-        // Admin notices for existing llms.txt detection (v2.0)
-        add_action( 'admin_notices', array( $this, 'maybe_show_existing_llms_notice' ) );
+        // Admin notices for llms.txt (v2.0)
         add_action( 'admin_notices', array( $this, 'maybe_show_llms_imported_notice' ) );
+        add_action( 'admin_notices', array( $this, 'maybe_show_seo_plugin_conflict_notice' ) );
 
-        // Existing llms.txt choice handlers (v2.0)
-        add_action( 'wp_ajax_getcited_import_existing_llms', array( $this, 'ajax_import_existing_llms' ) );
-        add_action( 'wp_ajax_getcited_keep_existing_llms', array( $this, 'ajax_keep_existing_llms' ) );
-        add_action( 'wp_ajax_getcited_dismiss_llms_choice', array( $this, 'ajax_dismiss_llms_choice' ) );
+        // llms.txt conflict resolution handler (v1.9.9.19)
+        add_action( 'wp_ajax_getcited_delete_conflicting_llms', array( $this, 'ajax_delete_conflicting_llms' ) );
     }
 
     /**
@@ -177,24 +175,6 @@ class GetCited_Dashboard {
                 }
                 if ( isset( $data['llms_txt_content'] ) ) {
                     $settings->set( 'llms_txt_content', $data['llms_txt_content'] );
-                }
-                // Handle llms_txt_source change with backup/restore (v1.9.9.18).
-                if ( isset( $data['llms_txt_source'] ) ) {
-                    $new_source = $data['llms_txt_source'];
-                    $old_source = $settings->get( 'llms_txt_source' );
-                    $llms       = GetCited_Llms_Txt::instance();
-
-                    if ( $new_source !== $old_source ) {
-                        if ( 'getcited' === $new_source ) {
-                            // Switching to GetCited - backup any existing physical file.
-                            $llms->backup_physical_file();
-                        } elseif ( 'existing' === $new_source && $llms->backup_exists() ) {
-                            // Switching back to existing - restore from backup.
-                            $llms->restore_physical_file();
-                        }
-                    }
-
-                    $settings->set( 'llms_txt_source', $new_source );
                 }
                 if ( isset( $data['llms_founder_name'] ) ) {
                     $settings->set( 'llms_founder_name', $data['llms_founder_name'] );
@@ -901,113 +881,87 @@ class GetCited_Dashboard {
     }
 
     /**
-     * Show notice when existing llms.txt was detected (moderate/substantial files)
+     * Show warning when SEO plugin llms.txt conflict detected
      *
-     * @since 2.0.0
+     * Physical llms.txt files from SEO plugins override GetCited's dynamic serving.
+     * This notice helps users resolve the conflict.
+     *
+     * @since 1.9.9.19
      */
-    public function maybe_show_existing_llms_notice() {
-        $settings = GetCited_Settings::instance();
-
-        // Check if detection flag is set
-        if ( ! $settings->get( 'existing_llms_txt_detected' ) ) {
-            return;
-        }
-
-        // Only show on GetCited admin pages
+    public function maybe_show_seo_plugin_conflict_notice() {
+        // Only show on GetCited admin pages.
         $screen = get_current_screen();
         if ( ! $screen || strpos( $screen->id, 'getcited' ) === false ) {
             return;
         }
 
-        $assessment = $settings->get( 'existing_llms_txt_assessment' );
-        $nonce = wp_create_nonce( 'getcited_admin' );
+        // Check for active conflict.
+        $llms     = GetCited_Llms_Txt::instance();
+        $conflict = $llms->check_seo_plugin_conflict();
 
-        // Determine messaging based on assessment
-        if ( 'substantial' === $assessment ) {
-            $message = __( 'We found a detailed llms.txt file on your site.', 'getcited' );
-            $primary_action = 'keep';
-        } else {
-            $message = __( 'We found an existing llms.txt file on your site.', 'getcited' );
-            $primary_action = 'import';
+        if ( ! $conflict ) {
+            return;
         }
 
+        $nonce = wp_create_nonce( 'getcited_admin' );
+
         ?>
-        <div class="notice notice-info getcited-existing-llms-notice" data-nonce="<?php echo esc_attr( $nonce ); ?>">
-            <p><strong><?php echo esc_html( $message ); ?></strong></p>
+        <div class="notice notice-warning getcited-seo-conflict-notice" data-nonce="<?php echo esc_attr( $nonce ); ?>">
             <p>
-                <?php if ( 'substantial' === $assessment ) : ?>
-                    <button type="button" class="button button-primary getcited-llms-keep">
-                        <?php esc_html_e( 'Keep existing file', 'getcited' ); ?>
-                    </button>
-                    <button type="button" class="button getcited-llms-import">
-                        <?php esc_html_e( 'Import into GetCited', 'getcited' ); ?>
-                    </button>
-                <?php else : ?>
-                    <button type="button" class="button button-primary getcited-llms-import">
-                        <?php esc_html_e( 'Import into GetCited', 'getcited' ); ?>
-                    </button>
-                    <button type="button" class="button getcited-llms-keep">
-                        <?php esc_html_e( 'Keep existing file', 'getcited' ); ?>
-                    </button>
-                <?php endif; ?>
-                <button type="button" class="button getcited-llms-dismiss">
-                    <?php esc_html_e( 'Decide later', 'getcited' ); ?>
+                <strong><?php esc_html_e( 'llms.txt Conflict Detected', 'getcited' ); ?></strong><br>
+                <?php
+                printf(
+                    /* translators: %s: SEO plugin name */
+                    esc_html__( '%s is generating a physical llms.txt file that overrides GetCited.', 'getcited' ),
+                    esc_html( $conflict['name'] )
+                );
+                ?>
+            </p>
+            <p>
+                <strong><?php esc_html_e( 'To fix:', 'getcited' ); ?></strong>
+                <?php echo esc_html( $conflict['instructions'] ); ?>
+            </p>
+            <p>
+                <button type="button" class="button getcited-delete-conflict">
+                    <?php esc_html_e( 'Remove conflicting file', 'getcited' ); ?>
+                </button>
+                <button type="button" class="button getcited-dismiss-conflict">
+                    <?php esc_html_e( 'Dismiss', 'getcited' ); ?>
                 </button>
             </p>
         </div>
         <script>
         (function() {
             document.addEventListener('DOMContentLoaded', function() {
-                var notice = document.querySelector('.getcited-existing-llms-notice');
+                var notice = document.querySelector('.getcited-seo-conflict-notice');
                 if (!notice) return;
 
                 var nonce = notice.dataset.nonce;
 
-                notice.querySelector('.getcited-llms-import').addEventListener('click', function() {
+                notice.querySelector('.getcited-delete-conflict').addEventListener('click', function() {
                     this.disabled = true;
-                    this.textContent = '<?php echo esc_js( __( 'Importing...', 'getcited' ) ); ?>';
+                    this.textContent = '<?php echo esc_js( __( 'Removing...', 'getcited' ) ); ?>';
                     fetch(ajaxurl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'action=getcited_import_existing_llms&nonce=' + nonce
+                        body: 'action=getcited_delete_conflicting_llms&nonce=' + nonce
                     }).then(function(response) {
                         return response.json();
                     }).then(function(data) {
                         if (data.success) {
-                            notice.innerHTML = '<p><strong><?php echo esc_js( __( 'llms.txt imported into GetCited successfully.', 'getcited' ) ); ?></strong></p>';
-                            notice.classList.remove('notice-info');
+                            notice.innerHTML = '<p><strong><?php echo esc_js( __( 'Conflicting file removed! GetCited is now serving llms.txt.', 'getcited' ) ); ?></strong><br><em><?php echo esc_js( __( 'Note: The SEO plugin may recreate this file. Disable its llms.txt feature for a permanent fix.', 'getcited' ) ); ?></em></p>';
+                            notice.classList.remove('notice-warning');
                             notice.classList.add('notice-success');
-                            setTimeout(function() { notice.remove(); }, 3000);
+                        } else {
+                            notice.querySelector('.getcited-delete-conflict').disabled = false;
+                            notice.querySelector('.getcited-delete-conflict').textContent = '<?php echo esc_js( __( 'Remove conflicting file', 'getcited' ) ); ?>';
+                            alert(data.data ? data.data.message : 'Failed to remove file');
                         }
                     });
                 });
 
-                notice.querySelector('.getcited-llms-keep').addEventListener('click', function() {
-                    this.disabled = true;
-                    fetch(ajaxurl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'action=getcited_keep_existing_llms&nonce=' + nonce
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        if (data.success) {
-                            notice.innerHTML = '<p><strong><?php echo esc_js( __( 'Your existing llms.txt file will be used.', 'getcited' ) ); ?></strong></p>';
-                            notice.classList.remove('notice-info');
-                            notice.classList.add('notice-success');
-                            setTimeout(function() { notice.remove(); }, 3000);
-                        }
-                    });
-                });
-
-                notice.querySelector('.getcited-llms-dismiss').addEventListener('click', function() {
-                    fetch(ajaxurl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'action=getcited_dismiss_llms_choice&nonce=' + nonce
-                    }).then(function() {
-                        notice.remove();
-                    });
+                notice.querySelector('.getcited-dismiss-conflict').addEventListener('click', function() {
+                    notice.remove();
                 });
             });
         })();
@@ -1046,71 +1000,55 @@ class GetCited_Dashboard {
     }
 
     /**
-     * AJAX: Import existing llms.txt into GetCited
+     * AJAX: Delete conflicting llms.txt file from SEO plugin
      *
-     * @since 2.0.0
+     * Force-deletes any physical llms.txt file, regardless of who created it.
+     * Used when user explicitly wants to remove an SEO plugin's llms.txt.
+     *
+     * @since 1.9.9.19
      */
-    public function ajax_import_existing_llms() {
+    public function ajax_delete_conflicting_llms() {
         check_ajax_referer( 'getcited_admin', 'nonce' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( array( 'message' => 'Permission denied' ) );
         }
 
-        $llms = GetCited_Llms_Txt::instance();
-        $result = $llms->import_existing_file();
+        $file_path = ABSPATH . 'llms.txt';
 
-        if ( $result['success'] ) {
-            wp_send_json_success( $result );
+        // Initialize WP_Filesystem.
+        global $wp_filesystem;
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        if ( ! WP_Filesystem() ) {
+            wp_send_json_error( array( 'message' => __( 'Could not initialize filesystem.', 'getcited' ) ) );
+        }
+
+        if ( ! $wp_filesystem->exists( $file_path ) ) {
+            wp_send_json_success( array( 'message' => __( 'No conflicting file found.', 'getcited' ) ) );
+        }
+
+        if ( ! $wp_filesystem->is_writable( $file_path ) ) {
+            wp_send_json_error( array( 'message' => __( 'File is not writable. Check permissions.', 'getcited' ) ) );
+        }
+
+        $result = $wp_filesystem->delete( $file_path );
+
+        if ( $result ) {
+            // Clear any stored conflict flag.
+            $settings = GetCited_Settings::instance();
+            $settings->set( 'seo_plugin_conflict', '' );
+
+            // Invalidate health check cache.
+            if ( class_exists( 'GetCited_Health_Check' ) ) {
+                GetCited_Health_Check::instance()->invalidate_cache();
+            }
+
+            wp_send_json_success( array( 'message' => __( 'Conflicting file removed.', 'getcited' ) ) );
         } else {
-            wp_send_json_error( $result );
+            wp_send_json_error( array( 'message' => __( 'Failed to delete file.', 'getcited' ) ) );
         }
-    }
-
-    /**
-     * AJAX: Keep existing llms.txt file
-     *
-     * @since 2.0.0
-     */
-    public function ajax_keep_existing_llms() {
-        check_ajax_referer( 'getcited_admin', 'nonce' );
-
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => 'Permission denied' ) );
-        }
-
-        $llms = GetCited_Llms_Txt::instance();
-        $result = $llms->keep_existing_file();
-
-        if ( $result['success'] ) {
-            wp_send_json_success( $result );
-        } else {
-            wp_send_json_error( $result );
-        }
-    }
-
-    /**
-     * AJAX: Dismiss llms.txt choice (decide later)
-     *
-     * @since 2.0.0
-     */
-    public function ajax_dismiss_llms_choice() {
-        check_ajax_referer( 'getcited_admin', 'nonce' );
-
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => 'Permission denied' ) );
-        }
-
-        $settings = GetCited_Settings::instance();
-
-        // Set source to existing (temporary default)
-        $settings->set( 'llms_txt_source', 'existing' );
-
-        // Keep detection flag so it can be revisited in settings
-        // Don't clear existing_llms_txt_detected
-
-        wp_send_json_success( array(
-            'message' => __( 'You can make this choice anytime from the llms.txt settings.', 'getcited' ),
-        ) );
     }
 }

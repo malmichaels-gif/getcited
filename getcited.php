@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.9.18
+ * Version: 1.9.9.19
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.9.18' );
+define( 'GETCITED_VERSION', '1.9.9.19' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -209,47 +209,46 @@ final class GetCited {
     /**
      * Detect existing llms.txt file on activation
      *
-     * Checks if a non-GetCited llms.txt file exists and handles it based on assessment:
-     * - Basic files (auto-generated or < 300 chars): Auto-import silently
-     * - Moderate/Substantial files: Set detection flag for user choice
+     * Simplified v1.9.9.19: Always import existing files, backup originals.
+     * If the file was created by an SEO plugin, set a conflict warning flag.
      *
      * @param GetCited_Settings $settings Settings instance.
      */
     private function detect_existing_llms_txt( $settings ) {
         $llms_txt = GetCited_Llms_Txt::instance();
 
-        // Check if physical file exists
+        // Check if physical file exists.
         if ( ! $llms_txt->physical_file_exists() ) {
             return;
         }
 
-        // Check if it's already our file
+        // Check if it's already our file.
         if ( $llms_txt->is_our_physical_file() ) {
             return;
         }
 
-        // Get content and assess
+        // Get content.
         $content = $llms_txt->get_physical_file_content();
         if ( empty( $content ) ) {
             return;
         }
 
-        $assessment = $llms_txt->assess_llms_txt( $content );
+        // Check if this is from an SEO plugin (for conflict warning).
+        $seo_plugin = $llms_txt->detect_seo_plugin_source( $content );
 
-        if ( 'basic' === $assessment ) {
-            // Auto-import basic files silently.
-            $settings->set( 'llms_txt_content', $content );
-            $settings->set( 'llms_txt_source', 'getcited' );
+        // Always import and backup - simplified flow.
+        $settings->set( 'llms_txt_content', $content );
+        $settings->set( 'llms_txt_source', 'getcited' );
 
-            // Set transient for post-setup notice.
-            set_transient( 'getcited_llms_imported_notice', true, DAY_IN_SECONDS );
-        } else {
-            // Moderate or substantial - set flag for user choice
-            $settings->set( 'existing_llms_txt_detected', true );
-            $settings->set( 'existing_llms_txt_assessment', $assessment );
+        // Backup the physical file (removes it from disk so GetCited serves dynamically).
+        $llms_txt->backup_physical_file();
 
-            // Default to serving existing file until user decides
-            $settings->set( 'llms_txt_source', 'existing' );
+        // Set transient for post-setup notice.
+        set_transient( 'getcited_llms_imported_notice', true, DAY_IN_SECONDS );
+
+        // If SEO plugin detected, set conflict warning for monitoring.
+        if ( $seo_plugin ) {
+            $settings->set( 'seo_plugin_conflict', $seo_plugin );
         }
     }
 
