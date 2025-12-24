@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "updated": "2025-12-11",
+  "version": "1.0.2",
+  "updated": "2025-12-19",
   "crawlers": [
     {
       "name": "GPTBot",
@@ -25,6 +25,46 @@
       "purpose": "ChatGPT Search feature",
       "recommended": true,
       "docs_url": "https://platform.openai.com/docs/bots"
+    },
+    {
+      "name": "Google-Extended",
+      "company": "Google",
+      "user_agent": "Google-Extended",
+      "purpose": "Gemini/Bard training",
+      "recommended": true,
+      "docs_url": "https://developers.google.com/search/docs/crawling-indexing/google-extended"
+    },
+    {
+      "name": "Gemini-Deep-Research",
+      "company": "Google",
+      "user_agent": "Gemini-Deep-Research",
+      "purpose": "Gemini deep research feature",
+      "recommended": true,
+      "docs_url": "https://blog.google/products/gemini/google-gemini-deep-research/"
+    },
+    {
+      "name": "Google-NotebookLM",
+      "company": "Google",
+      "user_agent": "Google-NotebookLM",
+      "purpose": "NotebookLM source fetching",
+      "recommended": true,
+      "docs_url": "https://notebooklm.google/"
+    },
+    {
+      "name": "GoogleOther",
+      "company": "Google",
+      "user_agent": "GoogleOther",
+      "purpose": "Google AI research and development",
+      "recommended": false,
+      "docs_url": "https://developers.google.com/search/docs/crawling-indexing/googleother"
+    },
+    {
+      "name": "Google-CloudVertexBot",
+      "company": "Google",
+      "user_agent": "Google-CloudVertexBot",
+      "purpose": "Vertex AI platform",
+      "recommended": false,
+      "docs_url": "https://cloud.google.com/vertex-ai"
     },
     {
       "name": "anthropic-ai",
@@ -67,28 +107,12 @@
       "docs_url": "https://docs.perplexity.ai/docs/perplexitybot"
     },
     {
-      "name": "Google-Extended",
-      "company": "Google",
-      "user_agent": "Google-Extended",
-      "purpose": "Gemini/Bard training",
+      "name": "xAI-Grok-Bot",
+      "company": "xAI",
+      "user_agent": "xAI-Grok-Bot",
+      "purpose": "Grok training & citations",
       "recommended": true,
-      "docs_url": "https://developers.google.com/search/docs/crawling-indexing/google-extended"
-    },
-    {
-      "name": "GoogleOther",
-      "company": "Google",
-      "user_agent": "GoogleOther",
-      "purpose": "Google AI research and development",
-      "recommended": true,
-      "docs_url": "https://developers.google.com/search/docs/crawling-indexing/googleother"
-    },
-    {
-      "name": "Google-CloudVertexBot",
-      "company": "Google",
-      "user_agent": "Google-CloudVertexBot",
-      "purpose": "Vertex AI platform",
-      "recommended": true,
-      "docs_url": "https://cloud.google.com/vertex-ai"
+      "docs_url": "https://x.ai"
     },
     {
       "name": "Applebot",
@@ -111,7 +135,7 @@
       "company": "Meta",
       "user_agent": "Meta-ExternalAgent",
       "purpose": "Meta AI training",
-      "recommended": true,
+      "recommended": false,
       "docs_url": "https://www.facebook.com/robots.txt"
     },
     {
@@ -119,7 +143,7 @@
       "company": "Meta",
       "user_agent": "FacebookBot",
       "purpose": "Meta AI features",
-      "recommended": true,
+      "recommended": false,
       "docs_url": "https://developers.facebook.com/docs/sharing/webmasters/crawler"
     },
     {
@@ -131,28 +155,28 @@
       "docs_url": "https://developer.amazon.com/amazonbot"
     },
     {
-      "name": "Bytespider",
-      "company": "ByteDance",
-      "user_agent": "Bytespider",
-      "purpose": "TikTok/Doubao AI training",
+      "name": "amazon-kendra",
+      "company": "Amazon",
+      "user_agent": "amazon-kendra",
+      "purpose": "Amazon Kendra enterprise search",
+      "recommended": false,
+      "docs_url": "https://aws.amazon.com/kendra/"
+    },
+    {
+      "name": "Bravebot",
+      "company": "Brave",
+      "user_agent": "Bravebot",
+      "purpose": "Brave Search and Leo AI",
       "recommended": true,
-      "docs_url": null
+      "docs_url": "https://search.brave.com/help/bravebot"
     },
     {
       "name": "CCBot",
       "company": "Common Crawl",
       "user_agent": "CCBot",
-      "purpose": "Open dataset (used by many LLMs)",
+      "purpose": "Open dataset used by many LLMs",
       "recommended": true,
       "docs_url": "https://commoncrawl.org/ccbot"
-    },
-    {
-      "name": "cohere-ai",
-      "company": "Cohere",
-      "user_agent": "cohere-ai",
-      "purpose": "Enterprise AI training",
-      "recommended": true,
-      "docs_url": "https://cohere.com"
     },
     {
       "name": "DuckAssistBot",
@@ -163,11 +187,27 @@
       "docs_url": "https://duckduckgo.com/duckduckbot"
     },
     {
+      "name": "Bytespider",
+      "company": "ByteDance",
+      "user_agent": "Bytespider",
+      "purpose": "TikTok/Doubao AI training",
+      "recommended": false,
+      "docs_url": null
+    },
+    {
+      "name": "cohere-ai",
+      "company": "Cohere",
+      "user_agent": "cohere-ai",
+      "purpose": "Enterprise AI training",
+      "recommended": false,
+      "docs_url": "https://cohere.com"
+    },
+    {
       "name": "Deepseek",
       "company": "DeepSeek",
       "user_agent": "Deepseek",
       "purpose": "DeepSeek AI training",
-      "recommended": true,
+      "recommended": false,
       "docs_url": "https://deepseek.com"
     },
     {
@@ -175,23 +215,23 @@
       "company": "Mistral",
       "user_agent": "MistralAI-User",
       "purpose": "Mistral AI (European)",
-      "recommended": true,
+      "recommended": false,
       "docs_url": "https://mistral.ai"
     },
     {
-      "name": "xAI-Grok-Bot",
-      "company": "xAI",
-      "user_agent": "xAI-Grok-Bot",
-      "purpose": "Grok training",
-      "recommended": true,
-      "docs_url": "https://x.ai"
+      "name": "Groq-Bot",
+      "company": "Groq",
+      "user_agent": "Groq-Bot",
+      "purpose": "Groq AI inference platform",
+      "recommended": false,
+      "docs_url": "https://groq.com"
     },
     {
       "name": "Diffbot",
       "company": "Diffbot",
       "user_agent": "Diffbot",
       "purpose": "Knowledge graph construction",
-      "recommended": true,
+      "recommended": false,
       "docs_url": "https://www.diffbot.com/company/crawling-policy"
     },
     {
@@ -207,7 +247,7 @@
       "company": "Imagesift",
       "user_agent": "ImagesiftBot",
       "purpose": "Image AI training",
-      "recommended": true,
+      "recommended": false,
       "docs_url": null
     }
   ]

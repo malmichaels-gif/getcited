@@ -81,13 +81,13 @@ No. GetCited adds zero JavaScript or CSS to your front-end. The only additions a
 
 = Which AI crawlers does this support? =
 
-GetCited includes 26 AI crawlers at launch:
+GetCited includes 31 AI crawlers:
 - OpenAI: GPTBot, ChatGPT-User, OAI-SearchBot
 - Anthropic: ClaudeBot, anthropic-ai, Claude-Web
 - Perplexity: PerplexityBot, Perplexity-User
-- Google: Google-Extended, GoogleOther
+- Google: Google-Extended, Gemini-Deep-Research, Google-NotebookLM, GoogleOther
 - Apple: Applebot, Applebot-Extended
-- And 14 more from Meta, Amazon, ByteDance, Cohere, and others
+- And 17 more from xAI, Meta, Amazon, Brave, ByteDance, Cohere, and others
 
 The crawler list updates automatically without requiring plugin updates.
 

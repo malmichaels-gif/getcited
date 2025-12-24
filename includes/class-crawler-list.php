@@ -255,6 +255,43 @@ class GetCited_Crawler_List {
                 'recommended' => true,
             ),
 
+            // Google
+            array(
+                'name' => 'Google-Extended',
+                'company' => 'Google',
+                'user_agent' => 'Google-Extended',
+                'purpose' => 'Gemini/Bard training',
+                'recommended' => true,
+            ),
+            array(
+                'name' => 'Gemini-Deep-Research',
+                'company' => 'Google',
+                'user_agent' => 'Gemini-Deep-Research',
+                'purpose' => 'Gemini deep research feature',
+                'recommended' => true,
+            ),
+            array(
+                'name' => 'Google-NotebookLM',
+                'company' => 'Google',
+                'user_agent' => 'Google-NotebookLM',
+                'purpose' => 'NotebookLM source fetching',
+                'recommended' => true,
+            ),
+            array(
+                'name' => 'GoogleOther',
+                'company' => 'Google',
+                'user_agent' => 'GoogleOther',
+                'purpose' => 'Google AI research and development',
+                'recommended' => false,
+            ),
+            array(
+                'name' => 'Google-CloudVertexBot',
+                'company' => 'Google',
+                'user_agent' => 'Google-CloudVertexBot',
+                'purpose' => 'Vertex AI platform',
+                'recommended' => false,
+            ),
+
             // Anthropic
             array(
                 'name' => 'anthropic-ai',
@@ -294,27 +331,13 @@ class GetCited_Crawler_List {
                 'recommended' => true,
             ),
 
-            // Google
+            // xAI
             array(
-                'name' => 'Google-Extended',
-                'company' => 'Google',
-                'user_agent' => 'Google-Extended',
-                'purpose' => 'Gemini/Bard training',
+                'name' => 'xAI-Grok-Bot',
+                'company' => 'xAI',
+                'user_agent' => 'xAI-Grok-Bot',
+                'purpose' => 'Grok training & citations',
                 'recommended' => true,
-            ),
-            array(
-                'name' => 'GoogleOther',
-                'company' => 'Google',
-                'user_agent' => 'GoogleOther',
-                'purpose' => 'Google AI research and development',
-                'recommended' => false,
-            ),
-            array(
-                'name' => 'Google-CloudVertexBot',
-                'company' => 'Google',
-                'user_agent' => 'Google-CloudVertexBot',
-                'purpose' => 'Vertex AI platform',
-                'recommended' => false,
             ),
 
             // Apple
@@ -357,6 +380,40 @@ class GetCited_Crawler_List {
                 'purpose' => 'Alexa and Amazon AI',
                 'recommended' => true,
             ),
+            array(
+                'name' => 'amazon-kendra',
+                'company' => 'Amazon',
+                'user_agent' => 'amazon-kendra',
+                'purpose' => 'Amazon Kendra enterprise search',
+                'recommended' => false,
+            ),
+
+            // Brave
+            array(
+                'name' => 'Bravebot',
+                'company' => 'Brave',
+                'user_agent' => 'Bravebot',
+                'purpose' => 'Brave Search and Leo AI',
+                'recommended' => true,
+            ),
+
+            // Common Crawl
+            array(
+                'name' => 'CCBot',
+                'company' => 'Common Crawl',
+                'user_agent' => 'CCBot',
+                'purpose' => 'Open dataset used by many LLMs',
+                'recommended' => true,
+            ),
+
+            // DuckDuckGo
+            array(
+                'name' => 'DuckAssistBot',
+                'company' => 'DuckDuckGo',
+                'user_agent' => 'DuckAssistBot',
+                'purpose' => 'DuckDuckGo AI Assist',
+                'recommended' => true,
+            ),
 
             // ByteDance
             array(
@@ -367,15 +424,6 @@ class GetCited_Crawler_List {
                 'recommended' => false,
             ),
 
-            // Common Crawl
-            array(
-                'name' => 'CCBot',
-                'company' => 'Common Crawl',
-                'user_agent' => 'CCBot',
-                'purpose' => 'Open dataset (used by many LLMs)',
-                'recommended' => true,
-            ),
-
             // Cohere
             array(
                 'name' => 'cohere-ai',
@@ -383,15 +431,6 @@ class GetCited_Crawler_List {
                 'user_agent' => 'cohere-ai',
                 'purpose' => 'Enterprise AI training',
                 'recommended' => false,
-            ),
-
-            // DuckDuckGo
-            array(
-                'name' => 'DuckAssistBot',
-                'company' => 'DuckDuckGo',
-                'user_agent' => 'DuckAssistBot',
-                'purpose' => 'DuckDuckGo AI Assist',
-                'recommended' => true,
             ),
 
             // DeepSeek
@@ -412,12 +451,12 @@ class GetCited_Crawler_List {
                 'recommended' => false,
             ),
 
-            // xAI
+            // Groq
             array(
-                'name' => 'xAI-Grok-Bot',
-                'company' => 'xAI',
-                'user_agent' => 'xAI-Grok-Bot',
-                'purpose' => 'Grok training',
+                'name' => 'Groq-Bot',
+                'company' => 'Groq',
+                'user_agent' => 'Groq-Bot',
+                'purpose' => 'Groq AI inference platform',
                 'recommended' => false,
             ),
 
