@@ -129,22 +129,10 @@ class GetCited_Health_Check {
         if ( ! $settings->get( 'llms_txt_enabled' ) ) {
             return array(
                 'status' => 'disabled',
-                'message' => __( 'llms.txt is disabled', 'getcited' ),
+                'message' => __( 'AI Visibility Data is disabled', 'getcited' ),
                 'action_type' => 'settings_link',
                 'action_url' => admin_url( 'admin.php?page=getcited-llms-txt' ),
-                'action_label' => __( 'Enable llms.txt', 'getcited' ),
-            );
-        }
-
-        // Check if user chose to keep existing file (v1.9.9.19)
-        $llms_source = $settings->get( 'llms_txt_source' );
-        if ( 'existing' === $llms_source ) {
-            return array(
-                'status' => 'ok',
-                'message' => __( 'Using existing llms.txt', 'getcited' ),
-                'details' => __( 'You chose to keep your existing llms.txt file.', 'getcited' ),
-                'url' => home_url( '/llms.txt' ),
-                'is_existing' => true,
+                'action_label' => __( 'Enable AI Visibility Data', 'getcited' ),
             );
         }
 
@@ -179,9 +167,10 @@ class GetCited_Health_Check {
                 }
                 // File was deleted, continue to standard check below
             } else {
-                // Not our file - show conflict
+                // Not our file - show conflict with disable instructions
                 $seo_conflict = $llms->check_seo_plugin_conflict();
-                $source_name = $seo_conflict ? $seo_conflict['name'] : __( 'Another source', 'getcited' );
+                $source_name  = $seo_conflict ? $seo_conflict['name'] : __( 'Another source', 'getcited' );
+                $instructions = $seo_conflict ? $seo_conflict['instructions'] : __( 'Check your SEO plugin settings and disable its llms.txt feature.', 'getcited' );
 
                 return array(
                     'status' => 'warning',
@@ -190,7 +179,7 @@ class GetCited_Health_Check {
                         __( '%s is overriding GetCited', 'getcited' ),
                         $source_name
                     ),
-                    'details' => __( 'Your changes in GetCited won\'t appear. Remove the file or keep using theirs.', 'getcited' ),
+                    'details' => $instructions,
                     'action_type' => 'resolve_conflict',
                     'url' => home_url( '/llms.txt' ),
                 );

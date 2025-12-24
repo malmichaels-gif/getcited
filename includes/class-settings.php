@@ -43,9 +43,6 @@ class GetCited_Settings {
         // llms.txt
         'llms_txt_content' => '',
         'llms_txt_enabled' => true,
-        'llms_txt_source' => 'getcited', // 'getcited' or 'existing' - which llms.txt to use
-        'existing_llms_txt_detected' => false, // Flag: existing non-GetCited llms.txt found on activation
-        'existing_llms_txt_assessment' => '', // 'basic', 'moderate', or 'substantial'
         'llms_founder_name' => '',
         'llms_founder_title' => '',
         'llms_site_expertise' => '',
@@ -328,15 +325,6 @@ class GetCited_Settings {
 
             case 'schema_detected_source':
                 return sanitize_text_field( $value );
-
-            case 'llms_txt_source':
-                return in_array( $value, array( 'getcited', 'existing' ), true ) ? $value : 'getcited';
-
-            case 'existing_llms_txt_detected':
-                return (bool) $value;
-
-            case 'existing_llms_txt_assessment':
-                return in_array( $value, array( 'basic', 'moderate', 'substantial', '' ), true ) ? $value : '';
 
             case 'llms_founder_name':
             case 'llms_founder_title':

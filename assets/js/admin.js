@@ -32,7 +32,6 @@
         initExportImport();
         initCopyButtons();
         initCollapsibleSections();
-        initSourceToggle();
         initMediaUpload();
         initLoadMorePosts();
         initCustomCheckboxes();
@@ -463,11 +462,9 @@
                 saveBtn.textContent = getcitedAdmin.strings.saving;
 
                 // Collect all llms.txt related settings
-                const sourceRadio = document.querySelector('input[name="llms_txt_source"]:checked');
                 const data = {
                     llms_txt_enabled: enabledToggle ? enabledToggle.checked : true,
                     llms_txt_content: textarea.value,
-                    llms_txt_source: sourceRadio ? sourceRadio.value : 'getcited',
                     llms_founder_name: document.getElementById('llms_founder_name')?.value || '',
                     llms_founder_title: document.getElementById('llms_founder_title')?.value || '',
                     llms_site_expertise: document.getElementById('llms_site_expertise')?.value || '',
@@ -1635,22 +1632,13 @@
             return;
         }
 
-        var allSteps = ['welcome', 'site_type', 'organization', 'crawlers', 'conflict', 'verify', 'complete'];
-        var steps = allSteps.slice(); // Copy that may be modified
+        var steps = ['welcome', 'site_type', 'organization', 'crawlers', 'verify', 'complete'];
         var currentStep = 0;
         var verifyData = null; // Store verification results
 
-        // Check if conflict step should be shown (data passed from PHP via localized script)
-        var hasConflict = typeof getcitedWizard !== 'undefined' && getcitedWizard.has_conflict;
-
-        // If no conflict, remove the conflict step from navigation
-        if (!hasConflict) {
-            steps = steps.filter(function(step) { return step !== 'conflict'; });
-        }
-
         // Get all step elements upfront
         var stepElements = {};
-        allSteps.forEach(function(stepName) {
+        steps.forEach(function(stepName) {
             var el = wizard.querySelector('.getcited-wizard-step[data-step="' + stepName + '"]');
             if (el) {
                 stepElements[stepName] = el;
@@ -1828,7 +1816,6 @@
             // Get state containers
             var checkingState = verifyStep.querySelector('.verify-checking');
             var successState = verifyStep.querySelector('.verify-success');
-            var usingExistingState = verifyStep.querySelector('.verify-using-existing');
             var needsFixState = verifyStep.querySelector('.verify-needs-fix');
             var fixingState = verifyStep.querySelector('.verify-fixing');
             var manualState = verifyStep.querySelector('.verify-manual');
@@ -1839,7 +1826,7 @@
             var skipBtn = verifyStep.querySelector('.getcited-verify-skip-btn');
 
             // Hide all states first
-            [checkingState, successState, usingExistingState, needsFixState, fixingState, manualState].forEach(function(el) {
+            [checkingState, successState, needsFixState, fixingState, manualState].forEach(function(el) {
                 if (el) el.style.display = 'none';
             });
 
@@ -1860,10 +1847,7 @@
                         if (checkingState) checkingState.style.display = 'none';
 
                         if (response.data.accessible) {
-                            // Check if using existing custom file
-                            if (response.data.is_custom && usingExistingState) {
-                                usingExistingState.style.display = 'block';
-                            } else if (successState) {
+                            if (successState) {
                                 successState.style.display = 'block';
                             }
                             if (continueBtn) continueBtn.style.display = 'inline-block';
@@ -2210,12 +2194,6 @@
                 data.allow_all = (choice && choice.value === 'allow_all') ? 'true' : 'false';
                 break;
 
-            case 'conflict':
-                // Handle conflict resolution via separate AJAX action
-                var conflictChoice = document.querySelector('input[name="conflict_choice"]:checked');
-                var choiceValue = (conflictChoice && conflictChoice.value) || 'getcited';
-                return ajax('getcited_wizard_resolve_conflict', { choice: choiceValue });
-
             default:
                 // welcome step - no data to save
                 return Promise.resolve();
@@ -2457,40 +2435,6 @@
                     content.style.display = 'none';
                     section.dataset.collapsed = 'true';
                 }
-            });
-        });
-    }
-
-    // ==========================================================================
-    // Source Toggle (llms.txt)
-    // ==========================================================================
-
-    function initSourceToggle() {
-        const sourceRadios = document.querySelectorAll('input[name="llms_txt_source"]');
-        if (!sourceRadios.length) return;
-
-        sourceRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                // Save preference immediately
-                ajax('getcited_save_settings', {
-                    section: 'llms_txt',
-                    data: {
-                        llms_txt_source: this.value
-                    }
-                }).then(response => {
-                    if (response.success) {
-                        // Show brief feedback
-                        const label = this.closest('.getcited-radio-option');
-                        if (label) {
-                            const feedback = document.createElement('span');
-                            feedback.className = 'getcited-inline-saved';
-                            feedback.textContent = '✓';
-                            feedback.style.cssText = 'color: #10b981; margin-left: 8px;';
-                            label.appendChild(feedback);
-                            setTimeout(() => feedback.remove(), 2000);
-                        }
-                    }
-                });
             });
         });
     }

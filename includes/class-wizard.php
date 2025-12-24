@@ -44,50 +44,6 @@ class GetCited_Wizard {
         add_action( 'wp_ajax_getcited_wizard_scan', array( $this, 'ajax_run_scan' ) );
         add_action( 'wp_ajax_getcited_wizard_verify', array( $this, 'ajax_verify_llms' ) );
         add_action( 'wp_ajax_getcited_wizard_fix_llms', array( $this, 'ajax_fix_llms' ) );
-        add_action( 'wp_ajax_getcited_wizard_resolve_conflict', array( $this, 'ajax_resolve_conflict' ) );
-    }
-
-    /**
-     * Get conflict information for the wizard
-     *
-     * Checks if there's an existing llms.txt file that wasn't created by GetCited.
-     *
-     * @since 1.9.9.19
-     * @return array|false Conflict info array or false if no conflict.
-     */
-    public function get_conflict_info() {
-        $llms = GetCited_Llms_Txt::instance();
-
-        // No conflict if no physical file exists.
-        if ( ! $llms->physical_file_exists() ) {
-            return false;
-        }
-
-        // No conflict if it's our file.
-        if ( $llms->is_our_physical_file() ) {
-            return false;
-        }
-
-        $content    = $llms->get_physical_file_content();
-        $seo_plugin = $llms->detect_seo_plugin_source( $content );
-
-        $info = array(
-            'has_conflict'    => true,
-            'content'         => $content,
-            'content_preview' => substr( $content, 0, 500 ),
-            'file_size'       => strlen( $content ),
-        );
-
-        if ( $seo_plugin ) {
-            $plugin_info       = $llms->get_seo_plugin_disable_instructions( $seo_plugin );
-            $info['source']    = $seo_plugin;
-            $info['source_name'] = $plugin_info['name'];
-        } else {
-            $info['source']      = 'unknown';
-            $info['source_name'] = __( 'Unknown source', 'getcited' );
-        }
-
-        return $info;
     }
 
     /**
@@ -153,11 +109,6 @@ class GetCited_Wizard {
             'crawlers' => array(
                 'title' => __( 'AI Access', 'getcited' ),
                 'description' => __( 'Choose which AI systems can access your content.', 'getcited' ),
-            ),
-            'conflict' => array(
-                'title'       => __( 'Existing File', 'getcited' ),
-                'description' => __( 'Choose which llms.txt to use.', 'getcited' ),
-                'conditional' => true,
             ),
             'verify' => array(
                 'title' => __( 'Verify', 'getcited' ),
@@ -255,16 +206,12 @@ class GetCited_Wizard {
         // Set site type
         $settings->set( 'site_type', $site_type );
 
-        // Skip llms.txt generation if user chose to keep existing file
-        $llms_source = $settings->get( 'llms_txt_source' );
-        if ( 'existing' !== $llms_source ) {
-            // Generate appropriate llms.txt only if not already customized
-            $existing_content = $settings->get( 'llms_txt_content' );
-            if ( empty( $existing_content ) ) {
-                $llms_txt = GetCited_Llms_Txt::instance();
-                $content = $llms_txt->generate_template( $site_type );
-                $settings->set( 'llms_txt_content', $content );
-            }
+        // Generate appropriate llms.txt only if not already customized
+        $existing_content = $settings->get( 'llms_txt_content' );
+        if ( empty( $existing_content ) ) {
+            $llms_txt = GetCited_Llms_Txt::instance();
+            $content = $llms_txt->generate_template( $site_type );
+            $settings->set( 'llms_txt_content', $content );
         }
 
         // Run SEO plugin detection and auto-configure schema.
@@ -527,12 +474,6 @@ class GetCited_Wizard {
         $settings = GetCited_Settings::instance();
         $settings->set( 'wizard_completed', true );
 
-        // Clear existing file detection if skipping while using existing file (v1.9.9.15).
-        if ( 'existing' === $settings->get( 'llms_txt_source' ) ) {
-            $settings->set( 'existing_llms_txt_detected', false );
-            $settings->set( 'existing_llms_txt_assessment', '' );
-        }
-
         wp_send_json_success();
     }
 
@@ -548,28 +489,18 @@ class GetCited_Wizard {
 
         $settings = GetCited_Settings::instance();
 
-        // Save the generated llms.txt content from the scan (only if not using existing file)
-        $llms_source = $settings->get( 'llms_txt_source' );
-        if ( 'existing' !== $llms_source ) {
-            // Backup any existing physical file since user is using GetCited (v1.9.9.18).
-            $llms = GetCited_Llms_Txt::instance();
-            $llms->backup_physical_file();
+        // Backup and remove any existing physical file (SEO plugin or otherwise).
+        $llms = GetCited_Llms_Txt::instance();
+        $llms->backup_physical_file();
 
-            $wizard_scan = get_transient( 'getcited_wizard_scan' );
-            if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
-                $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
-
-                // Clean up the transient
-                delete_transient( 'getcited_wizard_scan' );
-            }
-        } else {
-            // Clean up scan transient even if not used
-            delete_transient( 'getcited_wizard_scan' );
-
-            // Clear detection flag - user implicitly accepted existing file by completing wizard (v1.9.9.15).
-            $settings->set( 'existing_llms_txt_detected', false );
-            $settings->set( 'existing_llms_txt_assessment', '' );
+        // Save the generated llms.txt content from the scan.
+        $wizard_scan = get_transient( 'getcited_wizard_scan' );
+        if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
+            $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
         }
+
+        // Clean up the transient.
+        delete_transient( 'getcited_wizard_scan' );
 
         $settings->set( 'wizard_completed', true );
 
@@ -614,12 +545,6 @@ class GetCited_Wizard {
 
         // Check if we can write a physical file
         $result['can_write_physical'] = GetCited_Llms_Txt::instance()->can_write_physical_file();
-
-        // Check if using custom existing file
-        $settings = GetCited_Settings::instance();
-        if ( 'existing' === $settings->get( 'llms_txt_source' ) ) {
-            $result['is_custom'] = true;
-        }
 
         // Generate download URL
         $result['download_url'] = wp_nonce_url(
@@ -692,53 +617,13 @@ class GetCited_Wizard {
     }
 
     /**
-     * AJAX: Resolve llms.txt conflict
-     *
-     * Handles user's choice in the conflict resolution step.
-     *
-     * @since 1.9.9.19
-     */
-    public function ajax_resolve_conflict() {
-        check_ajax_referer( 'getcited_admin', 'nonce' );
-
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => 'Permission denied' ) );
-        }
-
-        $choice = isset( $_POST['choice'] ) ? sanitize_text_field( wp_unslash( $_POST['choice'] ) ) : 'getcited';
-
-        $settings = GetCited_Settings::instance();
-        $llms     = GetCited_Llms_Txt::instance();
-
-        if ( 'getcited' === $choice ) {
-            // User wants GetCited - backup existing file and use GetCited.
-            $llms->backup_physical_file();
-            $settings->set( 'llms_txt_source', 'getcited' );
-
-            wp_send_json_success( array(
-                'message' => __( 'Great! GetCited will manage your llms.txt.', 'getcited' ),
-                'choice'  => 'getcited',
-            ) );
-        } else {
-            // User wants to keep existing file.
-            $settings->set( 'llms_txt_source', 'existing' );
-
-            wp_send_json_success( array(
-                'message' => __( 'Your existing file will be used.', 'getcited' ),
-                'choice'  => 'existing',
-            ) );
-        }
-    }
-
-    /**
      * Render wizard
      */
     public function render() {
-        $steps         = $this->get_steps();
-        $site_types    = $this->get_site_types();
-        $settings      = GetCited_Settings::instance();
-        $org           = $settings->get( 'organization' );
-        $conflict_info = $this->get_conflict_info();
+        $steps      = $this->get_steps();
+        $site_types = $this->get_site_types();
+        $settings   = GetCited_Settings::instance();
+        $org        = $settings->get( 'organization' );
 
         // Pre-fill organization name
         if ( empty( $org['name'] ) ) {

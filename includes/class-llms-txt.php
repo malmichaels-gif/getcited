@@ -517,40 +517,12 @@ class GetCited_Llms_Txt {
         // Store the imported content.
         $settings->set( 'llms_txt_content', $content );
 
-        // Set source to GetCited-managed.
-        $settings->set( 'llms_txt_source', 'getcited' );
-
         // Backup the physical file so GetCited's dynamic serving takes over (v1.9.9.18).
         $this->backup_physical_file();
-
-        // Clear detection flags.
-        $settings->set( 'existing_llms_txt_detected', false );
-        $settings->set( 'existing_llms_txt_assessment', '' );
 
         return array(
             'success' => true,
             'message' => __( 'llms.txt imported into GetCited successfully.', 'getcited' ),
-        );
-    }
-
-    /**
-     * Keep existing llms.txt file (don't modify, just serve it)
-     *
-     * @return array Result with success status and message.
-     */
-    public function keep_existing_file() {
-        $settings = GetCited_Settings::instance();
-
-        // Set source to existing
-        $settings->set( 'llms_txt_source', 'existing' );
-
-        // Clear detection flags
-        $settings->set( 'existing_llms_txt_detected', false );
-        $settings->set( 'existing_llms_txt_assessment', '' );
-
-        return array(
-            'success' => true,
-            'message' => __( 'Your existing llms.txt file will be used.', 'getcited' ),
         );
     }
 
