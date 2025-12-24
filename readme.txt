@@ -4,7 +4,7 @@ Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.9.18
+Stable tag: 1.9.9.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -104,6 +104,12 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.9.9.20 =
+* New: Wizard conflict resolution step handles existing llms.txt during setup
+* Improved: Dashboard conflict notice simplified to binary choice
+* Improved: Health check reduced to 3 clear states (OK, Conflict, Error)
+* Improved: Legacy GetCited files auto-cleaned during health check
 
 = 1.9.8.6 =
 * Improved: Copy refinements for clarity and user-friendliness

@@ -1635,13 +1635,22 @@
             return;
         }
 
-        var steps = ['welcome', 'site_type', 'organization', 'crawlers', 'verify', 'complete'];
+        var allSteps = ['welcome', 'site_type', 'organization', 'crawlers', 'conflict', 'verify', 'complete'];
+        var steps = allSteps.slice(); // Copy that may be modified
         var currentStep = 0;
         var verifyData = null; // Store verification results
 
+        // Check if conflict step should be shown (data passed from PHP via localized script)
+        var hasConflict = typeof getcitedWizard !== 'undefined' && getcitedWizard.has_conflict;
+
+        // If no conflict, remove the conflict step from navigation
+        if (!hasConflict) {
+            steps = steps.filter(function(step) { return step !== 'conflict'; });
+        }
+
         // Get all step elements upfront
         var stepElements = {};
-        steps.forEach(function(stepName) {
+        allSteps.forEach(function(stepName) {
             var el = wizard.querySelector('.getcited-wizard-step[data-step="' + stepName + '"]');
             if (el) {
                 stepElements[stepName] = el;
@@ -2200,6 +2209,12 @@
                 var choice = document.querySelector('input[name="crawler_choice"]:checked');
                 data.allow_all = (choice && choice.value === 'allow_all') ? 'true' : 'false';
                 break;
+
+            case 'conflict':
+                // Handle conflict resolution via separate AJAX action
+                var conflictChoice = document.querySelector('input[name="conflict_choice"]:checked');
+                var choiceValue = (conflictChoice && conflictChoice.value) || 'getcited';
+                return ajax('getcited_wizard_resolve_conflict', { choice: choiceValue });
 
             default:
                 // welcome step - no data to save

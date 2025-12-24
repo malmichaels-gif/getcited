@@ -182,7 +182,68 @@ if ( empty( $org['name'] ) ) {
             </div>
         </div>
 
-        <!-- Step 5: Verify llms.txt -->
+        <!-- Step 5: Conflict Resolution (conditional) -->
+        <div class="getcited-wizard-step" data-step="conflict" style="display: none;">
+            <div class="wizard-content">
+                <h1><?php esc_html_e( 'We found an existing llms.txt', 'getcited' ); ?></h1>
+                <p class="wizard-subtitle">
+                    <?php
+                    if ( $conflict_info && 'unknown' !== $conflict_info['source'] ) {
+                        printf(
+                            /* translators: %s: Source plugin name */
+                            esc_html__( 'Created by %s. Which version would you like to use?', 'getcited' ),
+                            '<strong>' . esc_html( $conflict_info['source_name'] ) . '</strong>'
+                        );
+                    } else {
+                        esc_html_e( 'Which version would you like to use?', 'getcited' );
+                    }
+                    ?>
+                </p>
+
+                <div class="getcited-conflict-choice">
+                    <label class="getcited-radio-card selected">
+                        <input type="radio" name="conflict_choice" value="getcited" checked>
+                        <div class="radio-card-content">
+                            <span class="card-check"></span>
+                            <span class="dashicons dashicons-superhero-alt"></span>
+                            <strong><?php esc_html_e( 'Use GetCited', 'getcited' ); ?></strong>
+                            <span class="recommended-badge"><?php esc_html_e( 'Recommended', 'getcited' ); ?></span>
+                            <p><?php esc_html_e( 'AI-optimized with analytics, health monitoring, and easy updates.', 'getcited' ); ?></p>
+                        </div>
+                    </label>
+
+                    <label class="getcited-radio-card">
+                        <input type="radio" name="conflict_choice" value="existing">
+                        <div class="radio-card-content">
+                            <span class="card-check"></span>
+                            <span class="dashicons dashicons-media-text"></span>
+                            <strong><?php esc_html_e( 'Keep existing file', 'getcited' ); ?></strong>
+                            <p><?php esc_html_e( 'Continue using your current llms.txt as-is.', 'getcited' ); ?></p>
+                        </div>
+                    </label>
+                </div>
+
+                <?php if ( $conflict_info && ! empty( $conflict_info['content_preview'] ) ) : ?>
+                    <details class="getcited-conflict-preview">
+                        <summary>
+                            <span class="dashicons dashicons-visibility"></span>
+                            <?php esc_html_e( 'Preview existing file', 'getcited' ); ?>
+                        </summary>
+                        <pre class="conflict-preview-code"><?php echo esc_html( $conflict_info['content_preview'] ); ?><?php if ( strlen( $conflict_info['content'] ) > 500 ) : ?>...<?php endif; ?></pre>
+                    </details>
+                <?php endif; ?>
+            </div>
+            <div class="wizard-actions">
+                <button type="button" class="button getcited-wizard-back">
+                    ← <?php esc_html_e( 'Back', 'getcited' ); ?>
+                </button>
+                <button type="button" class="button button-primary getcited-wizard-next">
+                    <?php esc_html_e( 'Continue', 'getcited' ); ?> →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 6: Verify llms.txt -->
         <div class="getcited-wizard-step" data-step="verify" style="display: none;">
             <div class="wizard-content">
                 <h1><?php esc_html_e( 'Checking Your Setup', 'getcited' ); ?></h1>

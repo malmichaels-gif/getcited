@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.9.19
+ * Version: 1.9.9.20
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.9.19' );
+define( 'GETCITED_VERSION', '1.9.9.20' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -503,6 +503,15 @@ final class GetCited {
                 'rescan_complete' => __( 'Scan complete', 'getcited' ),
                 'rescan_failed' => __( 'Scan failed. Please try again.', 'getcited' ),
             ),
+        ) );
+
+        // Wizard-specific data (v1.9.9.19)
+        $wizard       = GetCited_Wizard::instance();
+        $conflict_info = $wizard->get_conflict_info();
+
+        wp_localize_script( 'getcited-admin', 'getcitedWizard', array(
+            'has_conflict'  => ! empty( $conflict_info ),
+            'conflict_info' => $conflict_info ? $conflict_info : null,
         ) );
     }
 
