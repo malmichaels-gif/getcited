@@ -92,7 +92,7 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 		<!-- Score Components -->
 		<div class="getcited-section getcited-score-components">
 			<h2><?php esc_html_e( 'Score Components', 'getcited' ); ?></h2>
-			<p class="score-components-explainer"><?php esc_html_e( 'Based on crawler access, llms.txt health, schema signals, content structure, and freshness.', 'getcited' ); ?></p>
+			<p class="score-components-explainer"><?php esc_html_e( 'Based on crawler access, AI visibility health, schema signals, content structure, and freshness.', 'getcited' ); ?></p>
 			<div class="getcited-breakdown-cards">
 			<?php foreach ( $visibility_score['breakdown'] as $key => $score ) :
 				$max        = $max_points[ $key ];
@@ -150,11 +150,11 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 			<a href="#" class="getcited-next-tip"><?php esc_html_e( 'Next', 'getcited' ); ?> →</a>
 		</div>
 
-		<!-- llms.txt Activity + Health Status (Two Column) -->
+		<!-- AI Visibility Activity + Health Status (Two Column) -->
 		<div class="getcited-dashboard-actions-row">
-			<!-- llms.txt Activity -->
+			<!-- AI Visibility Activity -->
 			<div class="getcited-section getcited-llms-activity-section">
-				<h2><?php esc_html_e( 'llms.txt Activity', 'getcited' ); ?></h2>
+				<h2><?php esc_html_e( 'AI Visibility Activity', 'getcited' ); ?></h2>
 
 				<?php if ( ! $llms_activity['enabled'] ) : ?>
 					<div class="getcited-activity-disabled">
