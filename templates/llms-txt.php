@@ -32,9 +32,9 @@ $status = $health->get_status();
 ?>
 
 <div class="wrap getcited-wrap">
-    <h1><?php esc_html_e( 'llms.txt Editor', 'getcited' ); ?></h1>
+    <h1><?php esc_html_e( 'AI Visibility Data', 'getcited' ); ?></h1>
     <p class="description">
-        <?php esc_html_e( 'The llms.txt file helps AI systems understand your site. Think of it as a welcome note for AI visitors.', 'getcited' ); ?>
+        <?php esc_html_e( 'Your AI visibility file (llms.txt) helps AI systems understand your site. Think of it as a welcome note for AI visitors.', 'getcited' ); ?>
     </p>
 
     <div class="getcited-llms-page">
@@ -42,9 +42,9 @@ $status = $health->get_status();
         <!-- Pro Teaser Banner -->
         <?php $pro_teaser->render_page_teaser( 'llms' ); ?>
 
-        <!-- Enable llms.txt -->
+        <!-- Enable AI Visibility -->
         <div class="getcited-section getcited-llms-toggle">
-            <h2><?php esc_html_e( 'Enable llms.txt', 'getcited' ); ?></h2>
+            <h2><?php esc_html_e( 'Enable AI Visibility', 'getcited' ); ?></h2>
             <label class="getcited-checkbox-custom <?php echo $enabled ? 'is-checked' : ''; ?>">
                 <input type="checkbox"
                        name="llms_txt_enabled"
@@ -53,7 +53,7 @@ $status = $health->get_status();
                        <?php checked( $enabled ); ?>>
                 <span class="check-box"></span>
                 <span class="check-content">
-                    <strong><?php esc_html_e( 'Serve llms.txt', 'getcited' ); ?></strong>
+                    <strong><?php esc_html_e( 'Serve AI visibility file', 'getcited' ); ?></strong>
                     <span class="check-description">
                         <?php
                         printf(
@@ -65,7 +65,7 @@ $status = $health->get_status();
                 </span>
             </label>
             <p class="description" style="margin-top: var(--getcited-space-sm); font-size: 14px;">
-                <?php esc_html_e( 'llms.txt is a helpful signal; crawler behavior varies by provider and may change over time.', 'getcited' ); ?>
+                <?php esc_html_e( 'Your AI visibility file is a helpful signal; crawler behavior varies by provider and may change over time.', 'getcited' ); ?>
             </p>
         </div>
 
@@ -77,7 +77,7 @@ $status = $health->get_status();
             </h2>
             <div class="getcited-collapsible-content">
                 <p class="description">
-                    <?php esc_html_e( 'These fields enhance your llms.txt with additional context. Included when you scan your site.', 'getcited' ); ?>
+                    <?php esc_html_e( 'These fields enhance your AI visibility data with additional context. Included when you scan your site.', 'getcited' ); ?>
                 </p>
 
                 <div class="getcited-compact-form">
@@ -133,7 +133,7 @@ $status = $health->get_status();
         <div class="getcited-section getcited-citation-guidelines">
             <h2><?php esc_html_e( 'AI Citation Guidelines', 'getcited' ); ?></h2>
             <p class="description">
-                <?php esc_html_e( 'Tell AI systems how to cite and use your content. These instructions are included in your llms.txt file.', 'getcited' ); ?>
+                <?php esc_html_e( 'Tell AI systems how to cite and use your content. These instructions are included in your AI visibility file.', 'getcited' ); ?>
             </p>
 
             <div class="getcited-field-group">
@@ -145,7 +145,7 @@ $status = $health->get_status();
                            <?php checked( ! empty( $citation_guidelines['enabled'] ) ); ?>>
                     <span class="check-box"></span>
                     <span class="check-content">
-                        <strong><?php esc_html_e( 'Include citation guidelines in llms.txt', 'getcited' ); ?></strong>
+                        <strong><?php esc_html_e( 'Include citation guidelines', 'getcited' ); ?></strong>
                         <span class="check-description"><?php esc_html_e( 'Tell AI systems how to cite your content.', 'getcited' ); ?></span>
                     </span>
                 </label>
@@ -252,7 +252,7 @@ $status = $health->get_status();
                               rows="6"
                               class="large-text"
                               placeholder="<?php esc_attr_e( "This site can help answer questions about:\n- Topic 1\n- Topic 2\n- Topic 3", 'getcited' ); ?>"><?php echo esc_textarea( $llms_use_cases ); ?></textarea>
-                    <p class="description"><?php esc_html_e( 'Describe what kinds of questions or topics your site is an authority on. If empty, this section will be omitted from your llms.txt.', 'getcited' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Describe what kinds of questions or topics your site is an authority on. If empty, this section will be omitted.', 'getcited' ); ?></p>
                 </div>
             </div>
         </div>
@@ -289,7 +289,7 @@ $status = $health->get_status();
                 </div>
             </div>
             <p class="description getcited-scan-description">
-                <?php esc_html_e( 'Scan your site to auto-generate llms.txt content based on your actual pages, posts, categories, and more.', 'getcited' ); ?>
+                <?php esc_html_e( 'Scan your site to auto-generate AI visibility content based on your actual pages, posts, categories, and more.', 'getcited' ); ?>
             </p>
 
             <div class="getcited-editor-wrapper">
@@ -314,7 +314,7 @@ $status = $health->get_status();
                     </div>
                     <pre class="getcited-preview-code" id="llms_txt_preview"><?php echo esc_html( html_entity_decode( $content, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ); ?></pre>
                     <p class="description getcited-copy-hint">
-                        <?php esc_html_e( 'Copy the content above to share or backup your llms.txt configuration.', 'getcited' ); ?>
+                        <?php esc_html_e( 'Copy the content above to share or backup your AI visibility configuration.', 'getcited' ); ?>
                     </p>
                 </div>
             </div>
@@ -340,9 +340,9 @@ $status = $health->get_status();
 
         <!-- Help -->
         <div class="getcited-section getcited-help">
-            <h2><?php esc_html_e( 'llms.txt Format Guide', 'getcited' ); ?></h2>
+            <h2><?php esc_html_e( 'Format Guide (llms.txt)', 'getcited' ); ?></h2>
             <div class="getcited-help-content">
-                <p><?php esc_html_e( 'llms.txt uses Markdown formatting:', 'getcited' ); ?></p>
+                <p><?php esc_html_e( 'The file uses Markdown formatting:', 'getcited' ); ?></p>
                 <ul>
                     <li><code># Heading</code> — <?php esc_html_e( 'Main heading (your site name)', 'getcited' ); ?></li>
                     <li><code>> Quote</code> — <?php esc_html_e( 'Blockquote (site description)', 'getcited' ); ?></li>

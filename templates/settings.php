@@ -104,7 +104,7 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                         <span class="check-box"></span>
                         <span class="check-content">
                             <strong><?php esc_html_e( 'Keep Data on Uninstall', 'getcited' ); ?></strong>
-                            <span class="check-description"><?php esc_html_e( 'Preserve settings, llms.txt file, and robots.txt rules when deleting the plugin', 'getcited' ); ?></span>
+                            <span class="check-description"><?php esc_html_e( 'Preserve settings, AI visibility data, and robots.txt rules when deleting the plugin', 'getcited' ); ?></span>
                         </span>
                     </label>
                 </div>
@@ -134,7 +134,7 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
         <div class="getcited-section">
             <h2><?php esc_html_e( 'Logging & Analytics', 'getcited' ); ?></h2>
             <p class="description">
-                <?php esc_html_e( 'Track when AI crawlers and other bots access your llms.txt file.', 'getcited' ); ?>
+                <?php esc_html_e( 'Track when AI crawlers and other bots access your AI visibility file.', 'getcited' ); ?>
             </p>
             <p class="description" style="margin-top: 4px;">
                 <?php esc_html_e( 'We store only what\'s needed: timestamp, user-agent, and request URL. IP addresses are hashed for privacy. You control retention and can purge logs anytime.', 'getcited' ); ?>
@@ -150,7 +150,7 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                     <span class="check-box"></span>
                     <span class="check-content">
                         <strong><?php esc_html_e( 'Enable Request Logging', 'getcited' ); ?></strong>
-                        <span class="check-description"><?php esc_html_e( 'Log llms.txt access attempts', 'getcited' ); ?></span>
+                        <span class="check-description"><?php esc_html_e( 'Log AI visibility file access', 'getcited' ); ?></span>
                     </span>
                 </label>
             </div>

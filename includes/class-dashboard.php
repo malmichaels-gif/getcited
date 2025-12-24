@@ -889,15 +889,26 @@ class GetCited_Dashboard {
      * @since 1.9.9.19
      */
     public function maybe_show_seo_plugin_conflict_notice() {
-        // Only show on GetCited admin pages.
-        $screen = get_current_screen();
-        if ( ! $screen || strpos( $screen->id, 'getcited' ) === false ) {
-            return;
-        }
+        // Check for stored conflict (from daily cron) or do real-time check on GetCited pages.
+        $screen       = get_current_screen();
+        $is_getcited  = $screen && strpos( $screen->id, 'getcited' ) !== false;
+        $stored       = get_option( 'getcited_seo_conflict_detected' );
 
-        // Check for active conflict.
-        $llms     = GetCited_Llms_Txt::instance();
-        $conflict = $llms->check_seo_plugin_conflict();
+        if ( $is_getcited ) {
+            // Real-time check on GetCited pages (most accurate).
+            $llms     = GetCited_Llms_Txt::instance();
+            $conflict = $llms->check_seo_plugin_conflict();
+
+            // Update stored value while we're here.
+            if ( $conflict ) {
+                update_option( 'getcited_seo_conflict_detected', $conflict, false );
+            } else {
+                delete_option( 'getcited_seo_conflict_detected' );
+            }
+        } else {
+            // Use cached result on other admin pages.
+            $conflict = $stored;
+        }
 
         if ( ! $conflict ) {
             return;
@@ -1047,9 +1058,10 @@ class GetCited_Dashboard {
         $result = $wp_filesystem->delete( $file_path );
 
         if ( $result ) {
-            // Clear any stored conflict flag.
+            // Clear any stored conflict flags.
             $settings = GetCited_Settings::instance();
             $settings->set( 'seo_plugin_conflict', '' );
+            delete_option( 'getcited_seo_conflict_detected' );
 
             // Invalidate health check cache.
             if ( class_exists( 'GetCited_Health_Check' ) ) {

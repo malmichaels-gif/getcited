@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.9.21
+ * Version: 1.9.9.22
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.9.21' );
+define( 'GETCITED_VERSION', '1.9.9.22' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -382,8 +382,8 @@ final class GetCited {
 
         add_submenu_page(
             'getcited',
-            __( 'llms.txt', 'getcited' ),
-            __( 'llms.txt', 'getcited' ),
+            __( 'AI Visibility', 'getcited' ),
+            __( 'AI Visibility', 'getcited' ),
             $capability,
             'getcited-llms-txt',
             array( GetCited_Dashboard::instance(), 'render_llms_txt_page' )
@@ -546,6 +546,9 @@ final class GetCited {
         // Run health checks
         GetCited_Health_Check::instance()->run_checks();
 
+        // Check for SEO plugin conflicts (stores result for admin notice)
+        $this->check_seo_plugin_conflict();
+
         // Clean up old request log entries
         if ( class_exists( 'GetCited_Request_Logger' ) ) {
             GetCited_Request_Logger::instance()->cleanup_old_requests();
@@ -565,6 +568,25 @@ final class GetCited {
 
         // Fire hook for extensions
         do_action( 'getcited_daily_tasks' );
+    }
+
+    /**
+     * Check for SEO plugin conflicts and store result
+     *
+     * Called daily via cron. Stores conflict info so admin notice
+     * can show on all admin pages, not just GetCited pages.
+     *
+     * @since 1.9.9.22
+     */
+    private function check_seo_plugin_conflict() {
+        $llms     = GetCited_Llms_Txt::instance();
+        $conflict = $llms->check_seo_plugin_conflict();
+
+        if ( $conflict ) {
+            update_option( 'getcited_seo_conflict_detected', $conflict, false );
+        } else {
+            delete_option( 'getcited_seo_conflict_detected' );
+        }
     }
 
     /**

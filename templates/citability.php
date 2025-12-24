@@ -92,7 +92,7 @@ $crawler_stats = $request_logger->get_request_stats();
                         <span class="dashicons dashicons-groups" style="color: var(--getcited-success);"></span>
                         <span class="stat-value"><?php echo esc_html( $unique_bots ); ?></span>
                         <span class="stat-label"><?php esc_html_e( 'Unique AI Bots', 'getcited' ); ?></span>
-                        <span class="stat-sublabel"><?php esc_html_e( 'Visiting your llms.txt', 'getcited' ); ?></span>
+                        <span class="stat-sublabel"><?php esc_html_e( 'Visiting your AI visibility file', 'getcited' ); ?></span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value"><?php echo esc_html( number_format_i18n( $total_posts ) ); ?></span>
