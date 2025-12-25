@@ -36,11 +36,24 @@ class GetCited_Health_Check {
     }
 
     /**
+     * Transient for tracking async check in progress
+     */
+    const ASYNC_LOCK_TRANSIENT = 'getcited_health_async_lock';
+
+    /**
+     * Stale threshold in seconds (30 minutes)
+     */
+    const STALE_THRESHOLD = 1800;
+
+    /**
      * Constructor
      */
     private function __construct() {
         // AJAX handler for manual health check
         add_action( 'wp_ajax_getcited_health_check', array( $this, 'ajax_run_checks' ) );
+
+        // Async health check handler
+        add_action( 'getcited_async_health_check', array( $this, 'perform_async_check' ) );
     }
 
     /**
@@ -84,15 +97,78 @@ class GetCited_Health_Check {
 
     /**
      * Get cached status or run checks
+     *
+     * Returns cached status immediately for fast dashboard loads.
+     * Schedules background refresh if data is stale.
+     *
+     * @param bool $force_sync Force synchronous check (bypass async).
+     * @return array Health status data.
      */
-    public function get_status() {
+    public function get_status( $force_sync = false ) {
         $status = get_transient( self::TRANSIENT_NAME );
 
+        // No cached data - must run synchronously
         if ( $status === false ) {
-            $status = $this->run_checks();
+            return $this->run_checks();
+        }
+
+        // Force sync requested
+        if ( $force_sync ) {
+            return $this->run_checks();
+        }
+
+        // Check if data is stale and schedule background refresh
+        if ( $this->is_stale( $status ) ) {
+            $this->schedule_async_check();
         }
 
         return $status;
+    }
+
+    /**
+     * Check if cached status is stale
+     *
+     * @param array $status Cached status data.
+     * @return bool True if stale.
+     */
+    private function is_stale( $status ) {
+        if ( empty( $status['last_checked'] ) ) {
+            return true;
+        }
+
+        $last_checked = strtotime( $status['last_checked'] );
+        $now = current_time( 'timestamp' );
+
+        return ( $now - $last_checked ) > self::STALE_THRESHOLD;
+    }
+
+    /**
+     * Schedule async health check if not already scheduled
+     */
+    private function schedule_async_check() {
+        // Prevent duplicate scheduling
+        if ( get_transient( self::ASYNC_LOCK_TRANSIENT ) ) {
+            return;
+        }
+
+        // Set lock to prevent duplicate checks
+        set_transient( self::ASYNC_LOCK_TRANSIENT, 1, 5 * MINUTE_IN_SECONDS );
+
+        // Schedule for immediate execution
+        if ( ! wp_next_scheduled( 'getcited_async_health_check' ) ) {
+            wp_schedule_single_event( time(), 'getcited_async_health_check' );
+        }
+    }
+
+    /**
+     * Perform async health check (called by cron)
+     */
+    public function perform_async_check() {
+        // Clear lock
+        delete_transient( self::ASYNC_LOCK_TRANSIENT );
+
+        // Run the actual checks
+        $this->run_checks();
     }
 
     /**
@@ -105,6 +181,10 @@ class GetCited_Health_Check {
 
     /**
      * AJAX handler for health check
+     *
+     * Supports modes:
+     * - 'refresh' (default): Force synchronous refresh
+     * - 'poll': Return cached data with freshness indicator (for polling after async refresh)
      */
     public function ajax_run_checks() {
         check_ajax_referer( 'getcited_admin', 'nonce' );
@@ -113,6 +193,22 @@ class GetCited_Health_Check {
             wp_send_json_error( 'Permission denied' );
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above
+        $mode = isset( $_POST['mode'] ) ? sanitize_text_field( wp_unslash( $_POST['mode'] ) ) : 'refresh';
+
+        if ( 'poll' === $mode ) {
+            // Poll mode: return cached data with async status
+            $status = get_transient( self::TRANSIENT_NAME );
+            $is_refreshing = (bool) get_transient( self::ASYNC_LOCK_TRANSIENT );
+
+            wp_send_json_success( array(
+                'status'        => $status ? $status : null,
+                'is_refreshing' => $is_refreshing,
+                'is_stale'      => $status ? $this->is_stale( $status ) : true,
+            ) );
+        }
+
+        // Default: force synchronous refresh
         $status = $this->refresh();
         wp_send_json_success( $status );
     }
@@ -1187,7 +1283,7 @@ class GetCited_Health_Check {
 
         $start = microtime( true );
         $response = wp_remote_get( $url, array(
-            'timeout'   => 10,
+            'timeout'   => 5,
             'sslverify' => false,  // Self-request, skip SSL verification issues
             'headers'   => array(
                 'Cache-Control' => 'no-cache',  // Try to bypass caching layers
@@ -1313,7 +1409,7 @@ class GetCited_Health_Check {
 
         $start = microtime( true );
         $response = wp_remote_get( $url, array(
-            'timeout'   => 10,
+            'timeout'   => 5,
             'sslverify' => false,
             'headers'   => array(
                 'Cache-Control' => 'no-cache',

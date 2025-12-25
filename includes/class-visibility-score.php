@@ -139,22 +139,28 @@ class GetCited_Visibility_Score {
 		$crawler_list   = GetCited_Crawler_List::instance();
 		$all_crawlers   = $crawler_list->get_all();
 
-		// Build lookup of crawler name to user_agent.
-		$crawler_map = array();
+		// Build lookup: major crawler name => user_agent (O(n) single pass).
+		$major_lookup = array();
 		foreach ( $all_crawlers as $crawler ) {
-			$crawler_map[ $crawler['user_agent'] ] = $crawler['name'];
+			$name = $crawler['name'];
+			$ua   = $crawler['user_agent'];
+
+			// Check if this crawler matches any major crawler.
+			foreach ( self::MAJOR_CRAWLERS as $major ) {
+				if ( stripos( $name, $major ) !== false || stripos( $ua, $major ) !== false ) {
+					$major_lookup[ $major ] = $ua;
+					break;
+				}
+			}
 		}
 
-		// Count how many major crawlers are allowed.
+		// Count allowed major crawlers (O(m) simple lookups).
 		$allowed_count = 0;
 		foreach ( self::MAJOR_CRAWLERS as $major_crawler ) {
-			// Find the user_agent key for this crawler name.
-			foreach ( $crawler_map as $ua => $name ) {
-				if ( stripos( $name, $major_crawler ) !== false || stripos( $ua, $major_crawler ) !== false ) {
-					if ( isset( $crawler_states[ $ua ] ) && $crawler_states[ $ua ] === 'allow' ) {
-						$allowed_count++;
-						break;
-					}
+			if ( isset( $major_lookup[ $major_crawler ] ) ) {
+				$ua = $major_lookup[ $major_crawler ];
+				if ( isset( $crawler_states[ $ua ] ) && $crawler_states[ $ua ] === 'allow' ) {
+					$allowed_count++;
 				}
 			}
 		}

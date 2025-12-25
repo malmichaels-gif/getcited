@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.9.23
+ * Version: 1.9.9.24
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.9.23' );
+define( 'GETCITED_VERSION', '1.9.9.24' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -714,12 +714,73 @@ final class GetCited {
     }
 
     /**
+     * Check rate limit for public API endpoints
+     *
+     * @param string $endpoint Endpoint identifier for rate limit tracking.
+     * @param int    $limit    Maximum requests allowed in window (default 60).
+     * @param int    $window   Time window in seconds (default 60).
+     * @return true|WP_Error True if allowed, WP_Error if rate limited.
+     */
+    private function check_rate_limit( $endpoint, $limit = 60, $window = 60 ) {
+        $ip = $this->get_client_ip();
+        $key = 'getcited_rate_' . md5( $endpoint . $ip );
+        $count = (int) get_transient( $key );
+
+        if ( $count >= $limit ) {
+            return new WP_Error(
+                'rate_limited',
+                __( 'Too many requests. Please try again later.', 'getcited' ),
+                array( 'status' => 429 )
+            );
+        }
+
+        set_transient( $key, $count + 1, $window );
+        return true;
+    }
+
+    /**
+     * Get client IP address
+     *
+     * @return string IP address or empty string.
+     */
+    private function get_client_ip() {
+        $headers = array(
+            'HTTP_CF_CONNECTING_IP', // Cloudflare
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_REAL_IP',
+            'REMOTE_ADDR',
+        );
+
+        foreach ( $headers as $header ) {
+            if ( ! empty( $_SERVER[ $header ] ) ) {
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                $ip = wp_unslash( $_SERVER[ $header ] );
+                // Handle comma-separated IPs (X-Forwarded-For)
+                if ( strpos( $ip, ',' ) !== false ) {
+                    $ip = trim( explode( ',', $ip )[0] );
+                }
+                if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+                    return $ip;
+                }
+            }
+        }
+
+        return '';
+    }
+
+    /**
      * API: Status endpoint (public, minimal info)
      *
      * Returns only basic info safe for public consumption.
      * Detailed config requires authentication via /settings endpoint.
      */
     public function api_status() {
+        // Rate limit: 60 requests per minute per IP
+        $rate_check = $this->check_rate_limit( 'status', 60, 60 );
+        if ( is_wp_error( $rate_check ) ) {
+            return $rate_check;
+        }
+
         $settings = GetCited_Settings::instance();
         $health   = GetCited_Health_Check::instance()->get_status();
 
@@ -741,6 +802,12 @@ final class GetCited {
      * Useful for decoupled frontends that need to serve llms.txt.
      */
     public function api_llms_txt() {
+        // Rate limit: 120 requests per minute per IP (higher for content endpoint)
+        $rate_check = $this->check_rate_limit( 'llms-txt', 120, 60 );
+        if ( is_wp_error( $rate_check ) ) {
+            return $rate_check;
+        }
+
         $settings = GetCited_Settings::instance();
 
         // Check if llms.txt is enabled

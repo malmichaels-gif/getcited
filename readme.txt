@@ -4,7 +4,7 @@ Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.9.23
+Stable tag: 1.9.9.24
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -119,6 +119,13 @@ The free version runs entirely on your server. The only external request is to f
 5. Content citability scoring
 
 == Changelog ==
+
+= 1.9.9.24 =
+* Improved: Visibility score calculation ~6x faster (optimized crawler matching algorithm)
+* Improved: Health check HTTP timeouts reduced from 10s to 5s for faster dashboard loads
+* Improved: Async health checks - dashboard loads instantly, checks run in background
+* Improved: Switched to system fonts, removing external Google Fonts dependency
+* New: Rate limiting on public REST API endpoints (prevents abuse)
 
 = 1.9.9.23 =
 * Updated: Bundled crawler list now includes 31 AI crawlers (was 26)
