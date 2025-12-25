@@ -54,6 +54,21 @@ GetCited complements Yoast SEO, Rank Math, and other SEO plugins. They handle Go
 
 Join the waitlist from your dashboard for early bird pricing!
 
+= Third Party Services =
+
+GetCited connects to the following external service:
+
+**Crawler List Updates**
+- **Service:** GetCited API (heytc.com)
+- **URL:** `https://heytc.com/getcited-api/crawlers.json`
+- **When:** Once daily via WordPress cron
+- **Data Sent:** None (GET request only)
+- **Data Received:** JSON file (~2KB) containing AI crawler names and user-agent strings
+- **Purpose:** Keeps your crawler list current without requiring plugin updates
+- **Privacy Policy:** [https://heytc.com/privacy-policy/](https://heytc.com/privacy-policy/)
+
+This request is made from your server, not from visitors' browsers. No personal data, site content, or usage information is transmitted. If the request fails, the plugin falls back to its bundled crawler list.
+
 == Installation ==
 
 1. Upload the `getcited` folder to `/wp-content/plugins/`
