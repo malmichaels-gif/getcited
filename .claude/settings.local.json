@@ -5,7 +5,18 @@
       "Bash(dir:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(tree:*)",
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(git stash push:*)",
+      "Bash(git checkout:*)",
+      "Bash(scp:*)",
+      "Bash(ssh -p 24772 heytccom@35.196.5.93 \"ls -la /www/heytccom_324/public/llms.txt* 2>/dev/null || echo ''No llms.txt files found''\")",
+      "Skill(frontend-design)",
+      "WebFetch(domain:heytc.com)"
     ],
     "deny": [],
     "ask": []

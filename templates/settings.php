@@ -190,7 +190,31 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
             </div>
         </div>
 
-        <!-- Developer Tools (Visible by default) -->
+        <!-- System Info (Expanded by default for easy support access) -->
+        <div class="getcited-section getcited-collapsible" data-collapsed="false">
+            <h2 class="getcited-collapsible-header">
+                <?php esc_html_e( 'System Information', 'getcited' ); ?>
+                <span class="dashicons dashicons-arrow-down-alt2"></span>
+            </h2>
+            <p class="description" style="margin-top: calc(-1 * var(--getcited-space-sm));">
+                <?php esc_html_e( 'Copy this when requesting support.', 'getcited' ); ?>
+            </p>
+            <div class="getcited-collapsible-content" style="display: block;">
+                <textarea id="getcited-system-info"
+                          rows="12"
+                          readonly
+                          class="large-text code"><?php echo esc_textarea( $dashboard->render_system_info() ); ?></textarea>
+
+                <p style="margin-top: var(--getcited-space-sm);">
+                    <button type="button" class="button button-primary getcited-copy-system-info">
+                        <span class="dashicons dashicons-clipboard" style="vertical-align: text-bottom; margin-right: 4px;"></span>
+                        <?php esc_html_e( 'Copy to Clipboard', 'getcited' ); ?>
+                    </button>
+                </p>
+            </div>
+        </div>
+
+        <!-- Developer Tools -->
         <div class="getcited-section">
             <h2><?php esc_html_e( 'Developer Tools', 'getcited' ); ?></h2>
 
@@ -243,30 +267,6 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
                         '<code>wp getcited &lt;command&gt; --help</code>'
                     );
                     ?>
-                </p>
-            </div>
-        </div>
-
-        <!-- System Info (Collapsible) -->
-        <div class="getcited-section getcited-collapsible" data-collapsed="true">
-            <h2 class="getcited-collapsible-header">
-                <?php esc_html_e( 'System Information', 'getcited' ); ?>
-                <span class="dashicons dashicons-arrow-down-alt2"></span>
-            </h2>
-            <p class="description" style="margin-top: calc(-1 * var(--getcited-space-sm));">
-                <?php esc_html_e( 'Copy this when requesting support.', 'getcited' ); ?>
-            </p>
-            <div class="getcited-collapsible-content" style="display: none;">
-                <textarea id="getcited-system-info"
-                          rows="12"
-                          readonly
-                          class="large-text code"><?php echo esc_textarea( $dashboard->render_system_info() ); ?></textarea>
-
-                <p style="margin-top: var(--getcited-space-sm);">
-                    <button type="button" class="button button-primary getcited-copy-system-info">
-                        <span class="dashicons dashicons-clipboard" style="vertical-align: text-bottom; margin-right: 4px;"></span>
-                        <?php esc_html_e( 'Copy to Clipboard', 'getcited' ); ?>
-                    </button>
                 </p>
             </div>
         </div>

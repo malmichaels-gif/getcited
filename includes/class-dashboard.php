@@ -681,6 +681,8 @@ class GetCited_Dashboard {
         })();
         </script>
         <?php
+        // Delete transient so message only shows once.
+        delete_transient( 'getcited_show_citation_nudge' );
     }
 
     /**
