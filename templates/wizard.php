@@ -209,7 +209,7 @@ if ( empty( $org['name'] ) ) {
                         <h2><?php esc_html_e( 'Looking good!', 'getcited' ); ?></h2>
                         <p class="verify-url">
                             <?php esc_html_e( 'Your site info is ready at:', 'getcited' ); ?><br>
-                            <a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank" class="llms-url-link">
+                            <a href="<?php echo esc_url( home_url( '/llms.txt?v=' . time() ) ); ?>" target="_blank" class="llms-url-link">
                                 <?php echo esc_html( home_url( '/llms.txt' ) ); ?>
                             </a>
                         </p>

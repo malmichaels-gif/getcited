@@ -56,10 +56,11 @@ $status = $health->get_status();
                     <strong><?php esc_html_e( 'Serve AI visibility file', 'getcited' ); ?></strong>
                     <span class="check-description">
                         <?php
+                        // Cache-busting URL for verification (v1.9.9.25) - display shows clean URL, link bypasses CDN cache
                         printf(
                             /* translators: %s: URL to the llms.txt file */
                             esc_html__( 'Available at %s', 'getcited' ),
-                            '<a href="' . esc_url( $llms_txt->get_url() ) . '" target="_blank">' . esc_html( $llms_txt->get_url() ) . '</a>'
+                            '<a href="' . esc_url( $llms_txt->get_url() . '?v=' . time() ) . '" target="_blank">' . esc_html( $llms_txt->get_url() ) . '</a>'
                         ); ?>
                     </span>
                 </span>
