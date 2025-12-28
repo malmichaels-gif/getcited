@@ -118,85 +118,6 @@ class GetCited_Pro_Teaser {
     }
 
     /**
-     * Get sample report data (for modal preview)
-     * Uses actual site data for personalization
-     */
-    public function get_sample_report() {
-        // Get site display name for leaderboard.
-        $site_display = $this->get_site_display_name();
-
-        // Get actual post titles from the site.
-        $recent_posts = get_posts( array(
-            'numberposts' => 3,
-            'post_status' => 'publish',
-            'post_type'   => 'post',
-            'orderby'     => 'comment_count',
-            'order'       => 'DESC',
-        ) );
-
-        // Build page titles - use real posts or fallbacks.
-        $page_titles = array();
-        if ( ! empty( $recent_posts ) ) {
-            foreach ( $recent_posts as $post ) {
-                $page_titles[] = $post->post_title;
-            }
-        }
-        // Pad with fallbacks if needed.
-        $fallback_titles = array(
-            __( 'Your Most Popular Post', 'getcited' ),
-            __( 'Your Second Best Post', 'getcited' ),
-            __( 'Another Great Article', 'getcited' ),
-        );
-        while ( count( $page_titles ) < 3 ) {
-            $page_titles[] = $fallback_titles[ count( $page_titles ) ];
-        }
-
-        // Try to derive a keyword from the site's primary category.
-        $keyword = $this->get_sample_keyword();
-
-        // Build the full query phrase (used in both alert and share of voice).
-        $query_phrase = sprintf(
-            /* translators: %s: keyword phrase */
-            __( 'best %s tips 2025', 'getcited' ),
-            $keyword
-        );
-
-        return array(
-            'period' => __( 'Last 30 Days', 'getcited' ),
-            'recent_citation' => array(
-                'source'  => 'Perplexity',
-                'page'    => $page_titles[0],
-                'query'   => $query_phrase,
-                'time'    => __( '2 hours ago', 'getcited' ),
-            ),
-            'ai_traffic' => array(
-                'total'  => 1247,
-                'change' => '+18%',
-                'sources' => array(
-                    array( 'name' => 'Perplexity', 'visits' => 847, 'percent' => 68 ),
-                    array( 'name' => 'ChatGPT', 'visits' => 203, 'percent' => 16 ),
-                    array( 'name' => 'Gemini', 'visits' => 142, 'percent' => 11 ),
-                    array( 'name' => 'Claude', 'visits' => 38, 'percent' => 3 ),
-                ),
-            ),
-            'share_of_voice' => array(
-                'keyword'     => $query_phrase,
-                'your_score'  => 87,
-                'competitors' => array(
-                    array( 'name' => $site_display, 'score' => 87, 'is_you' => true, 'blur' => false ),
-                    array( 'name' => 'industryexpert.io', 'score' => 72, 'is_you' => false, 'blur' => true ),
-                    array( 'name' => 'nicheguide.co', 'score' => 68, 'is_you' => false, 'blur' => true ),
-                ),
-            ),
-            'top_pages' => array(
-                array( 'title' => $page_titles[0], 'visits' => 312, 'citability' => 92 ),
-                array( 'title' => $page_titles[1], 'visits' => 289, 'citability' => 87 ),
-                array( 'title' => $page_titles[2], 'visits' => 201, 'citability' => 78 ),
-            ),
-        );
-    }
-
-    /**
      * Get a clean site display name for the leaderboard
      * Falls back to site name if domain looks like staging/dev
      */
@@ -331,9 +252,6 @@ class GetCited_Pro_Teaser {
                             <h4><?php echo esc_html( $feature['name'] ); ?></h4>
                             <p><?php echo esc_html( $feature['teaser'] ); ?></p>
                         </div>
-                        <div class="feature-locked">
-                            <span class="dashicons dashicons-lock"></span>
-                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -369,116 +287,6 @@ class GetCited_Pro_Teaser {
                 </div>
             <?php endif; ?>
 
-            <div class="getcited-sample-report">
-                <button type="button" class="button button-hero getcited-view-sample">
-                    <span class="dashicons dashicons-chart-bar"></span>
-                    <?php esc_html_e( 'View Sample Report', 'getcited' ); ?>
-                </button>
-                <p class="sample-hint"><?php esc_html_e( 'See what Pro users will see', 'getcited' ); ?></p>
-            </div>
-        </div>
-        <?php
-    }
-
-    /**
-     * Render sample report modal
-     */
-    public function render_sample_modal() {
-        $report = $this->get_sample_report();
-        ?>
-        <div id="getcited-sample-modal" class="getcited-modal" style="display: none;">
-            <div class="getcited-modal-content">
-                <div class="getcited-modal-header">
-                    <h2><?php esc_html_e( 'What Pro Users See', 'getcited' ); ?> <span class="sample-badge"><?php esc_html_e( '(Sample Data)', 'getcited' ); ?></span></h2>
-                    <button type="button" class="getcited-modal-close">&times;</button>
-                </div>
-                <div class="getcited-modal-body">
-                    <!-- Citation Alert - The Hook -->
-                    <div class="getcited-citation-alert">
-                        <span class="alert-icon">&#128276;</span>
-                        <div class="alert-content">
-                            <strong><?php esc_html_e( 'New AI Reference Detected', 'getcited' ); ?></strong> <span class="sample-badge"><?php esc_html_e( '(Sample)', 'getcited' ); ?></span>
-                            <p>
-                                <?php
-                                printf(
-                                    /* translators: %1$s: AI source name, %2$s: page title */
-                                    esc_html__( '%1$s cited your "%2$s"', 'getcited' ),
-                                    '<span class="alert-source">' . esc_html( $report['recent_citation']['source'] ) . '</span>',
-                                    esc_html( $report['recent_citation']['page'] )
-                                );
-                                ?>
-                            </p>
-                            <span class="alert-query">"<?php echo esc_html( $report['recent_citation']['query'] ); ?>"</span>
-                            <span class="alert-time"><?php echo esc_html( $report['recent_citation']['time'] ); ?></span>
-                        </div>
-                    </div>
-
-                    <div class="getcited-sample-section">
-                        <h3><?php esc_html_e( 'AI Referral Traffic', 'getcited' ); ?> — <?php echo esc_html( $report['period'] ); ?></h3>
-                        <div class="getcited-sample-stat">
-                            <span class="stat-number"><?php echo esc_html( number_format( $report['ai_traffic']['total'] ) ); ?></span>
-                            <span class="stat-label"><?php esc_html_e( 'visits from AI', 'getcited' ); ?></span>
-                            <span class="stat-change positive"><?php echo esc_html( $report['ai_traffic']['change'] ); ?></span>
-                        </div>
-                        <div class="getcited-sample-bars">
-                            <?php foreach ( $report['ai_traffic']['sources'] as $source ) : ?>
-                                <div class="sample-bar">
-                                    <span class="bar-label"><?php echo esc_html( $source['name'] ); ?></span>
-                                    <div class="bar-track">
-                                        <div class="bar-fill" style="width: <?php echo esc_attr( $source['percent'] ); ?>%;"></div>
-                                    </div>
-                                    <span class="bar-value"><?php echo esc_html( number_format( $source['visits'] ) ); ?></span>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="getcited-sample-section">
-                        <h3><?php esc_html_e( 'Share of Voice', 'getcited' ); ?>: "<?php echo esc_html( $report['share_of_voice']['keyword'] ); ?>"</h3>
-                        <div class="getcited-leaderboard">
-                            <?php foreach ( $report['share_of_voice']['competitors'] as $index => $competitor ) : ?>
-                                <div class="leaderboard-row <?php echo $competitor['is_you'] ? 'is-you' : ''; ?>">
-                                    <span class="leaderboard-rank">#<?php echo esc_html( $index + 1 ); ?></span>
-                                    <span class="leaderboard-name<?php echo ! empty( $competitor['blur'] ) ? ' is-blurred' : ''; ?>"><?php echo esc_html( $competitor['name'] ); ?></span>
-                                    <div class="leaderboard-bar">
-                                        <div class="leaderboard-fill" style="width: <?php echo esc_attr( $competitor['score'] ); ?>%;"></div>
-                                    </div>
-                                    <span class="leaderboard-score"><?php echo esc_html( $competitor['score'] ); ?></span>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                        <p class="leaderboard-hint"><?php esc_html_e( 'You\'re winning this keyword!', 'getcited' ); ?></p>
-                    </div>
-
-                    <div class="getcited-sample-section">
-                        <h3><?php esc_html_e( 'Top Performing Pages', 'getcited' ); ?></h3>
-                        <table class="getcited-sample-table">
-                            <thead>
-                                <tr>
-                                    <th><?php esc_html_e( 'Page', 'getcited' ); ?></th>
-                                    <th><?php esc_html_e( 'AI Visits', 'getcited' ); ?></th>
-                                    <th><?php esc_html_e( 'Citability', 'getcited' ); ?></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ( $report['top_pages'] as $page ) : ?>
-                                    <tr>
-                                        <td><?php echo esc_html( $page['title'] ); ?></td>
-                                        <td><?php echo esc_html( number_format( $page['visits'] ) ); ?></td>
-                                        <td><?php echo esc_html( $page['citability'] ); ?>/100</td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="getcited-modal-footer">
-                    <p><?php esc_html_e( 'Is your content being cited? Find out.', 'getcited' ); ?></p>
-                    <button type="button" class="button button-primary getcited-join-waitlist">
-                        <?php esc_html_e( 'Get Notified When Pro Launches', 'getcited' ); ?>
-                    </button>
-                </div>
-            </div>
         </div>
         <?php
     }
@@ -578,7 +386,6 @@ class GetCited_Pro_Teaser {
         $feature_name = isset( $features[ $feature ] ) ? $features[ $feature ]['name'] : __( 'This feature', 'getcited' );
         ?>
         <div class="getcited-upgrade-notice">
-            <span class="dashicons dashicons-lock"></span>
             <p>
                 <?php
                 printf(

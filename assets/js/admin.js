@@ -26,7 +26,8 @@
         initRobotsRulesActions();
         initWaitlistForm();
         initCompactWaitlistButtons();
-        initSampleModal();
+        initCitationNudge();
+        initSeoConflictNotice();
         initWizard();
         initSettingsPage();
         initExportImport();
@@ -1581,45 +1582,62 @@
     }
 
     // ==========================================================================
-    // Sample Modal
+    // Admin Notice Handlers
     // ==========================================================================
 
-    function initSampleModal() {
-        const openBtns = document.querySelectorAll('.getcited-view-sample');
-        const modal = document.getElementById('getcited-sample-modal');
-        const closeBtn = modal?.querySelector('.getcited-modal-close');
+    function initCitationNudge() {
+        var notice = document.querySelector('.getcited-citation-nudge');
+        if (!notice) return;
 
-        if (!modal) return;
-
-        openBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                modal.style.display = 'flex';
-            });
+        notice.addEventListener('click', function(e) {
+            if (e.target.classList.contains('notice-dismiss')) {
+                fetch(ajaxurl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=getcited_dismiss_citation_nudge&nonce=' + notice.dataset.nonce
+                });
+            }
         });
+    }
 
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
+    function initSeoConflictNotice() {
+        var notice = document.querySelector('.getcited-seo-conflict-notice');
+        if (!notice) return;
+
+        var nonce = notice.dataset.nonce;
+        var removeBtn = notice.querySelector('.getcited-remove-conflict');
+        var dismissBtn = notice.querySelector('.getcited-dismiss-notice');
+
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                var originalText = this.textContent;
+                this.disabled = true;
+                this.textContent = notice.dataset.removing || 'Removing...';
+                fetch(ajaxurl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'action=getcited_delete_conflicting_llms&nonce=' + nonce
+                }).then(function(response) {
+                    return response.json();
+                }).then(function(data) {
+                    if (data.success) {
+                        notice.innerHTML = '<p><strong>' + (notice.dataset.success || 'Done! GetCited is now serving your AI Visibility Data.') + '</strong></p>';
+                        notice.classList.remove('notice-warning');
+                        notice.classList.add('notice-success');
+                    } else {
+                        removeBtn.disabled = false;
+                        removeBtn.textContent = notice.dataset.removeText || originalText;
+                        alert(data.data ? data.data.message : 'Failed to remove file');
+                    }
+                });
             });
         }
 
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-
-        // Handle "Join Waitlist" buttons in modal
-        document.querySelectorAll('.getcited-join-waitlist').forEach(btn => {
-            btn.addEventListener('click', () => {
-                modal.style.display = 'none';
-                const waitlistForm = document.getElementById('getcited-waitlist-form');
-                if (waitlistForm) {
-                    waitlistForm.scrollIntoView({ behavior: 'smooth' });
-                    waitlistForm.querySelector('input[type="email"]')?.focus();
-                }
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', function() {
+                notice.remove();
             });
-        });
+        }
     }
 
     // ==========================================================================

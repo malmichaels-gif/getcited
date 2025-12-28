@@ -315,8 +315,6 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 		</p>
 
 	</div>
-
-	<?php $pro_teaser->render_sample_modal(); ?>
 </div>
 <?php
 } )();

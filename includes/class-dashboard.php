@@ -662,24 +662,6 @@ class GetCited_Dashboard {
                 </a>
             </p>
         </div>
-        <script>
-        (function() {
-            document.addEventListener('DOMContentLoaded', function() {
-                var notice = document.querySelector('.getcited-citation-nudge');
-                if (!notice) return;
-
-                notice.addEventListener('click', function(e) {
-                    if (e.target.classList.contains('notice-dismiss')) {
-                        fetch(ajaxurl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                            body: 'action=getcited_dismiss_citation_nudge&nonce=' + notice.dataset.nonce
-                        });
-                    }
-                });
-            });
-        })();
-        </script>
         <?php
         // Delete transient so message only shows once.
         delete_transient( 'getcited_show_citation_nudge' );
@@ -919,7 +901,11 @@ class GetCited_Dashboard {
         $nonce = wp_create_nonce( 'getcited_admin' );
 
         ?>
-        <div class="notice notice-warning getcited-seo-conflict-notice" data-nonce="<?php echo esc_attr( $nonce ); ?>">
+        <div class="notice notice-warning getcited-seo-conflict-notice"
+            data-nonce="<?php echo esc_attr( $nonce ); ?>"
+            data-removing="<?php esc_attr_e( 'Removing...', 'getcited' ); ?>"
+            data-success="<?php esc_attr_e( 'Done! GetCited is now serving your AI Visibility Data.', 'getcited' ); ?>"
+            data-remove-text="<?php esc_attr_e( 'Remove file', 'getcited' ); ?>">
             <p>
                 <strong>
                 <?php
@@ -951,44 +937,6 @@ class GetCited_Dashboard {
                 </button>
             </p>
         </div>
-        <script>
-        (function() {
-            document.addEventListener('DOMContentLoaded', function() {
-                var notice = document.querySelector('.getcited-seo-conflict-notice');
-                if (!notice) return;
-
-                var nonce = notice.dataset.nonce;
-
-                // Remove file button
-                notice.querySelector('.getcited-remove-conflict').addEventListener('click', function() {
-                    this.disabled = true;
-                    this.textContent = '<?php echo esc_js( __( 'Removing...', 'getcited' ) ); ?>';
-                    fetch(ajaxurl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'action=getcited_delete_conflicting_llms&nonce=' + nonce
-                    }).then(function(response) {
-                        return response.json();
-                    }).then(function(data) {
-                        if (data.success) {
-                            notice.innerHTML = '<p><strong><?php echo esc_js( __( 'Done! GetCited is now serving your AI Visibility Data.', 'getcited' ) ); ?></strong></p>';
-                            notice.classList.remove('notice-warning');
-                            notice.classList.add('notice-success');
-                        } else {
-                            notice.querySelector('.getcited-remove-conflict').disabled = false;
-                            notice.querySelector('.getcited-remove-conflict').textContent = '<?php echo esc_js( __( 'Remove file', 'getcited' ) ); ?>';
-                            alert(data.data ? data.data.message : 'Failed to remove file');
-                        }
-                    });
-                });
-
-                // Dismiss button
-                notice.querySelector('.getcited-dismiss-notice').addEventListener('click', function() {
-                    notice.remove();
-                });
-            });
-        })();
-        </script>
         <?php
     }
 

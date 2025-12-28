@@ -1,10 +1,10 @@
 === GetCited — AI Visibility ===
-Contributors: malcolmmichaels
+Contributors: heytc
 Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.9.26
+Stable tag: 1.9.9.27
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ While traditional SEO plugins optimize for Google, GetCited optimizes for the AI
 = What GetCited Does =
 
 **🤖 AI Crawler Management**
-Control which AI systems can access your content. Toggle access for 26 different AI crawlers including GPTBot (ChatGPT), ClaudeBot, PerplexityBot, and more. Your settings automatically update your robots.txt.
+Control which AI systems can access your content. Toggle access for 31 different AI crawlers including GPTBot (ChatGPT), ClaudeBot, PerplexityBot, and more. Your settings automatically update your robots.txt.
 
 **📄 llms.txt Generator**
 Create and serve an llms.txt file — the emerging standard for AI discoverability. Like robots.txt told search engines how to crawl your site, llms.txt tells AI systems what your site is about.
@@ -110,15 +110,15 @@ The crawler list updates automatically without requiring plugin updates.
 
 The free version runs entirely on your server. The only external request is to fetch the latest crawler list from our server (a simple JSON file, no data sent from your site).
 
-== Screenshots ==
-
-1. Dashboard overview showing AI visibility status
-2. AI Crawler management panel with toggle controls
-3. llms.txt editor with live preview
-4. Schema settings and preview
-5. Content citability scoring
-
 == Changelog ==
+
+= 1.9.9.27 =
+* Improved: Cleaner Pro features section (removed placeholder lock icons)
+* Improved: WordPress.org plugin guidelines compliance updates
+
+= 1.9.9.26 =
+* New: One-time setup completion message after wizard
+* Improved: Settings page section reordering for better UX
 
 = 1.9.9.25 =
 * Improved: Verification links now bypass CDN cache for instant content preview
