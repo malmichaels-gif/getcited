@@ -1,6 +1,6 @@
 {
-  "version": "1.0.2",
-  "updated": "2025-12-19",
+  "version": "1.0.3",
+  "updated": "2025-12-29",
   "crawlers": [
     {
       "name": "GPTBot",
@@ -87,6 +87,22 @@
       "company": "Anthropic",
       "user_agent": "Claude-Web",
       "purpose": "Claude web features",
+      "recommended": true,
+      "docs_url": "https://www.anthropic.com/robots-txt"
+    },
+    {
+      "name": "Claude-User",
+      "company": "Anthropic",
+      "user_agent": "Claude-User",
+      "purpose": "User-triggered page fetches for Claude",
+      "recommended": true,
+      "docs_url": "https://www.anthropic.com/robots-txt"
+    },
+    {
+      "name": "Claude-SearchBot",
+      "company": "Anthropic",
+      "user_agent": "Claude-SearchBot",
+      "purpose": "Claude search result quality",
       "recommended": true,
       "docs_url": "https://www.anthropic.com/robots-txt"
     },
@@ -211,6 +227,14 @@
       "docs_url": "https://deepseek.com"
     },
     {
+      "name": "DeepseekBot",
+      "company": "DeepSeek",
+      "user_agent": "DeepseekBot",
+      "purpose": "DeepSeek web crawling",
+      "recommended": false,
+      "docs_url": "https://deepseek.com"
+    },
+    {
       "name": "MistralAI-User",
       "company": "Mistral",
       "user_agent": "MistralAI-User",
@@ -241,6 +265,38 @@
       "purpose": "AI search engine",
       "recommended": true,
       "docs_url": "https://about.you.com/youbot"
+    },
+    {
+      "name": "PhindBot",
+      "company": "Phind",
+      "user_agent": "PhindBot",
+      "purpose": "Phind AI search for developers",
+      "recommended": true,
+      "docs_url": "https://www.phind.com"
+    },
+    {
+      "name": "ExaBot",
+      "company": "Exa",
+      "user_agent": "ExaBot",
+      "purpose": "Exa semantic search indexing",
+      "recommended": true,
+      "docs_url": "https://exa.ai"
+    },
+    {
+      "name": "AndiBot",
+      "company": "Andi",
+      "user_agent": "AndiBot",
+      "purpose": "Andi conversational search",
+      "recommended": true,
+      "docs_url": "https://andisearch.com"
+    },
+    {
+      "name": "LinkedInBot",
+      "company": "LinkedIn",
+      "user_agent": "LinkedInBot",
+      "purpose": "LinkedIn link previews",
+      "recommended": true,
+      "docs_url": "https://www.linkedin.com/help/linkedin"
     },
     {
       "name": "ImagesiftBot",
