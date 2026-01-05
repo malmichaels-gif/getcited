@@ -273,17 +273,11 @@ class GetCited_Citability {
 
         $offset   = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
         $limit    = 5;
-        $max_free = 10; // Free tier shows max 10 posts
-
-        // Enforce free tier limit
-        if ( $offset >= $max_free ) {
-            wp_send_json_error( array( 'message' => 'Free tier limit reached' ) );
-        }
 
         $posts = get_posts( array(
             'post_type'      => 'post',
             'post_status'    => 'publish',
-            'posts_per_page' => min( $limit, $max_free - $offset ),
+            'posts_per_page' => $limit,
             'offset'         => $offset,
             'orderby'        => 'date',
             'order'          => 'DESC',
@@ -335,7 +329,7 @@ class GetCited_Citability {
 
         wp_send_json_success( array(
             'html'     => $html,
-            'has_more' => ( $offset + count( $posts ) ) < $max_free && count( $posts ) === $limit,
+            'has_more' => count( $posts ) === $limit,
         ) );
     }
 
@@ -1188,7 +1182,7 @@ class GetCited_Citability {
     }
 
     /**
-     * Get recent posts for analysis (free tier limit)
+     * Get recent posts for analysis
      */
     public function get_analyzable_posts( $limit = 5 ) {
         $args = array(
@@ -1227,7 +1221,7 @@ class GetCited_Citability {
     }
 
     /**
-     * Auto-analyze recent posts on activation (doesn't count against free tier)
+     * Auto-analyze recent posts on activation
      *
      * @param int $limit Number of posts to analyze.
      * @return int Number of posts analyzed.

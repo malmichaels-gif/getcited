@@ -56,9 +56,9 @@ class GetCited_Pro_Teaser {
             ),
             'citability' => array(
                 'name' => __( 'Full Citability Scoring', 'getcited' ),
-                'description' => __( 'Audit unlimited posts with export', 'getcited' ),
+                'description' => __( 'Export reports and track score history', 'getcited' ),
                 'icon' => 'dashicons-search',
-                'teaser' => __( 'Score unlimited posts, run bulk audits across your whole site, and export reports to share with your team', 'getcited' ),
+                'teaser' => __( 'Export citability reports as CSV or PDF, track scores over time, and run bulk audits with one click', 'getcited' ),
             ),
             'share_of_voice' => array(
                 'name' => __( 'Citation Share of Voice', 'getcited' ),
@@ -106,7 +106,7 @@ class GetCited_Pro_Teaser {
             ),
             'citability' => array(
                 'feature' => 'citability',
-                'message' => __( 'Score unlimited posts and export reports to share with your team', 'getcited' ),
+                'message' => __( 'Export citability reports and track your scores over time', 'getcited' ),
             ),
             'settings' => array(
                 'feature' => 'alerts',

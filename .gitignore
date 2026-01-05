@@ -1,0 +1,13 @@
+# Build artifacts
+getcited.zip
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

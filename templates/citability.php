@@ -99,8 +99,8 @@ $crawler_stats = $request_logger->get_request_stats();
                         <span class="stat-label"><?php esc_html_e( 'Published Posts', 'getcited' ); ?></span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value"><?php echo esc_html( $analyzed_count ); ?>/10</span>
-                        <span class="stat-label"><?php esc_html_e( 'Analyzed (Free)', 'getcited' ); ?></span>
+                        <span class="stat-value"><?php echo esc_html( $analyzed_count ); ?></span>
+                        <span class="stat-label"><?php esc_html_e( 'Posts Analyzed', 'getcited' ); ?></span>
                     </div>
                 </div>
             </div>
@@ -175,9 +175,6 @@ $crawler_stats = $request_logger->get_request_stats();
                         <button type="button" class="button getcited-load-more-posts" data-offset="5">
                             <?php esc_html_e( 'Load More Posts', 'getcited' ); ?>
                         </button>
-                        <span class="description" style="margin-left: 8px;">
-                            <?php esc_html_e( '(Free tier: up to 10 posts)', 'getcited' ); ?>
-                        </span>
                     </p>
                 <?php endif; ?>
             <?php endif; ?>
