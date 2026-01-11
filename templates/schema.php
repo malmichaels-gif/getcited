@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 $settings    = GetCited_Settings::instance();
 $schema      = GetCited_Schema::instance();
 $detector    = GetCited_Schema_Detector::instance();
-$pro_teaser  = GetCited_Pro_Teaser::instance();
 
 $enabled       = $settings->get( 'schema_enabled' );
 $force_enabled = $settings->get( 'schema_force_enabled' );
@@ -48,8 +47,6 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 
 	<div class="getcited-schema-page">
 
-		<!-- Pro Teaser Banner -->
-		<?php $pro_teaser->render_page_teaser( 'schema' ); ?>
 
 		<!-- Detection Status Section -->
 		<div class="getcited-section getcited-detection-status <?php echo esc_attr( $status_info['status'] ); ?>">

@@ -14,7 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 $crawler_list = GetCited_Crawler_List::instance();
 $settings = GetCited_Settings::instance();
 $robots = GetCited_Robots::instance();
-$pro_teaser = GetCited_Pro_Teaser::instance();
 
 $grouped_crawlers = $crawler_list->get_grouped();
 $crawler_states = $settings->get( 'crawlers' );
@@ -51,8 +50,6 @@ foreach ( $grouped_crawlers as $crawlers ) {
 
     <div class="getcited-crawlers-page">
 
-        <!-- Pro Teaser Banner -->
-        <?php $pro_teaser->render_page_teaser( 'crawlers' ); ?>
 
         <!-- Two-Column Settings Grid -->
         <div class="getcited-settings-grid">

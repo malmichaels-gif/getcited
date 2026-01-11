@@ -1128,7 +1128,7 @@ class GetCited_Health_Check {
 
         // Check for active modules that might conflict
         if ( class_exists( 'Jetpack' ) && method_exists( 'Jetpack', 'is_module_active' ) ) {
-            // SEO Tools module (paid feature, but check anyway)
+            // SEO Tools module
             if ( Jetpack::is_module_active( 'seo-tools' ) ) {
                 $modules_active[] = 'SEO Tools';
                 $concerns[] = __( 'SEO Tools module is active - may add schema markup', 'getcited' );

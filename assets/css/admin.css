@@ -71,7 +71,7 @@
     --getcited-gray-800: #1f2937;
     --getcited-gray-900: #111827;
 
-    /* Dark theme (for Pro sections) */
+    /* Dark theme */
     --getcited-dark-bg: #1e1e2e;
     --getcited-dark-card: #2a2a3e;
     --getcited-dark-border: #3a3a4e;
@@ -1855,38 +1855,17 @@
 
 /* Citability buttons - styled like Refresh button (v1.5.4) */
 .getcited-analyze-post,
-.getcited-load-more-posts,
-.getcited-join-waitlist {
+.getcited-load-more-posts {
     background: var(--getcited-primary) !important;
     border: 1px solid var(--getcited-primary) !important;
     color: #fff !important;
 }
 
 .getcited-analyze-post:hover,
-.getcited-load-more-posts:hover,
-.getcited-join-waitlist:hover {
+.getcited-load-more-posts:hover {
     background: var(--getcited-primary-dark) !important;
     border-color: var(--getcited-primary-dark) !important;
     color: #fff !important;
-}
-
-/* Inline upsell area (v1.5.4) */
-.getcited-inline-upsell {
-    margin-top: var(--getcited-space-lg);
-    padding: var(--getcited-space-md);
-    background: var(--getcited-gray-50);
-    border: 1px solid var(--getcited-gray-200);
-    border-radius: var(--getcited-radius-sm);
-    display: flex;
-    align-items: center;
-    gap: var(--getcited-space-md);
-    flex-wrap: wrap;
-    font-size: 15px;
-    color: var(--getcited-gray-600);
-}
-
-.getcited-inline-upsell .dashicons {
-    color: var(--getcited-gray-400);
 }
 
 /* ==========================================================================
@@ -1993,165 +1972,6 @@
     display: inline-flex !important;
     align-items: center;
     gap: 4px;
-}
-
-/* ==========================================================================
-   Pro Feature Teasers
-   ========================================================================== */
-
-.getcited-pro-teasers {
-    background: var(--getcited-dark-bg);
-    border: 1px solid var(--getcited-dark-border);
-    border-radius: var(--getcited-radius-lg);
-    padding: var(--getcited-space-xl);
-    color: var(--getcited-dark-text);
-}
-
-.getcited-pro-header {
-    text-align: center;
-    margin-bottom: var(--getcited-space-xl);
-}
-
-.getcited-pro-header h3 {
-    font-size: 22px;
-    color: #fff;
-    margin: 0 0 var(--getcited-space-sm) 0;
-}
-
-.getcited-pro-header p {
-    color: var(--getcited-dark-muted);
-    margin: 0;
-}
-
-.getcited-pro-features {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--getcited-space-md);
-    margin-bottom: var(--getcited-space-xl);
-}
-
-.getcited-pro-feature {
-    display: flex;
-    gap: var(--getcited-space-md);
-    padding: var(--getcited-space-md);
-    background: var(--getcited-dark-card);
-    border: 1px solid var(--getcited-dark-border);
-    border-radius: var(--getcited-radius-md);
-    position: relative;
-}
-
-.getcited-pro-feature .feature-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--getcited-accent);
-    border-radius: var(--getcited-radius-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.getcited-pro-feature .feature-icon .dashicons {
-    color: #fff;
-    font-size: 22px;
-    width: 20px;
-    height: 20px;
-}
-
-.getcited-pro-feature .feature-content h4 {
-    font-size: 15px;
-    color: #fff;
-    margin: 0 0 4px 0;
-}
-
-.getcited-pro-feature .feature-content p {
-    font-size: 13px;
-    color: var(--getcited-dark-muted);
-    margin: 0;
-    line-height: 1.4;
-}
-
-.getcited-pro-feature .feature-locked {
-    position: absolute;
-    top: var(--getcited-space-md);
-    right: var(--getcited-space-md);
-    color: var(--getcited-dark-muted);
-}
-
-.getcited-pro-feature .feature-locked .dashicons {
-    font-size: 18px;
-    width: 16px;
-    height: 16px;
-}
-
-/* Waitlist Form */
-.getcited-waitlist-form {
-    text-align: center;
-    margin-bottom: var(--getcited-space-lg);
-}
-
-.getcited-waitlist-form p {
-    color: var(--getcited-dark-muted);
-    margin-bottom: var(--getcited-space-md);
-}
-
-.getcited-waitlist-form form {
-    display: flex;
-    justify-content: center;
-    gap: var(--getcited-space-sm);
-    max-width: 400px;
-    margin: 0 auto var(--getcited-space-md);
-}
-
-.getcited-waitlist-form input[type="email"] {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid var(--getcited-dark-border);
-    border-radius: var(--getcited-radius-sm);
-    background: var(--getcited-dark-card);
-    color: var(--getcited-dark-text);
-    font-size: 15px;
-}
-
-.getcited-waitlist-form input[type="email"]::placeholder {
-    color: var(--getcited-dark-muted);
-}
-
-.getcited-waitlist-form input[type="email"]:focus {
-    outline: none;
-    border-color: var(--getcited-accent);
-}
-
-.getcited-waitlist-form .button-primary {
-    background: var(--getcited-accent);
-    border: none;
-    padding: 10px 20px;
-    font-weight: 500;
-}
-
-.getcited-waitlist-form .button-primary:hover {
-    background: var(--getcited-accent-light);
-}
-
-.getcited-waitlist-count {
-    font-size: 14px;
-    color: var(--getcited-dark-muted);
-}
-
-.getcited-waitlist-count .count {
-    color: var(--getcited-accent-light);
-    font-weight: 600;
-}
-
-.getcited-pricing-hint {
-    font-size: 13px;
-    color: var(--getcited-dark-muted);
-    margin-top: var(--getcited-space-sm);
-    opacity: 0.8;
-}
-
-.getcited-sample-report {
-    text-align: center;
 }
 
 /* ==========================================================================
@@ -3276,7 +3096,7 @@
     display: none;
 }
 
-/* Premium Radio Cards */
+/* Custom Radio Cards */
 .radio-card-content {
     padding: var(--getcited-space-xl);
     background: #fff;
@@ -3349,7 +3169,7 @@
     letter-spacing: -0.01em;
 }
 
-/* Premium Recommended Badge */
+/* Recommended Badge */
 .radio-card-content .recommended-badge {
     background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
     color: #fff;
@@ -3977,15 +3797,7 @@
         grid-column: 1 / -1;
         margin-top: var(--getcited-space-sm);
     }
-    
-    .getcited-pro-features {
-        grid-template-columns: 1fr;
-    }
-    
-    .getcited-waitlist-form form {
-        flex-direction: column;
-    }
-    
+
     .getcited-wizard-wrap {
         padding: var(--getcited-space-md);
     }
@@ -4381,164 +4193,6 @@
 }
 
 /* ==========================================================================
-   Page Teaser (Compact Banner)
-   ========================================================================== */
-
-.getcited-page-teaser {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--getcited-space-md);
-    padding: var(--getcited-space-md) var(--getcited-space-lg);
-    background: var(--getcited-dark-bg);
-    border: 1px solid var(--getcited-dark-border);
-    border-radius: var(--getcited-radius-md);
-    margin-bottom: var(--getcited-space-lg);
-}
-
-.getcited-page-teaser .teaser-content {
-    display: flex;
-    align-items: center;
-    gap: var(--getcited-space-md);
-    color: var(--getcited-dark-text);
-}
-
-.getcited-page-teaser .teaser-content .dashicons {
-    font-size: 22px;
-    width: 20px;
-    height: 20px;
-    color: var(--getcited-accent);
-}
-
-.getcited-page-teaser .teaser-text {
-    font-size: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.getcited-page-teaser .teaser-text strong {
-    color: var(--getcited-accent-light);
-}
-
-.getcited-page-teaser .teaser-text .teaser-message {
-    color: var(--getcited-dark-text);
-    font-size: 14px;
-}
-
-/* Inline form in page teaser */
-.getcited-teaser-form {
-    display: flex;
-    gap: var(--getcited-space-sm);
-    align-items: center;
-}
-
-.getcited-teaser-form input[type="email"] {
-    padding: 6px 12px;
-    border: 1px solid var(--getcited-dark-border);
-    border-radius: var(--getcited-radius-sm);
-    background: var(--getcited-dark-card);
-    color: var(--getcited-dark-text);
-    font-size: 14px;
-    width: 180px;
-}
-
-.getcited-teaser-form input[type="email"]::placeholder {
-    color: #d1d5db;
-}
-
-.getcited-teaser-form input[type="email"]:focus {
-    outline: none;
-    border-color: var(--getcited-accent);
-}
-
-.getcited-teaser-form .button-primary {
-    background: var(--getcited-accent);
-    border-color: var(--getcited-accent);
-    color: #fff;
-    padding: 6px 14px;
-    white-space: nowrap;
-}
-
-.getcited-teaser-form .button-primary:hover {
-    background: var(--getcited-accent-light);
-    border-color: var(--getcited-accent-light);
-    color: #fff;
-}
-
-.getcited-teaser-form .button-primary:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.getcited-page-teaser .teaser-joined {
-    display: flex;
-    align-items: center;
-    gap: var(--getcited-space-xs);
-    color: var(--getcited-success);
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.getcited-page-teaser .teaser-joined .dashicons {
-    font-size: 20px;
-    width: 18px;
-    height: 18px;
-}
-
-@media (max-width: 768px) {
-    .getcited-page-teaser {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--getcited-space-sm);
-    }
-
-    .getcited-teaser-form {
-        width: 100%;
-    }
-
-    .getcited-teaser-form input[type="email"] {
-        flex: 1;
-    }
-}
-
-@media (max-width: 480px) {
-    .getcited-teaser-form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .getcited-teaser-form input[type="email"] {
-        width: 100%;
-    }
-}
-
-/* ==========================================================================
-   Waitlist Confirmed State
-   ========================================================================== */
-
-.getcited-waitlist-confirmed {
-    text-align: center;
-    padding: var(--getcited-space-lg);
-    background: rgba(16, 185, 129, 0.1);
-    border-radius: var(--getcited-radius-md);
-    margin-bottom: var(--getcited-space-lg);
-}
-
-.getcited-waitlist-confirmed .dashicons {
-    font-size: 34px;
-    width: 32px;
-    height: 32px;
-    color: var(--getcited-success);
-    margin-bottom: var(--getcited-space-sm);
-}
-
-.getcited-waitlist-confirmed p {
-    color: var(--getcited-dark-text);
-    margin: 0;
-}
-
-/* ==========================================================================
    Sample Report Button (Hero Size)
    ========================================================================== */
 
@@ -4715,34 +4369,6 @@
     margin-top: var(--getcited-space-md);
     font-size: 15px;
     font-weight: 500;
-}
-
-/* ==========================================================================
-   Inline Upsell
-   ========================================================================== */
-
-.getcited-inline-upsell {
-    display: flex;
-    align-items: center;
-    gap: var(--getcited-space-sm);
-    padding: var(--getcited-space-md);
-    background: var(--getcited-gray-100);
-    border-radius: var(--getcited-radius-sm);
-    margin-top: var(--getcited-space-md);
-    font-size: 14px;
-    color: var(--getcited-gray-600);
-}
-
-.getcited-inline-upsell .dashicons {
-    color: var(--getcited-gray-400);
-    font-size: 18px;
-    width: 16px;
-    height: 16px;
-}
-
-.getcited-inline-upsell .button {
-    margin-left: auto;
-    white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -5770,7 +5396,7 @@ a.health-status-item.status-info .status-label {
    v1.7.2 - Custom Checkbox Component
    ========================================================================== */
 
-/* Premium checkbox container */
+/* Custom checkbox container */
 .getcited-checkbox-custom {
     position: relative;
     display: flex;
@@ -6057,11 +5683,11 @@ a.health-status-item.status-info .status-label {
 }
 
 /* ==========================================================================
-   v1.7.3 - Premium SaaS Admin Redesign
+   v1.7.3 - Admin UI Redesign
    ========================================================================== */
 
 /* ---------------------------------------------------------------------------
-   Dashboard Premium Styles
+   Dashboard Styles
    --------------------------------------------------------------------------- */
 
 /* Score Section Hero Treatment */
@@ -6186,10 +5812,10 @@ a.health-status-item.status-info .status-label {
 }
 
 /* ---------------------------------------------------------------------------
-   Global Premium Patterns
+   Global UI Patterns
    --------------------------------------------------------------------------- */
 
-/* Premium Section Cards */
+/* Section Cards */
 .getcited-section {
     border: 1px solid var(--getcited-gray-100);
     border-radius: 12px;
@@ -6209,7 +5835,7 @@ a.health-status-item.status-info .status-label {
     margin-bottom: 16px;
 }
 
-/* Premium Primary Buttons */
+/* Primary Buttons */
 .getcited-wrap .button-primary {
     background: linear-gradient(180deg, var(--getcited-primary) 0%, var(--getcited-primary-dark) 100%);
     border: none;
@@ -6254,7 +5880,7 @@ a.health-status-item.status-info .status-label {
     }
 }
 
-/* Premium Table Styling */
+/* Table Styling */
 .getcited-wrap .widefat {
     border: 1px solid var(--getcited-gray-100);
     border-radius: 10px;

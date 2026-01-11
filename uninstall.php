@@ -43,7 +43,6 @@ function getcited_uninstall() {
 
     // 1. Delete main settings
     delete_option( 'getcited_settings' );
-    delete_option( 'getcited_local_waitlist' );
     delete_option( 'getcited_auto_analyzed_done' );
 
     // 2. Delete all transients

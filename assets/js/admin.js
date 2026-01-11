@@ -24,8 +24,6 @@
         initTips();
         initHealthCheck();
         initRobotsRulesActions();
-        initWaitlistForm();
-        initCompactWaitlistButtons();
         initCitationNudge();
         initSeoConflictNotice();
         initWizard();
@@ -1536,52 +1534,6 @@
     }
 
     // ==========================================================================
-    // Waitlist Form
-    // ==========================================================================
-
-    function initWaitlistForm() {
-        const form = document.getElementById('getcited-waitlist-form');
-        if (!form) return;
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const emailInput = form.querySelector('input[type="email"]');
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const messageEl = document.querySelector('.getcited-waitlist-message');
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Joining...';
-
-            ajax('getcited_waitlist_signup', { email: emailInput.value })
-                .then(response => {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Reserve Your Spot';
-
-                    if (response.success) {
-                        form.style.display = 'none';
-                        messageEl.style.display = 'block';
-                        messageEl.innerHTML = `<p style="color: #10b981;">✓ ${response.data.message}</p>`;
-                        
-                        // Only show/update count if 100+
-                        const countEl = document.querySelector('.getcited-waitlist-count');
-                        if (countEl && response.data.count && response.data.count >= 100) {
-                            countEl.querySelector('.count').textContent = response.data.count.toLocaleString();
-                            countEl.style.display = 'block';
-                        }
-                    } else {
-                        messageEl.style.display = 'block';
-                        messageEl.innerHTML = `<p style="color: #ef4444;">${response.data.message}</p>`;
-                    }
-                })
-                .catch(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Reserve Your Spot';
-                });
-        });
-    }
-
-    // ==========================================================================
     // Admin Notice Handlers
     // ==========================================================================
 
@@ -2377,7 +2329,6 @@
             exportBtn.addEventListener('click', () => {
                 api('settings').then(settings => {
                     // Remove sensitive data
-                    delete settings.license_key;
                     delete settings.site_uuid;
                     
                     // Add metadata
@@ -2453,56 +2404,6 @@
                     content.style.display = 'none';
                     section.dataset.collapsed = 'true';
                 }
-            });
-        });
-    }
-
-    // ==========================================================================
-    // Page Teaser Waitlist Forms
-    // ==========================================================================
-
-    function initCompactWaitlistButtons() {
-        // Handle inline teaser forms
-        document.querySelectorAll('.getcited-teaser-form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const emailInput = this.querySelector('input[type="email"]');
-                const submitBtn = this.querySelector('button[type="submit"]');
-                const email = emailInput.value.trim();
-
-                if (!email) return;
-
-                // Disable form while submitting
-                const originalText = submitBtn.textContent;
-                submitBtn.disabled = true;
-                emailInput.disabled = true;
-                submitBtn.textContent = 'Joining...';
-
-                ajax('getcited_waitlist_signup', { email: email })
-                    .then(response => {
-                        if (response.success) {
-                            // Replace form with confirmation
-                            this.outerHTML = '<span class="teaser-joined"><span class="dashicons dashicons-yes-alt"></span> On the list!</span>';
-                        } else {
-                            submitBtn.disabled = false;
-                            emailInput.disabled = false;
-                            submitBtn.textContent = originalText;
-                            // Show error inline
-                            const errorMsg = response.data?.message || 'Failed to join waitlist.';
-                            emailInput.setCustomValidity(errorMsg);
-                            emailInput.reportValidity();
-                            setTimeout(() => emailInput.setCustomValidity(''), 3000);
-                        }
-                    })
-                    .catch(() => {
-                        submitBtn.disabled = false;
-                        emailInput.disabled = false;
-                        submitBtn.textContent = originalText;
-                        emailInput.setCustomValidity('Failed to join. Please try again.');
-                        emailInput.reportValidity();
-                        setTimeout(() => emailInput.setCustomValidity(''), 3000);
-                    });
             });
         });
     }

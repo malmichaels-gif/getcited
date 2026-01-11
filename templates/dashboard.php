@@ -13,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 ( function() {
 $stats            = GetCited_Dashboard::instance()->get_stats();
 $health           = GetCited_Health_Check::instance();
-$pro_teaser       = GetCited_Pro_Teaser::instance();
 $visibility_score = $stats['visibility_score'];
 $llms_activity    = $stats['llms_activity'];
 
@@ -305,8 +304,6 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 		</div>
 		<?php endif; ?>
 
-		<!-- Pro Features Section -->
-		<?php $pro_teaser->render_dashboard_teasers(); ?>
 
 		<!-- Footer Attribution -->
 		<p class="getcited-footer-attribution">

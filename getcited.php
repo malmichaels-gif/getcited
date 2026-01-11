@@ -3,7 +3,7 @@
  * Plugin Name: GetCited — AI Visibility
  * Plugin URI: https://heytc.com/getcited
  * Description: Get your content cited by ChatGPT, Gemini, Grok, Perplexity, and more. Manage AI crawlers, generate llms.txt, and optimize schema for AI search engines.
- * Version: 1.9.9.28
+ * Version: 1.9.9.29
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: HeyTC
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'GETCITED_VERSION', '1.9.9.28' );
+define( 'GETCITED_VERSION', '1.9.9.29' );
 define( 'GETCITED_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GETCITED_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GETCITED_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -88,7 +88,6 @@ final class GetCited {
         require_once GETCITED_PLUGIN_DIR . 'includes/class-citability.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-wizard.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-dashboard.php';
-        require_once GETCITED_PLUGIN_DIR . 'includes/class-pro-teaser.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/class-site-scanner.php';
         require_once GETCITED_PLUGIN_DIR . 'includes/helpers.php';
 
@@ -332,7 +331,6 @@ final class GetCited {
         GetCited_Citability::instance();
         GetCited_Wizard::instance();
         GetCited_Dashboard::instance();
-        GetCited_Pro_Teaser::instance();
         GetCited_Site_Scanner::instance();
 
         // Maybe run migrations
@@ -692,18 +690,6 @@ final class GetCited {
             'permission_callback' => array( $this, 'api_permissions' ),
         ) );
 
-        // Future Pro endpoints (registered but return upgrade notice)
-        register_rest_route( 'getcited/v1', '/citations', array(
-            'methods' => 'GET',
-            'callback' => array( $this, 'api_pro_required' ),
-            'permission_callback' => array( $this, 'api_permissions' ),
-        ) );
-
-        register_rest_route( 'getcited/v1', '/traffic', array(
-            'methods' => 'GET',
-            'callback' => array( $this, 'api_pro_required' ),
-            'permission_callback' => array( $this, 'api_permissions' ),
-        ) );
     }
 
     /**
@@ -921,16 +907,6 @@ final class GetCited {
         ) );
     }
 
-    /**
-     * API: Pro feature required
-     */
-    public function api_pro_required() {
-        return new WP_Error(
-            'pro_required',
-            __( 'This feature requires GetCited Pro', 'getcited' ),
-            array( 'status' => 403 )
-        );
-    }
 
     /**
      * Run database migrations if needed

@@ -85,16 +85,9 @@ class GetCited_Settings {
         'debug_mode' => false,
         'keep_on_delete' => false,
 
-        // Pro (future)
-        'license_key' => '',
-        'license_status' => 'free',
-        'site_uuid' => '',
-        'ga4_connected' => false,
-        'ga4_property_id' => '',
-        'waitlist_submitted' => false, // Remember if user joined waitlist
-
-        // Version tracking
+        // Internal tracking
         'db_version' => '1.0',
+        'site_uuid' => '',
 
         // Citation guidelines (v1.5.1)
         'citation_guidelines' => array(
@@ -316,8 +309,6 @@ class GetCited_Settings {
             case 'wizard_completed':
             case 'debug_mode':
             case 'keep_on_delete':
-            case 'ga4_connected':
-            case 'waitlist_submitted':
                 return (bool) $value;
 
             case 'schema_last_scan':
@@ -374,15 +365,6 @@ class GetCited_Settings {
                 );
                 return in_array( $value, $valid_types, true ) ? $value : 'blog';
 
-            case 'license_key':
-            case 'site_uuid':
-            case 'ga4_property_id':
-                return sanitize_text_field( $value );
-
-            case 'license_status':
-                $valid_statuses = array( 'free', 'pro', 'agency' );
-                return in_array( $value, $valid_statuses, true ) ? $value : 'free';
-
             case 'db_version':
                 return sanitize_text_field( $value );
 
@@ -418,7 +400,6 @@ class GetCited_Settings {
         $export = $this->settings;
 
         // Remove sensitive data
-        unset( $export['license_key'] );
         unset( $export['site_uuid'] );
 
         // Add metadata
@@ -457,7 +438,6 @@ class GetCited_Settings {
         } else {
             // Replace all (keep certain keys)
             $preserve = array(
-                'license_key' => $this->settings['license_key'],
                 'site_uuid' => $this->settings['site_uuid'],
                 'db_version' => $this->settings['db_version'],
             );

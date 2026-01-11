@@ -144,14 +144,6 @@ class GetCited_Citability {
             'description' => 'Disable schema on this post',
         ) );
 
-        // Future Pro meta
-        register_post_meta( 'post', '_getcited_citation_count', array(
-            'type' => 'integer',
-            'default' => 0,
-            'single' => true,
-            'show_in_rest' => true,
-            'description' => 'Number of AI citations detected',
-        ) );
     }
 
     /**

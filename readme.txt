@@ -4,7 +4,7 @@ Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.9.28
+Stable tag: 1.9.9.29
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,17 +42,6 @@ Zero impact on your front-end performance. No JavaScript or CSS loaded for visit
 = Works With Your Existing Setup =
 
 GetCited complements Yoast SEO, Rank Math, and other SEO plugins. They handle Google optimization — we handle AI visibility.
-
-= GetCited Pro — Spring 2026 =
-
-- AI Referral Traffic Dashboard (see visits from ChatGPT, Perplexity, etc.)
-- Full Citability Scoring (audit unlimited posts with export)
-- Citation Share of Voice (track your competitive share)
-- Competitor Quick-Check (spot-check competitor citability)
-- Citation Alerts (weekly digests + Slack webhooks)
-- Private Community Access (connect with other AI-focused publishers)
-
-Join the waitlist from your dashboard for early bird pricing!
 
 = Third Party Services =
 
@@ -112,12 +101,14 @@ The free version runs entirely on your server. The only external request is to f
 
 == Changelog ==
 
+= 1.9.9.29 =
+* Improved: Code cleanup and optimization
+
 = 1.9.9.28 =
 * Fixed: Removed artificial post limit on citability analysis
 * Improved: WordPress.org plugin guidelines compliance
 
 = 1.9.9.27 =
-* Improved: Cleaner Pro features section (removed placeholder lock icons)
 * Improved: WordPress.org plugin guidelines compliance updates
 
 = 1.9.9.26 =
@@ -186,7 +177,6 @@ The free version runs entirely on your server. The only external request is to f
 
 = 1.9.8.1 =
 * Improved: Copy refinements to reduce over-claim language throughout plugin
-* Improved: Pro preview sections now clearly labeled as sample data
 * Improved: Schema detection now confirms GetCited won't override existing plugins
 * Improved: Privacy explanation added to logging settings
 * Improved: Scoring methodology explained on dashboard
@@ -198,7 +188,6 @@ The free version runs entirely on your server. The only external request is to f
 = 1.9.7 =
 * New: Weekly automatic llms.txt refresh for high-volume publishing sites
 * New: Dashboard tip explaining AI crawler timing expectations
-* Improved: Security hardening for waitlist API endpoint
 
 = 1.9.6 =
 * Fixed: Wizard Step 6 now correctly populates dynamic content
@@ -221,15 +210,6 @@ The free version runs entirely on your server. The only external request is to f
 * New: Dashboard tagline emphasizing AI visibility over traditional SEO
 * Changed: Visibility score recommendations now action-focused without point values
 * Improved: Messaging matches Citability page philosophy (guide, not gamify)
-
-= 1.8.8 =
-* New: Personalized sample Pro report using actual site data
-* Improved: Pro teaser shows your site name in mock traffic dashboard
-* Improved: Share of Voice shows your domain competing against blurred competitors
-
-= 1.8.7 =
-* Changed: Pro features marketing content refined
-* Changed: Pro launch date updated to Spring 2026
 
 = 1.8.6 =
 * New: Inline tip bar on dashboard (replaces collapsible tips section)

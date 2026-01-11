@@ -14,7 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 $settings = GetCited_Settings::instance();
 $llms_txt = GetCited_Llms_Txt::instance();
 $health = GetCited_Health_Check::instance();
-$pro_teaser = GetCited_Pro_Teaser::instance();
 
 $enabled = $settings->get( 'llms_txt_enabled' );
 $content = $settings->get( 'llms_txt_content' );
@@ -39,8 +38,6 @@ $status = $health->get_status();
 
     <div class="getcited-llms-page">
 
-        <!-- Pro Teaser Banner -->
-        <?php $pro_teaser->render_page_teaser( 'llms' ); ?>
 
         <!-- Enable AI Visibility -->
         <div class="getcited-section getcited-llms-toggle">

@@ -483,7 +483,6 @@ class GetCited_Dashboard {
             'Using Remote List' => $crawler_list->is_remote_cached() ? 'Yes' : 'No (bundled)',
             'llms.txt Enabled' => $settings->get( 'llms_txt_enabled' ) ? 'Yes' : 'No',
             'Schema Enabled' => $settings->get( 'schema_enabled' ) ? 'Yes' : 'No',
-            'License Status' => ucfirst( $settings->get( 'license_status' ) ),
             'Debug Mode' => $settings->get( 'debug_mode' ) ? 'Yes' : 'No',
             'Active Plugins' => implode( ', ', $plugin_names ),
         );

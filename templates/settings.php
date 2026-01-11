@@ -13,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 ( function() {
 $settings   = GetCited_Settings::instance();
 $dashboard  = GetCited_Dashboard::instance();
-$pro_teaser = GetCited_Pro_Teaser::instance();
 
 $debug_mode              = $settings->get( 'debug_mode' );
 $keep_on_delete          = $settings->get( 'keep_on_delete' );
@@ -30,8 +29,6 @@ $request_log_retention   = $settings->get( 'request_log_retention' );
 
     <div class="getcited-settings-page">
 
-        <!-- Pro Teaser Banner -->
-        <?php $pro_teaser->render_page_teaser( 'settings' ); ?>
 
         <!-- Two-column layout for Site Config and Data Management -->
         <div class="getcited-two-column" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--getcited-space-lg); margin-bottom: var(--getcited-space-lg);">

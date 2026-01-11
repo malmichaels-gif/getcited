@@ -12,7 +12,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ( function() {
 $citability = GetCited_Citability::instance();
-$pro_teaser = GetCited_Pro_Teaser::instance();
 $request_logger = GetCited_Request_Logger::instance();
 
 $rubric = $citability->get_rubric();
@@ -29,8 +28,6 @@ $crawler_stats = $request_logger->get_request_stats();
 
     <div class="getcited-citability-page">
 
-        <!-- Pro Teaser Banner -->
-        <?php $pro_teaser->render_page_teaser( 'citability' ); ?>
 
         <!-- Two-Column Grid: Score + Recent Posts -->
         <div class="getcited-settings-grid">
