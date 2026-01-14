@@ -16,7 +16,14 @@
       "Bash(scp:*)",
       "Bash(ssh -p 24772 heytccom@35.196.5.93 \"ls -la /www/heytccom_324/public/llms.txt* 2>/dev/null || echo ''No llms.txt files found''\")",
       "Skill(frontend-design)",
-      "WebFetch(domain:heytc.com)"
+      "WebFetch(domain:heytc.com)",
+      "Bash(ssh:*)",
+      "Bash(for term in \"license\" \"pro\" \"premium\" \"upgrade\" \"upsell\" \"unlock\" \"subscribe\" \"subscription\" \"paid\" \"free tier\" \"free version\")",
+      "Bash(done)",
+      "Bash(for term in \"trial\" \"limit\" \"restrict\" \"disabled\" \"locked\" \"coming soon\" \"waitlist\" \"early access\" \"pricing\")",
+      "Bash(for term in \"tier\" \"plan\" \"basic\" \"starter\" \"agency\" \"enterprise\" \"business\" \"activate\" \"valid\" \"expire\" \"renew\")",
+      "WebFetch(domain:stg-heytccom-devheytc.kinsta.cloud)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

@@ -45,9 +45,35 @@ The WordPress Plugin Check will fail if `Stable tag` doesn't match the plugin he
 After completing changes, ask the user if they want to:
 1. **Commit** - Stage and commit the changes
 2. **Tag** - Create a git tag for the version
-3. **Changelog** - Update the changelog in readme.txt
+3. **Push** - Push to GitHub
+4. **Changelog** - Update the changelog in readme.txt
 
 The changelog in readme.txt is public (for plugin distribution), so only include user-facing feature changes - no internal/deployment details.
+
+### Git & GitHub Workflow
+**Repository:** https://github.com/malmichaels-gif/getcited
+
+When user wants to commit & tag a release:
+
+```bash
+# 1. Stage all changes
+git add -A
+
+# 2. Commit with version message
+git commit -m "vX.X.X: Description of changes"
+
+# 3. Create annotated tag
+git tag -a vX.X.X -m "Version X.X.X"
+
+# 4. Push commit and tags to GitHub
+git push origin master
+git push origin --tags
+```
+
+Or as a single command after staging:
+```bash
+git add -A && git commit -m "vX.X.X: Description" && git tag -a vX.X.X -m "Version X.X.X" && git push origin master && git push origin --tags
+```
 
 ### Security
 Distributed plugin files (php, css, js, txt) must NOT contain:
