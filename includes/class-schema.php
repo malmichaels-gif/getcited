@@ -473,8 +473,7 @@ class GetCited_Schema {
 			}
 		}
 
-		// Limit to 10 FAQs.
-		return array_slice( $faqs, 0, 10 );
+		return $faqs;
 	}
 
 	/**
