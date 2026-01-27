@@ -482,6 +482,9 @@ class GetCited_Robots {
         // Clear health check cache so it re-evaluates
         GetCited_Health_Check::instance()->invalidate_cache();
 
+        // Purge robots.txt from page caches
+        $this->purge_robots_cache();
+
         return array(
             'success' => true,
             'action' => $action,
@@ -562,6 +565,9 @@ class GetCited_Robots {
             );
         }
 
+        // Purge robots.txt from page caches
+        $this->purge_robots_cache();
+
         return array(
             'success' => true,
             'message' => __( 'GetCited rules removed from robots.txt', 'getcited' ),
@@ -589,5 +595,57 @@ class GetCited_Robots {
 
         $content = $wp_filesystem->get_contents( $file_path );
         return $content && strpos( $content, '# === GetCited AI Crawler Rules ===' ) !== false;
+    }
+
+    /**
+     * Purge robots.txt from common page caches
+     *
+     * Called after writing to robots.txt to ensure changes are visible immediately.
+     */
+    private function purge_robots_cache() {
+        $robots_url = home_url( '/robots.txt' );
+
+        // LiteSpeed Cache
+        if ( class_exists( 'LiteSpeed_Cache_API' ) ) {
+            LiteSpeed_Cache_API::purge_url( $robots_url );
+        }
+
+        // WP Rocket
+        if ( function_exists( 'rocket_clean_files' ) ) {
+            rocket_clean_files( array( $robots_url ) );
+        }
+
+        // W3 Total Cache
+        if ( function_exists( 'w3tc_flush_url' ) ) {
+            w3tc_flush_url( $robots_url );
+        }
+
+        // WP Super Cache
+        if ( function_exists( 'wpsc_delete_url_cache' ) ) {
+            wpsc_delete_url_cache( $robots_url );
+        }
+
+        // SG Optimizer (SiteGround)
+        if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
+            sg_cachepress_purge_cache( $robots_url );
+        }
+
+        // WP Fastest Cache
+        if ( isset( $GLOBALS['wp_fastest_cache'] ) && method_exists( $GLOBALS['wp_fastest_cache'], 'deleteCache' ) ) {
+            $GLOBALS['wp_fastest_cache']->deleteCache( true );
+        }
+
+        // Breeze (Cloudways)
+        if ( class_exists( 'Breeze_PurgeCache' ) && method_exists( 'Breeze_PurgeCache', 'breeze_cache_flush' ) ) {
+            Breeze_PurgeCache::breeze_cache_flush();
+        }
+
+        // Kinsta Cache (via API)
+        if ( class_exists( 'Kinsta\Cache' ) && method_exists( 'Kinsta\Cache', 'purge_single_url' ) ) {
+            \Kinsta\Cache::purge_single_url( $robots_url );
+        }
+
+        // Generic action for other caches to hook into
+        do_action( 'getcited_purge_robots_cache', $robots_url );
     }
 }
