@@ -288,14 +288,6 @@ class GetCited_Robots {
             }
         }
 
-        // Add llms.txt reference if enabled
-        $llms_enabled = $settings->get( 'llms_txt_enabled' );
-        if ( $llms_enabled ) {
-            $lines[] = '# AI discoverability file';
-            $lines[] = '# llms.txt: ' . home_url( '/llms.txt' );
-            $lines[] = '';
-        }
-
         $lines[] = '# === End GetCited Rules ===';
 
         $rules = implode( "\n", $lines );
