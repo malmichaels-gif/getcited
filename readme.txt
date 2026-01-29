@@ -4,7 +4,7 @@ Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.9.30
+Stable tag: 1.9.9.31
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,6 +100,10 @@ The crawler list updates automatically without requiring plugin updates.
 GetCited runs entirely on your server. The only external request is to fetch the latest crawler list from our server (a simple JSON file, no data sent from your site).
 
 == Changelog ==
+
+= 1.9.9.31 =
+* Fixed: Non-admin users can now save posts without permission errors
+* Improved: Exclude and schema checkboxes restricted to admin users
 
 = 1.9.9.30 =
 * Fixed: Robots.txt changes now visible immediately (auto-purges page caches)
