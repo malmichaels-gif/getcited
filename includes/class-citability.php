@@ -106,44 +106,54 @@ class GetCited_Citability {
 
         // Register post meta
         add_action( 'init', array( $this, 'register_meta' ) );
+
+        // Save meta box fields (classic editor)
+        add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 2 );
     }
 
     /**
      * Register post meta fields
      */
     public function register_meta() {
+        $can_edit_post = function ( $allowed, $meta_key, $post_id ) {
+            return current_user_can( 'edit_post', $post_id );
+        };
+
         register_post_meta( 'post', '_getcited_citability_score', array(
-            'type' => 'integer',
-            'default' => 0,
-            'single' => true,
-            'show_in_rest' => true,
-            'description' => 'AI citability score (0-100)',
+            'type'          => 'integer',
+            'default'       => 0,
+            'single'        => true,
+            'show_in_rest'  => true,
+            'auth_callback' => $can_edit_post,
+            'description'   => 'AI citability score (0-100)',
         ) );
 
         register_post_meta( 'post', '_getcited_last_audit', array(
-            'type' => 'string',
-            'default' => '',
-            'single' => true,
-            'show_in_rest' => true,
-            'description' => 'Timestamp of last citability audit',
+            'type'          => 'string',
+            'default'       => '',
+            'single'        => true,
+            'show_in_rest'  => true,
+            'auth_callback' => $can_edit_post,
+            'description'   => 'Timestamp of last citability audit',
         ) );
 
         register_post_meta( 'post', '_getcited_exclude', array(
-            'type' => 'boolean',
-            'default' => false,
-            'single' => true,
-            'show_in_rest' => true,
-            'description' => 'Exclude this post from llms.txt',
+            'type'          => 'boolean',
+            'default'       => false,
+            'single'        => true,
+            'show_in_rest'  => true,
+            'auth_callback' => $can_edit_post,
+            'description'   => 'Exclude this post from llms.txt',
         ) );
 
         register_post_meta( 'post', '_getcited_no_schema', array(
-            'type' => 'boolean',
-            'default' => false,
-            'single' => true,
-            'show_in_rest' => true,
-            'description' => 'Disable schema on this post',
+            'type'          => 'boolean',
+            'default'       => false,
+            'single'        => true,
+            'show_in_rest'  => true,
+            'auth_callback' => $can_edit_post,
+            'description'   => 'Disable schema on this post',
         ) );
-
     }
 
     /**
@@ -205,23 +215,63 @@ class GetCited_Citability {
 
             <div class="getcited-analysis-results" style="display: none;"></div>
 
-            <hr>
+            <?php if ( current_user_can( 'manage_options' ) ) : ?>
+                <hr>
 
-            <p>
-                <label>
-                    <input type="checkbox" name="getcited_exclude" value="1" <?php checked( $exclude ); ?>>
-                    <?php esc_html_e( 'Exclude from llms.txt', 'getcited' ); ?>
-                </label>
-            </p>
+                <p>
+                    <label>
+                        <input type="checkbox" name="getcited_exclude" value="1" <?php checked( $exclude ); ?>>
+                        <?php esc_html_e( 'Exclude from llms.txt', 'getcited' ); ?>
+                    </label>
+                </p>
 
-            <p>
-                <label>
-                    <input type="checkbox" name="getcited_no_schema" value="1" <?php checked( $no_schema ); ?>>
-                    <?php esc_html_e( 'Disable schema on this page', 'getcited' ); ?>
-                </label>
-            </p>
+                <p>
+                    <label>
+                        <input type="checkbox" name="getcited_no_schema" value="1" <?php checked( $no_schema ); ?>>
+                        <?php esc_html_e( 'Disable schema on this page', 'getcited' ); ?>
+                    </label>
+                </p>
+            <?php endif; ?>
         </div>
         <?php
+    }
+
+    /**
+     * Save meta box fields (classic editor)
+     *
+     * @param int     $post_id Post ID.
+     * @param WP_Post $post    Post object.
+     */
+    public function save_meta_box( $post_id, $post ) {
+        // Verify nonce
+        if ( ! isset( $_POST['getcited_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['getcited_meta_nonce'] ) ), 'getcited_meta_box' ) ) {
+            return;
+        }
+
+        // Skip autosaves and revisions
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+            return;
+        }
+        if ( wp_is_post_revision( $post_id ) ) {
+            return;
+        }
+
+        // Check permissions
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            return;
+        }
+
+        // Only admins can change these settings
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        // Save checkbox values (unchecked = not in $_POST)
+        $exclude   = isset( $_POST['getcited_exclude'] ) ? true : false;
+        $no_schema = isset( $_POST['getcited_no_schema'] ) ? true : false;
+
+        update_post_meta( $post_id, '_getcited_exclude', $exclude );
+        update_post_meta( $post_id, '_getcited_no_schema', $no_schema );
     }
 
     /**
