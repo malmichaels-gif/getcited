@@ -101,6 +101,13 @@ GetCited runs entirely on your server. The only external request is to fetch the
 
 == Changelog ==
 
+= 1.9.9.32 =
+* Improved: Hardened settings sanitization with safer defaults
+* Improved: Added REST API settings key whitelist
+* Fixed: Textarea fields (citation guidelines, use cases) no longer lose line breaks on save
+* Fixed: Prevented potential fatal errors on hosts with restricted filesystem access
+* Improved: Better error handling and debug logging for database operations
+
 = 1.9.9.31 =
 * Fixed: Non-admin users can now save posts without permission errors
 * Improved: Exclude and schema checkboxes restricted to admin users
