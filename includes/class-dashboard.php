@@ -173,8 +173,8 @@ class GetCited_Dashboard {
                 if ( isset( $data['llms_txt_enabled'] ) ) {
                     $settings->set( 'llms_txt_enabled', filter_var( $data['llms_txt_enabled'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
-                if ( isset( $data['llms_txt_content'] ) ) {
-                    $settings->set( 'llms_txt_content', $data['llms_txt_content'] );
+                if ( isset( $raw_data['llms_txt_content'] ) ) {
+                    $settings->set( 'llms_txt_content', sanitize_textarea_field( $raw_data['llms_txt_content'] ) );
                 }
                 if ( isset( $data['llms_founder_name'] ) ) {
                     $settings->set( 'llms_founder_name', $data['llms_founder_name'] );
@@ -197,14 +197,15 @@ class GetCited_Dashboard {
                     $settings->set( 'llms_use_cases', sanitize_textarea_field( $raw_data['llms_use_cases'] ) );
                 }
                 // Save citation guidelines (v1.5.1+).
-                if ( isset( $data['citation_guidelines'] ) && is_array( $data['citation_guidelines'] ) ) {
+                if ( isset( $raw_data['citation_guidelines'] ) && is_array( $raw_data['citation_guidelines'] ) ) {
+                    $raw_guidelines = $raw_data['citation_guidelines'];
                     $citation_guidelines = array(
-                        'enabled'         => filter_var( $data['citation_guidelines']['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN ),
-                        'citation_format' => $data['citation_guidelines']['citation_format'] ?? '',
-                        'accuracy_notes'  => $data['citation_guidelines']['accuracy_notes'] ?? '',
-                        'restrictions'    => $data['citation_guidelines']['restrictions'] ?? '',
-                        'freshness_note'  => $data['citation_guidelines']['freshness_note'] ?? '',
-                        'contact_email'   => sanitize_email( $data['citation_guidelines']['contact_email'] ?? '' ),
+                        'enabled'         => filter_var( $raw_guidelines['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN ),
+                        'citation_format' => sanitize_text_field( $raw_guidelines['citation_format'] ?? '' ),
+                        'accuracy_notes'  => sanitize_textarea_field( $raw_guidelines['accuracy_notes'] ?? '' ),
+                        'restrictions'    => sanitize_textarea_field( $raw_guidelines['restrictions'] ?? '' ),
+                        'freshness_note'  => sanitize_text_field( $raw_guidelines['freshness_note'] ?? '' ),
+                        'contact_email'   => sanitize_email( $raw_guidelines['contact_email'] ?? '' ),
                     );
                     $settings->set( 'citation_guidelines', $citation_guidelines );
                 }
@@ -404,6 +405,9 @@ class GetCited_Dashboard {
 
         $allowed = 0;
         $blocked = 0;
+        if ( ! is_array( $crawler_states ) ) {
+            $crawler_states = array();
+        }
         foreach ( $crawler_states as $status ) {
             if ( $status === 'allow' ) {
                 $allowed++;

@@ -23,7 +23,8 @@
       "Bash(for term in \"trial\" \"limit\" \"restrict\" \"disabled\" \"locked\" \"coming soon\" \"waitlist\" \"early access\" \"pricing\")",
       "Bash(for term in \"tier\" \"plan\" \"basic\" \"starter\" \"agency\" \"enterprise\" \"business\" \"activate\" \"valid\" \"expire\" \"renew\")",
       "WebFetch(domain:stg-heytccom-devheytc.kinsta.cloud)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git status:*)"
     ],
     "deny": [],
     "ask": []

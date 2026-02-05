@@ -142,6 +142,9 @@ class GetCited_Schema {
 		}
 
 		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_HEX_TAG );
+		if ( ! $json ) {
+			return;
+		}
 
 		echo "\n<!-- GetCited Schema -->\n";
 		echo '<script type="application/ld+json">' . "\n";
@@ -258,6 +261,9 @@ class GetCited_Schema {
 
 		// Check for news-like categories.
 		$categories      = wp_get_post_categories( $post->ID, array( 'fields' => 'names' ) );
+		if ( is_wp_error( $categories ) ) {
+			$categories = array();
+		}
 		$news_indicators = array( 'news', 'breaking', 'press release', 'announcement' );
 
 		foreach ( $categories as $cat ) {

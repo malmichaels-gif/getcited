@@ -557,12 +557,15 @@ final class GetCited {
         // without an external object cache, causing options table bloat over time.
         global $wpdb;
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Batch cleanup of expired transients requires direct query.
-        $wpdb->query(
+        $result = $wpdb->query(
             "DELETE a, b FROM {$wpdb->options} a
              LEFT JOIN {$wpdb->options} b ON b.option_name = REPLACE(a.option_name, '_transient_timeout_', '_transient_')
              WHERE a.option_name LIKE '_transient_timeout_getcited_req_%'
              AND a.option_value < UNIX_TIMESTAMP()"
         );
+        if ( false === $result && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            error_log( '[GetCited] Transient cleanup failed: ' . $wpdb->last_error );
+        }
 
         // Fire hook for extensions
         do_action( 'getcited_daily_tasks' );
@@ -739,8 +742,7 @@ final class GetCited {
 
         foreach ( $headers as $header ) {
             if ( ! empty( $_SERVER[ $header ] ) ) {
-                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                $ip = wp_unslash( $_SERVER[ $header ] );
+                $ip = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) );
                 // Handle comma-separated IPs (X-Forwarded-For)
                 if ( strpos( $ip, ',' ) !== false ) {
                     $ip = trim( explode( ',', $ip )[0] );
@@ -854,7 +856,30 @@ final class GetCited {
         $settings = GetCited_Settings::instance();
 
         if ( $request->get_method() === 'POST' ) {
-            $params = $request->get_json_params();
+            $allowed_keys = array(
+                'crawlers',
+                'custom_crawlers',
+                'llms_txt_content',
+                'llms_txt_enabled',
+                'llms_founder_name',
+                'llms_founder_title',
+                'llms_site_expertise',
+                'llms_update_frequency',
+                'llms_citation_format',
+                'llms_use_cases',
+                'robots_write_physical',
+                'schema_enabled',
+                'schema_force_enabled',
+                'schema_types',
+                'organization',
+                'site_type',
+                'request_logging_enabled',
+                'request_log_retention',
+                'debug_mode',
+                'keep_on_delete',
+                'citation_guidelines',
+            );
+            $params = array_intersect_key( $request->get_json_params(), array_flip( $allowed_keys ) );
             foreach ( $params as $key => $value ) {
                 $settings->set( $key, $value );
             }
@@ -979,6 +1004,15 @@ final class GetCited {
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
+
+        // Verify table was created.
+        if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Verification query
+            $table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
+            if ( ! $table_exists ) {
+                error_log( '[GetCited] Failed to create table: ' . $table_name );
+            }
+        }
     }
 
     /**
@@ -999,7 +1033,10 @@ final class GetCited {
 
         if ( ! $index_exists ) {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Migration requires direct DDL
-            $wpdb->query( "ALTER TABLE {$wpdb->getcited_llms_requests} ADD INDEX idx_category (category)" );
+            $result = $wpdb->query( "ALTER TABLE {$wpdb->getcited_llms_requests} ADD INDEX idx_category (category)" );
+            if ( false === $result && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                error_log( '[GetCited] Failed to add category index: ' . $wpdb->last_error );
+            }
         }
     }
 

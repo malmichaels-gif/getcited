@@ -309,7 +309,13 @@ class GetCited_Request_Logger {
 			array( '%s', '%s', '%s', '%s', '%s' )
 		);
 
-		return $result ? $wpdb->insert_id : false;
+		if ( ! $result ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( '[GetCited] Failed to insert request log: ' . $wpdb->last_error );
+			}
+			return false;
+		}
+		return $wpdb->insert_id;
 	}
 
 	/**
@@ -348,6 +354,18 @@ class GetCited_Request_Logger {
 	 */
 	public function get_request_stats( $days = 30 ) {
 		global $wpdb;
+
+		// Bail early if table doesn't exist (e.g., if create_tables() failed).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table existence check
+		$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->getcited_llms_requests ) );
+		if ( ! $table_exists ) {
+			return array(
+				'total'       => 0,
+				'unique_bots' => 0,
+				'ai_crawlers' => 0,
+				'categories'  => array(),
+			);
+		}
 
 		$since = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
 

@@ -260,6 +260,10 @@ class GetCited_Site_Scanner {
 			)
 		);
 
+		if ( ! $categories || is_wp_error( $categories ) ) {
+			return array();
+		}
+
 		$result = array();
 		foreach ( $categories as $cat ) {
 			if ( $cat->slug === 'uncategorized' && $cat->count < 2 ) {

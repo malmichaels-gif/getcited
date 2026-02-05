@@ -82,3 +82,43 @@ Distributed plugin files (php, css, js, txt) must NOT contain:
 - Any deployment or infrastructure details
 
 These details belong only in `.claude/` which is not distributed.
+
+### Planning
+- For non-trivial tasks (3+ steps or architectural decisions), write a plan first
+- If something goes sideways, STOP and re-plan — don't keep pushing
+- Write detailed specs upfront to reduce ambiguity
+
+### Subagents
+- Use subagents for research, exploration, and parallel analysis
+- Keep main context focused — one task per subagent
+- For complex problems, throw more compute at it via subagents
+
+### Self-Improvement
+- After ANY correction, update CLAUDE.md with a rule to prevent the same mistake
+- Write rules for yourself that prevent recurring errors
+
+### Verification
+- Never mark a task complete without proving it works
+- Diff behavior between main and your changes when relevant
+- Show logs, output, or test results — don't just say "done"
+
+### Elegance
+- For non-trivial changes, pause and ask "is there a more elegant way?"
+- If a fix feels hacky: implement the elegant solution instead
+- Skip this for simple, obvious fixes — don't over-engineer
+
+### Bug Fixing
+- When given a bug report: just fix it. Don't ask for hand-holding.
+- Point at logs, errors, failing tests — then resolve them
+
+### Tech Currency (2026)
+- Current year is 2026 — your training may be outdated
+- Before implementing significant features, search for current best practices
+- Flag when you're unsure if an approach is still recommended
+- Don't assume libraries, APIs, or frameworks work the same as in your general knowledge
+
+## Core Principles
+
+- **Simplicity First:** Make every change as simple as possible. Minimal code.
+- **No Laziness:** Find root causes. No temporary fixes. Senior developer standards.
+- **Minimal Impact:** Changes should only touch what's necessary. Avoid introducing bugs.

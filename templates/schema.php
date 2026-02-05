@@ -77,7 +77,7 @@ $is_active = $enabled && ( ! $detection['should_disable'] || $force_enabled );
 						<?php esc_html_e( 'Refresh', 'getcited' ); ?>
 					</button>
 				</p>
-				<a href="https://search.google.com/test/rich-results?url=<?php echo urlencode( home_url() ); ?>"
+				<a href="<?php echo esc_url( 'https://search.google.com/test/rich-results?url=' . rawurlencode( home_url() ) ); ?>"
 				   target="_blank"
 				   class="button button-primary"
 				   style="display: inline-flex; align-items: center; text-decoration: none;">

@@ -279,9 +279,11 @@ class GetCited_Settings {
             case 'crawlers':
                 // Whitelist crawler status values
                 if ( is_array( $value ) ) {
+                    $sanitized = array();
                     foreach ( $value as $crawler => $status ) {
-                        $value[ sanitize_text_field( $crawler ) ] = in_array( $status, array( 'allow', 'block' ), true ) ? $status : 'allow';
+                        $sanitized[ sanitize_text_field( $crawler ) ] = in_array( $status, array( 'allow', 'block' ), true ) ? $status : 'allow';
                     }
+                    return $sanitized;
                 }
                 return $value;
 
@@ -344,6 +346,7 @@ class GetCited_Settings {
                         'name' => sanitize_text_field( $value['name'] ?? '' ),
                         'logo_url' => esc_url_raw( $value['logo_url'] ?? '' ),
                         'social_urls' => array_map( 'esc_url_raw', (array) ( $value['social_urls'] ?? array() ) ),
+                        'sameas_urls' => array_map( 'esc_url_raw', (array) ( $value['sameas_urls'] ?? array() ) ),
                         'linkedin_company' => esc_url_raw( $value['linkedin_company'] ?? '' ),
                         'wikipedia' => esc_url_raw( $value['wikipedia'] ?? '' ),
                         'crunchbase' => esc_url_raw( $value['crunchbase'] ?? '' ),
@@ -381,8 +384,14 @@ class GetCited_Settings {
                 }
                 return $this->defaults['citation_guidelines'];
 
+            case 'request_logging_enabled':
+                return (bool) $value;
+
+            case 'request_log_retention':
+                return absint( $value );
+
             default:
-                return $value;
+                return is_array( $value ) ? map_deep( $value, 'sanitize_text_field' ) : sanitize_text_field( $value );
         }
     }
 
@@ -444,6 +453,12 @@ class GetCited_Settings {
 
             $this->settings = $this->merge_defaults( $data );
             $this->settings = array_merge( $this->settings, $preserve );
+
+            // Sanitize each imported value
+            foreach ( $this->settings as $key => $value ) {
+                $this->settings[ $key ] = $this->sanitize_setting( $key, $value );
+            }
+
             $this->save();
         }
 

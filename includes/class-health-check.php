@@ -241,7 +241,12 @@ class GetCited_Health_Check {
             if ( ! function_exists( 'WP_Filesystem' ) ) {
                 require_once ABSPATH . 'wp-admin/includes/file.php';
             }
-            WP_Filesystem();
+            if ( ! WP_Filesystem() ) {
+                return array(
+                    'status'  => 'error',
+                    'message' => __( 'Filesystem not available', 'getcited' ),
+                );
+            }
 
             $content = $wp_filesystem->get_contents( $file_path );
 

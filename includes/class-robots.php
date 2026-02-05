@@ -334,6 +334,9 @@ class GetCited_Robots {
         $allowed = 0;
         $blocked = 0;
 
+        if ( ! is_array( $crawler_states ) ) {
+            $crawler_states = array();
+        }
         foreach ( $crawler_states as $status ) {
             if ( $status === 'allow' ) {
                 $allowed++;
@@ -591,7 +594,9 @@ class GetCited_Robots {
         if ( ! function_exists( 'WP_Filesystem' ) ) {
             require_once ABSPATH . 'wp-admin/includes/file.php';
         }
-        WP_Filesystem();
+        if ( ! WP_Filesystem() ) {
+            return false;
+        }
 
         $content = $wp_filesystem->get_contents( $file_path );
         return $content && strpos( $content, '# === GetCited AI Crawler Rules ===' ) !== false;
