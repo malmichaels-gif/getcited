@@ -99,6 +99,12 @@ The crawler list updates automatically without requiring plugin updates.
 
 GetCited runs entirely on your server. The only external request is to fetch the latest crawler list from our server (a simple JSON file, no data sent from your site).
 
+== Screenshots ==
+
+1. AI Visibility Dashboard with score
+2. llms.txt Editor
+3. Settings and configuration
+
 == Changelog ==
 
 = 1.9.9.32 =
