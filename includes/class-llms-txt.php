@@ -283,7 +283,12 @@ class GetCited_Llms_Txt {
 
         // Delete current file if it exists and is ours.
         if ( $wp_filesystem->exists( $file_path ) && $this->is_our_physical_file() ) {
-            $wp_filesystem->delete( $file_path );
+            if ( ! $wp_filesystem->delete( $file_path ) ) {
+                return array(
+                    'success' => false,
+                    'message' => __( 'Could not remove current llms.txt before restore.', 'getcited' ),
+                );
+            }
         }
 
         // Move backup back to original location.

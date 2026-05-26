@@ -262,7 +262,7 @@ class GetCited_Settings {
      * Save settings to database
      */
     private function save() {
-        update_option( self::OPTION_NAME, $this->settings );
+        update_option( self::OPTION_NAME, $this->settings, false );
 
         // Clear object cache to ensure other processes get fresh data
         wp_cache_delete( self::OPTION_NAME, 'options' );
@@ -388,7 +388,7 @@ class GetCited_Settings {
                 return (bool) $value;
 
             case 'request_log_retention':
-                return absint( $value );
+                return in_array( absint( $value ), array( 30, 60, 90, 180 ), true ) ? absint( $value ) : 90;
 
             default:
                 return is_array( $value ) ? map_deep( $value, 'sanitize_text_field' ) : sanitize_text_field( $value );

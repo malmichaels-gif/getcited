@@ -174,7 +174,7 @@ class GetCited_Dashboard {
                     $settings->set( 'llms_txt_enabled', filter_var( $data['llms_txt_enabled'], FILTER_VALIDATE_BOOLEAN ) ?? false );
                 }
                 if ( isset( $raw_data['llms_txt_content'] ) ) {
-                    $settings->set( 'llms_txt_content', sanitize_textarea_field( $raw_data['llms_txt_content'] ) );
+                    $settings->set( 'llms_txt_content', wp_unslash( $raw_data['llms_txt_content'] ) );
                 }
                 if ( isset( $data['llms_founder_name'] ) ) {
                     $settings->set( 'llms_founder_name', $data['llms_founder_name'] );
@@ -194,7 +194,7 @@ class GetCited_Dashboard {
                 // Save Use Cases for AI (v1.9.9.12+).
                 // Use $raw_data with sanitize_textarea_field to preserve line breaks.
                 if ( isset( $raw_data['llms_use_cases'] ) ) {
-                    $settings->set( 'llms_use_cases', sanitize_textarea_field( $raw_data['llms_use_cases'] ) );
+                    $settings->set( 'llms_use_cases', wp_unslash( $raw_data['llms_use_cases'] ) );
                 }
                 // Save citation guidelines (v1.5.1+).
                 if ( isset( $raw_data['citation_guidelines'] ) && is_array( $raw_data['citation_guidelines'] ) ) {

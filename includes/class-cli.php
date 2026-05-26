@@ -192,7 +192,10 @@ class GetCited_CLI {
             WP_CLI::error( "File not found: {$file}" );
         }
 
-        $json = file_get_contents( $file );
+        $json = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+        if ( false === $json ) {
+            WP_CLI::error( "Could not read file: {$file}" );
+        }
         $merge = isset( $assoc_args['merge'] );
 
         $settings = GetCited_Settings::instance();
@@ -471,7 +474,10 @@ class GetCited_CLI {
             WP_CLI::confirm( 'Are you sure you want to clear all crawler log entries?' );
 
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table truncate requires direct query
-            $wpdb->query( "TRUNCATE TABLE {$wpdb->getcited_llms_requests}" );
+            $result = $wpdb->query( "TRUNCATE TABLE {$wpdb->getcited_llms_requests}" );
+            if ( false === $result ) {
+                WP_CLI::error( 'Failed to clear log: ' . $wpdb->last_error );
+            }
 
             WP_CLI::success( 'Crawler log cleared.' );
             return;
@@ -562,12 +568,17 @@ class GetCited_CLI {
 
         // Write data rows.
         foreach ( $entries as $entry ) {
-            fputcsv( $handle, array(
+            $written = fputcsv( $handle, array(
                 $entry['request_time'],
                 $entry['bot_name'] ?: 'Unknown',
                 $entry['category'] ?: 'unknown',
                 $entry['user_agent'],
             ) );
+            if ( false === $written ) {
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+                fclose( $handle );
+                WP_CLI::error( "Write failed during CSV export to: {$file}" );
+            }
         }
 
         // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose

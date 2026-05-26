@@ -697,6 +697,14 @@ final class GetCited {
             'methods' => 'GET',
             'callback' => array( $this, 'api_citability' ),
             'permission_callback' => array( $this, 'api_permissions' ),
+            'args' => array(
+                'id' => array(
+                    'validate_callback' => function ( $param ) {
+                        return is_numeric( $param );
+                    },
+                    'sanitize_callback' => 'absint',
+                ),
+            ),
         ) );
 
         // Settings endpoint (for future API access)
@@ -704,6 +712,26 @@ final class GetCited {
             'methods' => array( 'GET', 'POST' ),
             'callback' => array( $this, 'api_settings' ),
             'permission_callback' => array( $this, 'api_permissions' ),
+            'args' => array(
+                'crawlers'               => array( 'sanitize_callback' => function ( $v ) { return is_array( $v ) ? $v : array(); } ),
+                'custom_crawlers'        => array( 'sanitize_callback' => function ( $v ) { return is_array( $v ) ? $v : array(); } ),
+                'llms_txt_content'       => array( 'sanitize_callback' => 'sanitize_textarea_field' ),
+                'llms_txt_enabled'       => array( 'sanitize_callback' => 'rest_sanitize_boolean' ),
+                'schema_enabled'         => array( 'sanitize_callback' => 'rest_sanitize_boolean' ),
+                'schema_types'           => array( 'sanitize_callback' => function ( $v ) { return is_array( $v ) ? $v : array(); } ),
+                'organization'           => array( 'sanitize_callback' => function ( $v ) { return is_array( $v ) ? $v : array(); } ),
+                'site_type'              => array( 'sanitize_callback' => 'sanitize_text_field' ),
+                'request_logging_enabled' => array( 'sanitize_callback' => 'rest_sanitize_boolean' ),
+                'request_log_retention'  => array(
+                    'sanitize_callback' => 'absint',
+                    'validate_callback' => function ( $param ) {
+                        return in_array( absint( $param ), array( 30, 60, 90, 180 ), true );
+                    },
+                ),
+                'debug_mode'             => array( 'sanitize_callback' => 'rest_sanitize_boolean' ),
+                'keep_on_delete'         => array( 'sanitize_callback' => 'rest_sanitize_boolean' ),
+                'citation_guidelines'    => array( 'sanitize_callback' => function ( $v ) { return is_array( $v ) ? $v : array(); } ),
+            ),
         ) );
 
         // Crawlers endpoint
@@ -718,6 +746,14 @@ final class GetCited {
             'methods' => 'POST',
             'callback' => array( $this, 'api_toggle_crawler' ),
             'permission_callback' => array( $this, 'api_permissions' ),
+            'args' => array(
+                'name' => array(
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'validate_callback' => function ( $param ) {
+                        return preg_match( '/^[a-zA-Z0-9_-]+$/', $param );
+                    },
+                ),
+            ),
         ) );
 
     }
@@ -846,7 +882,7 @@ final class GetCited {
 
         // Log this request as an AI crawler visit
         if ( class_exists( 'GetCited_Request_Logger' ) ) {
-            GetCited_Request_Logger::instance()->log_llms_request();
+            GetCited_Request_Logger::instance()->log_request( $content );
         }
 
         // Return as plain text with appropriate headers
@@ -913,7 +949,9 @@ final class GetCited {
             do_action( 'getcited_settings_saved', $settings->get_all(), $params );
         }
 
-        return rest_ensure_response( $settings->get_all() );
+        $all = $settings->get_all();
+        unset( $all['site_uuid'], $all['db_version'] );
+        return rest_ensure_response( $all );
     }
 
     /**

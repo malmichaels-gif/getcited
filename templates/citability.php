@@ -121,6 +121,7 @@ $crawler_stats = $request_logger->get_request_stats();
                     </thead>
                     <tbody>
                         <?php
+                        update_meta_cache( 'post', wp_list_pluck( $recent_posts, 'ID' ) );
                         foreach ( $recent_posts as $post ) :
                             $score      = get_post_meta( $post->ID, '_getcited_citability_score', true );
                             $last_audit = get_post_meta( $post->ID, '_getcited_last_audit', true );

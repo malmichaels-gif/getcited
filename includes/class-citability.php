@@ -332,6 +332,8 @@ class GetCited_Citability {
             ) );
         }
 
+        update_meta_cache( 'post', wp_list_pluck( $posts, 'ID' ) );
+
         $html = '';
         foreach ( $posts as $post ) {
             $score      = get_post_meta( $post->ID, '_getcited_citability_score', true );
@@ -1184,6 +1186,12 @@ class GetCited_Citability {
      * @return string The meta description or empty string.
      */
     private function get_meta_description_from_html( $post_id ) {
+        $cache_key = 'getcited_meta_desc_' . $post_id;
+        $cached    = get_transient( $cache_key );
+        if ( false !== $cached ) {
+            return $cached;
+        }
+
         $url = get_permalink( $post_id );
         if ( empty( $url ) ) {
             return '';
@@ -1203,17 +1211,21 @@ class GetCited_Citability {
             return '';
         }
 
+        $description = '';
+
         // Match <meta name="description" content="...">
         if ( preg_match( '/<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']+)["\'][^>]*>/i', $body, $matches ) ) {
-            return trim( $matches[1] );
+            $description = trim( $matches[1] );
         }
 
         // Also try reversed attribute order: content before name
-        if ( preg_match( '/<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']description["\'][^>]*>/i', $body, $matches ) ) {
-            return trim( $matches[1] );
+        if ( empty( $description ) && preg_match( '/<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']description["\'][^>]*>/i', $body, $matches ) ) {
+            $description = trim( $matches[1] );
         }
 
-        return '';
+        set_transient( $cache_key, $description, HOUR_IN_SECONDS );
+
+        return $description;
     }
 
     /**
@@ -1301,13 +1313,15 @@ class GetCited_Citability {
         if ( empty( $content ) ) {
             // Exclude common utility pages.
             $utility_slugs = array( 'privacy-policy', 'terms-of-service', 'terms', 'contact', 'cookie-policy', 'about', 'sample-page' );
-            $exclude_page_ids = array();
-            foreach ( $utility_slugs as $slug ) {
-                $page = get_page_by_path( $slug, OBJECT, 'page' );
-                if ( $page ) {
-                    $exclude_page_ids[] = $page->ID;
-                }
-            }
+            $utility_pages = get_posts( array(
+                'post_type'      => 'page',
+                'post_status'    => 'publish',
+                'post_name__in'  => $utility_slugs,
+                'posts_per_page' => count( $utility_slugs ),
+                'fields'         => 'ids',
+                'no_found_rows'  => true,
+            ) );
+            $exclude_page_ids = $utility_pages;
 
             $content = get_posts( array(
                 'post_type'      => 'page',
@@ -1353,8 +1367,9 @@ class GetCited_Citability {
         $query = new WP_Query( array(
             'post_type'      => 'post',
             'post_status'    => 'publish',
-            'posts_per_page' => -1,
+            'posts_per_page' => 1,
             'fields'         => 'ids',
+            'no_found_rows'  => false,
             'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Admin-only, optimized, necessary for accurate count.
                 array(
                     'key'     => '_getcited_citability_score',

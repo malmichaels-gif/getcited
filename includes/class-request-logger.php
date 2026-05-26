@@ -315,6 +315,12 @@ class GetCited_Request_Logger {
 			}
 			return false;
 		}
+
+		// Invalidate stats/recent caches.
+		delete_transient( 'getcited_req_stats_30' );
+		delete_transient( 'getcited_recent_req_30_50' );
+		delete_transient( 'getcited_recent_req_30_10' );
+
 		return $wpdb->insert_id;
 	}
 
@@ -326,6 +332,12 @@ class GetCited_Request_Logger {
 	 * @return array Array of request objects.
 	 */
 	public function get_recent_requests( $days = 30, $limit = 50 ) {
+		$cache_key = 'getcited_recent_req_' . $days . '_' . $limit;
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		global $wpdb;
 
 		$since = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
@@ -343,7 +355,10 @@ class GetCited_Request_Logger {
 			)
 		);
 
-		return $results ? $results : array();
+		$results = $results ? $results : array();
+		set_transient( $cache_key, $results, 5 * MINUTE_IN_SECONDS );
+
+		return $results;
 	}
 
 	/**
@@ -353,6 +368,12 @@ class GetCited_Request_Logger {
 	 * @return array Stats array with total, unique_bots, ai_crawlers, categories.
 	 */
 	public function get_request_stats( $days = 30 ) {
+		$cache_key = 'getcited_req_stats_' . $days;
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
 		global $wpdb;
 
 		// Bail early if table doesn't exist (e.g., if create_tables() failed).
@@ -406,12 +427,16 @@ class GetCited_Request_Logger {
 			OBJECT_K
 		);
 
-		return array(
+		$stats = array(
 			'total'       => (int) $total,
 			'unique_bots' => (int) $unique_bots,
 			'ai_crawlers' => (int) $ai_crawlers,
 			'categories'  => $categories,
 		);
+
+		set_transient( $cache_key, $stats, 5 * MINUTE_IN_SECONDS );
+
+		return $stats;
 	}
 
 	/**
