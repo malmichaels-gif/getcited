@@ -2,13 +2,13 @@
 Contributors: heytc
 Tags: llms-txt, chatgpt, ai-seo, perplexity, ai-crawlers
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Optimize for AI search. The AI visibility plugin — manage crawlers, generate llms.txt, track citability.
+Help AI assistants find, understand, and cite your site. Works automatically — install and go.
 
 == Description ==
 
@@ -62,8 +62,8 @@ This request is made from your server, not from visitors' browsers. No personal 
 
 1. Upload the `getcited` folder to `/wp-content/plugins/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to GetCited in your admin menu
-4. Run the setup wizard to configure optimal settings
+3. That's it — your site is now visible to AI assistants
+4. Visit GetCited in your admin menu to customize settings
 
 == Frequently Asked Questions ==
 

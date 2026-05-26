@@ -94,29 +94,13 @@ class GetCited_Wizard {
      */
     public function get_steps() {
         return array(
-            'welcome' => array(
-                'title' => __( 'Welcome', 'getcited' ),
-                'description' => __( "Let's make your site visible to AI search engines.", 'getcited' ),
-            ),
             'site_type' => array(
                 'title' => __( 'Site Type', 'getcited' ),
-                'description' => __( 'This helps us configure optimal settings for you.', 'getcited' ),
+                'description' => __( "Let's make your site visible to AI search engines.", 'getcited' ),
             ),
-            'organization' => array(
-                'title' => __( 'Your Brand', 'getcited' ),
-                'description' => __( 'This information appears in schema markup.', 'getcited' ),
-            ),
-            'crawlers' => array(
-                'title' => __( 'AI Access', 'getcited' ),
-                'description' => __( 'Choose which AI systems can access your content.', 'getcited' ),
-            ),
-            'verify' => array(
-                'title' => __( 'Verify', 'getcited' ),
-                'description' => __( 'Making sure AI systems can access your llms.txt file.', 'getcited' ),
-            ),
-            'complete' => array(
+            'done' => array(
                 'title' => __( 'Done!', 'getcited' ),
-                'description' => __( 'Your site is now optimized for AI visibility.', 'getcited' ),
+                'description' => __( 'Your site is configured for AI discovery.', 'getcited' ),
             ),
         );
     }
@@ -343,122 +327,73 @@ class GetCited_Wizard {
             case 'site_type':
                 $site_type = sanitize_text_field( $data['site_type'] ?? 'blog' );
                 $this->apply_preset( $site_type );
-                // Note: Site scan is now triggered asynchronously via getcited_wizard_scan
-                break;
 
-            case 'organization':
-                // Merge with existing settings to preserve social_urls if not provided
-                $existing_org = $settings->get( 'organization' );
-                $org = array(
-                    'name' => sanitize_text_field( $data['name'] ?? $existing_org['name'] ?? '' ),
-                    'logo_url' => esc_url_raw( $data['logo_url'] ?? $existing_org['logo_url'] ?? '' ),
-                    'social_urls' => ! empty( $data['social_urls'] )
-                        ? array_map( 'esc_url_raw', (array) $data['social_urls'] )
-                        : ( $existing_org['social_urls'] ?? array() ),
-                );
-                $settings->set( 'organization', $org );
-                break;
-
-            case 'crawlers':
-                $allow_all = isset( $data['allow_all'] ) && ( $data['allow_all'] === 'true' || $data['allow_all'] === true );
-
-                if ( $allow_all ) {
-                    // Set all crawlers to allow
-                    $crawler_list = GetCited_Crawler_List::instance();
-                    $crawlers = $crawler_list->get_all();
-
-                    $states = array();
-                    foreach ( $crawlers as $crawler ) {
-                        $states[ $crawler['name'] ] = 'allow';
-                    }
-                    $settings->set( 'crawlers', $states );
+                // Run site scan and generate rich llms.txt content inline.
+                $scanner   = GetCited_Site_Scanner::instance();
+                $scan_data = $scanner->scan_site();
+                $generated = $scanner->generate_llms_txt( $scan_data );
+                if ( ! empty( $generated ) ) {
+                    $settings->set( 'llms_txt_content', $generated );
                 }
-                break;
+
+                // Pre-fill organization info from scan.
+                $org         = $settings->get( 'organization' );
+                $org_updated = false;
+                if ( empty( $org['name'] ) && ! empty( $scan_data['site']['name'] ) ) {
+                    $org['name'] = $scan_data['site']['name'];
+                    $org_updated = true;
+                }
+                if ( empty( $org['social_urls'] ) && ! empty( $scan_data['social'] ) ) {
+                    $org['social_urls'] = array_values( array_filter( $scan_data['social'] ) );
+                    $org_updated        = true;
+                }
+                if ( $org_updated ) {
+                    $settings->set( 'organization', $org );
+                }
+
+                // Build summary for the done step.
+                $crawler_states = $settings->get( 'crawlers' );
+                $allowed_count  = 0;
+                $total_count    = 0;
+                if ( is_array( $crawler_states ) ) {
+                    $total_count = count( $crawler_states );
+                    foreach ( $crawler_states as $status ) {
+                        if ( 'allow' === $status ) {
+                            ++$allowed_count;
+                        }
+                    }
+                }
+
+                $schema_enabled = $settings->get( 'schema_enabled' );
+                $schema_source  = $settings->get( 'schema_detected_source' );
+
+                wp_send_json_success( array(
+                    'step'          => $step,
+                    'llms_url'      => home_url( '/llms.txt' ),
+                    'crawlers'      => array(
+                        'allowed' => $allowed_count,
+                        'total'   => $total_count,
+                    ),
+                    'schema'        => array(
+                        'enabled' => (bool) $schema_enabled,
+                        'source'  => $schema_source ? $schema_source : '',
+                    ),
+                ) );
+                return;
         }
 
         wp_send_json_success( array( 'step' => $step ) );
     }
 
     /**
-     * AJAX: Run site scan asynchronously
-     *
-     * Called from JavaScript after site type selection to generate personalized llms.txt content.
-     * Results are stored in a transient for display in the completion step.
+     * AJAX: Run site scan (legacy — scan now runs inline during site_type step save)
      */
     public function ajax_run_scan() {
         check_ajax_referer( 'getcited_admin', 'nonce' );
-
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( array( 'message' => 'Permission denied' ) );
         }
-
-        // Rate limiting: prevent rapid successive scans
-        $last_scan = get_transient( 'getcited_scan_throttle' );
-        if ( $last_scan ) {
-            // Return cached results if available
-            $cached = get_transient( 'getcited_wizard_scan' );
-            if ( $cached ) {
-                wp_send_json_success( array(
-                    'scan_data' => $cached['scan_data'],
-                    'llms_txt'  => $cached['llms_txt'],
-                    'cached'    => true,
-                ) );
-            }
-            wp_send_json_error( array( 'message' => 'Please wait before scanning again' ) );
-        }
-
-        // Set rate limit transient (60 seconds)
-        set_transient( 'getcited_scan_throttle', time(), 60 );
-
-        $scanner        = GetCited_Site_Scanner::instance();
-        $scan_data      = $scanner->scan_site();
-        $generated_llms = $scanner->generate_llms_txt( $scan_data );
-
-        // Store for step 5 (complete) display - 24 hour TTL
-        set_transient(
-            'getcited_wizard_scan',
-            array(
-                'scan_data'  => $scan_data,
-                'llms_txt'   => $generated_llms,
-                'scanned_at' => current_time( 'mysql' ),
-            ),
-            DAY_IN_SECONDS
-        );
-
-        // Pre-fill organization info from scan if not already set
-        $settings = GetCited_Settings::instance();
-        $org      = $settings->get( 'organization' );
-
-        $org_updated = false;
-
-        if ( empty( $org['name'] ) && ! empty( $scan_data['site']['name'] ) ) {
-            $org['name'] = $scan_data['site']['name'];
-            $org_updated = true;
-        }
-
-        // Auto-populate social URLs from scan if not already set
-        if ( empty( $org['social_urls'] ) && ! empty( $scan_data['social'] ) ) {
-            $org['social_urls'] = array_values( array_filter( $scan_data['social'] ) );
-            $org_updated        = true;
-        }
-
-        if ( $org_updated ) {
-            $settings->set( 'organization', $org );
-        }
-
-        wp_send_json_success( array(
-            'scan_data' => $scan_data,
-            'llms_txt'  => $generated_llms,
-        ) );
-    }
-
-    /**
-     * Get wizard scan data if available
-     *
-     * @return array|false Scan data or false if not available.
-     */
-    public function get_scan_data() {
-        return get_transient( 'getcited_wizard_scan' );
+        wp_send_json_success();
     }
 
     /**
@@ -493,19 +428,10 @@ class GetCited_Wizard {
         $llms = GetCited_Llms_Txt::instance();
         $llms->backup_physical_file();
 
-        // Save the generated llms.txt content from the scan.
-        $wizard_scan = get_transient( 'getcited_wizard_scan' );
-        if ( $wizard_scan && ! empty( $wizard_scan['llms_txt'] ) ) {
-            $settings->set( 'llms_txt_content', $wizard_scan['llms_txt'] );
-        }
-
-        // Clean up the transient.
+        // Content already saved during site_type step — clean up any leftover transient.
         delete_transient( 'getcited_wizard_scan' );
 
         $settings->set( 'wizard_completed', true );
-
-        // Set transient to show citation guidelines nudge (v1.5.1).
-        set_transient( 'getcited_show_citation_nudge', true, WEEK_IN_SECONDS );
 
         // Flush rewrite rules to ensure llms.txt works
         flush_rewrite_rules();
@@ -516,104 +442,25 @@ class GetCited_Wizard {
     }
 
     /**
-     * AJAX: Verify llms.txt accessibility
-     *
-     * Called when entering the verify step to check if llms.txt is accessible.
+     * AJAX: Verify llms.txt accessibility (legacy — verification now handled on dashboard)
      */
     public function ajax_verify_llms() {
         check_ajax_referer( 'getcited_admin', 'nonce' );
-
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( array( 'message' => 'Permission denied' ) );
         }
-
-        // First, flush rewrite rules to ensure they're current
-        flush_rewrite_rules();
-
-        // Small delay to let rules take effect
-        usleep( 100000 ); // 100ms
-
-        $health_check = GetCited_Health_Check::instance();
-        $result       = $health_check->verify_llms_txt_with_fallback();
-
-        // Add hosting environment info
-        $host     = $health_check->detect_hosting_environment();
-        $guidance = $health_check->get_host_specific_guidance( $host );
-
-        $result['host']          = $host;
-        $result['host_guidance'] = $guidance;
-
-        // Check if we can write a physical file
-        $result['can_write_physical'] = GetCited_Llms_Txt::instance()->can_write_physical_file();
-
-        // Generate download URL
-        $result['download_url'] = wp_nonce_url(
-            admin_url( 'admin-ajax.php?action=getcited_download_llms' ),
-            'getcited_admin',
-            'nonce'
-        );
-
-        wp_send_json_success( $result );
+        wp_send_json_success( array( 'accessible' => true ) );
     }
 
     /**
-     * AJAX: Fix llms.txt accessibility issue
-     *
-     * Handles actions to fix llms.txt accessibility:
-     * - regenerate: Regenerate llms.txt content (served dynamically via WordPress)
-     * - skip: Mark as skipped, continue with setup
+     * AJAX: Fix llms.txt accessibility (legacy — no longer used in wizard)
      */
     public function ajax_fix_llms() {
         check_ajax_referer( 'getcited_admin', 'nonce' );
-
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( array( 'message' => 'Permission denied' ) );
         }
-
-        $action = isset( $_POST['fix_action'] ) ? sanitize_text_field( wp_unslash( $_POST['fix_action'] ) ) : 'regenerate';
-
-        switch ( $action ) {
-            case 'write_physical': // Legacy - now treated as regenerate.
-            case 'regenerate':
-                // Regenerate llms.txt content fresh to include all current settings.
-                $settings  = GetCited_Settings::instance();
-                $llms      = GetCited_Llms_Txt::instance();
-                $site_type = $settings->get( 'site_type' );
-                $fresh_content = $llms->generate_template( $site_type );
-                $settings->set( 'llms_txt_content', $fresh_content );
-
-                // Verify it's accessible (served dynamically via WordPress).
-                $health_check   = GetCited_Health_Check::instance();
-                $verify_result  = $health_check->verify_llms_txt_accessible();
-
-                if ( $verify_result['accessible'] ) {
-                    wp_send_json_success( array(
-                        'message'    => __( 'llms.txt is now accessible!', 'getcited' ),
-                        'accessible' => true,
-                    ) );
-                } else {
-                    wp_send_json_success( array(
-                        'message'    => __( 'llms.txt regenerated. Verification pending.', 'getcited' ),
-                        'accessible' => false,
-                        'retry'      => true,
-                    ) );
-                }
-                break;
-
-            case 'skip':
-                // Mark as skipped for dashboard reminder.
-                $settings = GetCited_Settings::instance();
-                $settings->set( 'llms_verification_skipped', true );
-
-                wp_send_json_success( array(
-                    'message' => __( 'Verification skipped. You can fix this later in settings.', 'getcited' ),
-                    'skipped' => true,
-                ) );
-                break;
-
-            default:
-                wp_send_json_error( array( 'message' => 'Invalid action' ) );
-        }
+        wp_send_json_success();
     }
 
     /**

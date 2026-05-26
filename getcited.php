@@ -162,6 +162,11 @@ final class GetCited {
         $settings = GetCited_Settings::instance();
         $settings->init_defaults();
 
+        // Apply blog preset as sensible default (overridden by wizard if user picks a different type).
+        // This ensures schema defaults, citation guidelines, and use cases are configured
+        // even if the wizard is skipped entirely.
+        GetCited_Wizard::instance()->apply_preset( 'blog' );
+
         // Generate site UUID if not exists
         $current = $settings->get_all();
         if ( empty( $current['site_uuid'] ) ) {
@@ -626,7 +631,7 @@ final class GetCited {
     }
 
     /**
-     * Auto-analyze recent posts on first admin load
+     * Auto-analyze recent posts and generate rich llms.txt on first admin load
      *
      * Deferred from activation hook so all plugins (Yoast, etc.) are loaded
      * and can provide meta descriptions and schema data.
@@ -637,10 +642,32 @@ final class GetCited {
             return;
         }
 
-        // Don't run until wizard is completed (site type affects scoring)
         $settings = GetCited_Settings::instance();
-        if ( ! $settings->get( 'wizard_completed' ) ) {
-            return;
+
+        // Generate rich llms.txt from actual site content if still using the basic default.
+        $current_content = $settings->get( 'llms_txt_content' );
+        if ( empty( $current_content ) || strpos( $current_content, '## Sections' ) !== false ) {
+            $scanner   = GetCited_Site_Scanner::instance();
+            $scan_data = $scanner->scan_site();
+            $generated = $scanner->generate_llms_txt( $scan_data );
+            if ( ! empty( $generated ) ) {
+                $settings->set( 'llms_txt_content', $generated );
+            }
+
+            // Pre-fill organization info from scan if not already set.
+            $org = $settings->get( 'organization' );
+            $org_updated = false;
+            if ( empty( $org['name'] ) && ! empty( $scan_data['site']['name'] ) ) {
+                $org['name'] = $scan_data['site']['name'];
+                $org_updated = true;
+            }
+            if ( empty( $org['social_urls'] ) && ! empty( $scan_data['social'] ) ) {
+                $org['social_urls'] = array_values( array_filter( $scan_data['social'] ) );
+                $org_updated        = true;
+            }
+            if ( $org_updated ) {
+                $settings->set( 'organization', $org );
+            }
         }
 
         // Run the auto-analyze

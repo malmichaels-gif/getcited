@@ -1602,9 +1602,8 @@
             return;
         }
 
-        var steps = ['welcome', 'site_type', 'organization', 'crawlers', 'verify', 'complete'];
+        var steps = ['site_type', 'done'];
         var currentStep = 0;
-        var verifyData = null; // Store verification results
 
         // Get all step elements upfront
         var stepElements = {};
@@ -1616,7 +1615,6 @@
         });
 
         function showStep(index) {
-            // Validate index
             if (index < 0 || index >= steps.length) {
                 return;
             }
@@ -1647,70 +1645,48 @@
                 }
             });
 
-            // Update progress line fill width (v1.7.3)
             var progressBar = wizard.querySelector('.getcited-wizard-progress');
             if (progressBar && progressSteps.length > 1) {
                 var progressPercent = (index / (progressSteps.length - 1)) * 100;
-                // Calculate the width relative to the line (which spans between first and last dots)
                 progressBar.style.setProperty('--progress-width', progressPercent + '%');
             }
 
             currentStep = index;
         }
 
-        // Next buttons - handle click on each button
+        // Next button — saves site type, runs scan, shows done step
         wizard.querySelectorAll('.getcited-wizard-next').forEach(function(nextBtn) {
             nextBtn.addEventListener('click', function() {
-                var stepName = steps[currentStep];
                 var clickedBtn = this;
-
-                // Disable button to prevent double-clicks
                 clickedBtn.disabled = true;
 
-                // For site_type step, save and continue (scan moved to organization step)
-                if (stepName === 'site_type') {
-                    var siteTypeInput = document.querySelector('input[name="site_type"]:checked');
-                    var data = {
-                        site_type: siteTypeInput ? siteTypeInput.value : 'blog'
-                    };
-                    ajax('getcited_wizard_save', { step: stepName, data: data })
-                        .then(function() {
-                            clickedBtn.disabled = false;
-                            if (currentStep < steps.length - 1) {
-                                showStep(currentStep + 1);
-                            }
-                        })
-                        .catch(function() {
-                            clickedBtn.disabled = false;
-                            if (currentStep < steps.length - 1) {
-                                showStep(currentStep + 1);
-                            }
-                        });
-                    return;
-                }
+                var siteTypeInput = document.querySelector('input[name="site_type"]:checked');
+                var data = {
+                    site_type: siteTypeInput ? siteTypeInput.value : 'blog'
+                };
 
-                // For other steps, just save and continue
-                saveWizardStep(stepName).then(function() {
-                    clickedBtn.disabled = false;
-                    if (currentStep < steps.length - 1) {
-                        showStep(currentStep + 1);
-                    }
-                }).catch(function() {
-                    clickedBtn.disabled = false;
-                    // Continue anyway to prevent getting stuck
-                    if (currentStep < steps.length - 1) {
-                        showStep(currentStep + 1);
-                    }
-                });
-            });
-        });
+                // Show loading state
+                var originalText = clickedBtn.textContent;
+                clickedBtn.textContent = 'Setting up...';
 
-        // Back buttons
-        wizard.querySelectorAll('.getcited-wizard-back').forEach(function(backBtn) {
-            backBtn.addEventListener('click', function() {
-                if (currentStep > 0) {
-                    showStep(currentStep - 1);
-                }
+                ajax('getcited_wizard_save', { step: 'site_type', data: data })
+                    .then(function(response) {
+                        clickedBtn.disabled = false;
+                        clickedBtn.textContent = originalText;
+
+                        // Populate done step with results
+                        if (response.success && response.data) {
+                            populateDoneStep(wizard, response.data);
+                        }
+
+                        showStep(1);
+                    })
+                    .catch(function() {
+                        clickedBtn.disabled = false;
+                        clickedBtn.textContent = originalText;
+                        // Continue anyway
+                        showStep(1);
+                    });
             });
         });
 
@@ -1737,11 +1713,10 @@
             });
         }
 
-        // Site type selection - visual update and validation
+        // Site type selection — visual update and validation
         var siteTypeStep = stepElements['site_type'];
         var siteTypeNextBtn = siteTypeStep ? siteTypeStep.querySelector('.getcited-wizard-next') : null;
 
-        // Disable Continue button initially if no site type is selected
         if (siteTypeNextBtn) {
             var hasSelection = wizard.querySelector('.getcited-site-type input:checked');
             if (!hasSelection) {
@@ -1758,7 +1733,6 @@
                 });
                 if (this.checked) {
                     this.closest('.getcited-site-type').querySelector('.site-type-card').classList.add('selected');
-                    // Enable Continue button when a site type is selected
                     if (siteTypeNextBtn) {
                         siteTypeNextBtn.disabled = false;
                         siteTypeNextBtn.style.opacity = '1';
@@ -1768,426 +1742,36 @@
             });
         });
 
-        // Crawler choice selection - visual update
-        wizard.querySelectorAll('.getcited-radio-card input').forEach(function(input) {
-            input.addEventListener('change', function() {
-                wizard.querySelectorAll('.getcited-radio-card').forEach(function(card) {
-                    card.classList.remove('selected');
-                });
-                this.closest('.getcited-radio-card').classList.add('selected');
-            });
-        });
-
-        // Handle entering verify step
-        function runVerification() {
-            var verifyStep = stepElements['verify'];
-            if (!verifyStep) return;
-
-            // Get state containers
-            var checkingState = verifyStep.querySelector('.verify-checking');
-            var successState = verifyStep.querySelector('.verify-success');
-            var needsFixState = verifyStep.querySelector('.verify-needs-fix');
-            var fixingState = verifyStep.querySelector('.verify-fixing');
-            var manualState = verifyStep.querySelector('.verify-manual');
-
-            // Get buttons
-            var continueBtn = verifyStep.querySelector('.verify-continue-btn');
-            var fixBtn = verifyStep.querySelector('.getcited-verify-fix-btn');
-            var skipBtn = verifyStep.querySelector('.getcited-verify-skip-btn');
-
-            // Hide all states first
-            [checkingState, successState, needsFixState, fixingState, manualState].forEach(function(el) {
-                if (el) el.style.display = 'none';
-            });
-
-            // Hide all action buttons except back
-            if (continueBtn) continueBtn.style.display = 'none';
-            if (fixBtn) fixBtn.style.display = 'none';
-            if (skipBtn) skipBtn.style.display = 'none';
-
-            // Show checking state
-            if (checkingState) checkingState.style.display = 'block';
-
-            // Run the verification check
-            ajax('getcited_wizard_verify')
-                .then(function(response) {
-                    if (response.success && response.data) {
-                        verifyData = response.data;
-
-                        if (checkingState) checkingState.style.display = 'none';
-
-                        if (response.data.accessible) {
-                            if (successState) {
-                                successState.style.display = 'block';
-                            }
-                            if (continueBtn) continueBtn.style.display = 'inline-block';
-                        } else {
-                            // Needs fix
-                            if (needsFixState) needsFixState.style.display = 'block';
-                            if (fixBtn) fixBtn.style.display = 'inline-block';
-                            if (skipBtn) skipBtn.style.display = 'inline-block';
-
-                            // Show host-specific guidance if detected
-                            if (response.data.host && response.data.host !== 'unknown') {
-                                var hostGuidance = verifyStep.querySelector('.verify-host-guidance');
-                                if (hostGuidance) {
-                                    var hostTitle = hostGuidance.querySelector('.host-title');
-                                    var hostMessage = hostGuidance.querySelector('.host-message');
-                                    var hostDocsLink = hostGuidance.querySelector('.host-docs-link');
-
-                                    if (response.data.host_guidance) {
-                                        if (hostTitle) hostTitle.textContent = response.data.host_guidance.title || response.data.host;
-                                        if (hostMessage) hostMessage.textContent = response.data.host_guidance.message || '';
-                                        if (hostDocsLink && response.data.host_guidance.docs_url) {
-                                            hostDocsLink.href = response.data.host_guidance.docs_url;
-                                            hostDocsLink.style.display = 'inline';
-                                        } else if (hostDocsLink) {
-                                            hostDocsLink.style.display = 'none';
-                                        }
-                                        hostGuidance.style.display = 'block';
-                                    }
-                                }
-                            }
-
-                            // Update verify message with suggestion
-                            if (response.data.suggestion) {
-                                var verifyMessage = needsFixState.querySelector('.verify-message');
-                                if (verifyMessage) {
-                                    verifyMessage.textContent = response.data.suggestion;
-                                }
-                            }
-                        }
-                    } else {
-                        // Error - show needs fix state with default message
-                        if (checkingState) checkingState.style.display = 'none';
-                        if (needsFixState) needsFixState.style.display = 'block';
-                        if (fixBtn) fixBtn.style.display = 'inline-block';
-                        if (skipBtn) skipBtn.style.display = 'inline-block';
-                    }
-                })
-                .catch(function() {
-                    // On error, show needs fix state
-                    if (checkingState) checkingState.style.display = 'none';
-                    if (needsFixState) needsFixState.style.display = 'block';
-                    if (fixBtn) fixBtn.style.display = 'inline-block';
-                    if (skipBtn) skipBtn.style.display = 'inline-block';
-                });
-        }
-
-        // Handle verify step fix button
-        var verifyFixBtn = wizard.querySelector('.getcited-verify-fix-btn');
-        if (verifyFixBtn) {
-            verifyFixBtn.addEventListener('click', function() {
-                var verifyStep = stepElements['verify'];
-                var selectedOption = verifyStep.querySelector('input[name="verify_fix"]:checked');
-                var optionValue = selectedOption ? selectedOption.value : 'skip';
-
-                if (optionValue === 'skip') {
-                    // Just continue to next step
-                    showStep(currentStep + 1);
-                    return;
-                }
-
-                if (optionValue === 'download') {
-                    // Show manual state with download instructions
-                    var needsFixState = verifyStep.querySelector('.verify-needs-fix');
-                    var manualState = verifyStep.querySelector('.verify-manual');
-                    var fixBtn = verifyStep.querySelector('.getcited-verify-fix-btn');
-                    var skipBtn = verifyStep.querySelector('.getcited-verify-skip-btn');
-                    var continueBtn = verifyStep.querySelector('.verify-continue-btn');
-
-                    if (needsFixState) needsFixState.style.display = 'none';
-                    if (manualState) manualState.style.display = 'block';
-                    if (fixBtn) fixBtn.style.display = 'none';
-
-                    // Show WordPress.com note if detected
-                    if (verifyData && verifyData.host === 'wordpress_com') {
-                        var wpNote = manualState.querySelector('.wordpress-com-note');
-                        if (wpNote) wpNote.style.display = 'block';
-                    }
-
-                    // Change skip button text
-                    if (skipBtn) {
-                        skipBtn.textContent = getcitedAdmin.strings?.continue || 'Continue' + ' →';
-                        skipBtn.style.display = 'inline-block';
-                    }
-                    return;
-                }
-
-                if (optionValue === 'write_physical') {
-                    // Attempt to write physical file
-                    var needsFixState = verifyStep.querySelector('.verify-needs-fix');
-                    var fixingState = verifyStep.querySelector('.verify-fixing');
-                    var manualState = verifyStep.querySelector('.verify-manual');
-                    var successState = verifyStep.querySelector('.verify-success');
-                    var fixBtn = verifyStep.querySelector('.getcited-verify-fix-btn');
-                    var skipBtn = verifyStep.querySelector('.getcited-verify-skip-btn');
-                    var continueBtn = verifyStep.querySelector('.verify-continue-btn');
-
-                    // Show fixing state
-                    if (needsFixState) needsFixState.style.display = 'none';
-                    if (fixingState) fixingState.style.display = 'block';
-                    if (fixBtn) fixBtn.style.display = 'none';
-                    if (skipBtn) skipBtn.style.display = 'none';
-
-                    ajax('getcited_wizard_fix_llms')
-                        .then(function(response) {
-                            if (fixingState) fixingState.style.display = 'none';
-
-                            if (response.success) {
-                                // File written successfully
-                                if (successState) successState.style.display = 'block';
-                                if (continueBtn) continueBtn.style.display = 'inline-block';
-                            } else {
-                                // Writing failed - show manual upload option
-                                if (manualState) manualState.style.display = 'block';
-                                if (skipBtn) {
-                                    skipBtn.textContent = (getcitedAdmin.strings?.continue || 'Continue') + ' →';
-                                    skipBtn.style.display = 'inline-block';
-                                }
-
-                                // Show WordPress.com note if detected
-                                if (verifyData && verifyData.host === 'wordpress_com') {
-                                    var wpNote = manualState.querySelector('.wordpress-com-note');
-                                    if (wpNote) wpNote.style.display = 'block';
-                                }
-                            }
-                        })
-                        .catch(function() {
-                            // On error, show manual state
-                            if (fixingState) fixingState.style.display = 'none';
-                            if (manualState) manualState.style.display = 'block';
-                            if (skipBtn) {
-                                skipBtn.textContent = (getcitedAdmin.strings?.continue || 'Continue') + ' →';
-                                skipBtn.style.display = 'inline-block';
-                            }
-                        });
-                }
-            });
-        }
-
-        // Handle verify skip button
-        var verifySkipBtn = wizard.querySelector('.getcited-verify-skip-btn');
-        if (verifySkipBtn) {
-            verifySkipBtn.addEventListener('click', function() {
-                showStep(currentStep + 1);
-            });
-        }
-
-        // Handle download llms.txt button
-        var downloadBtns = wizard.querySelectorAll('.getcited-download-llms');
-        downloadBtns.forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                // Build the download URL with nonce
-                var downloadUrl = getcitedAdmin.ajaxUrl + '?action=getcited_download_llms&nonce=' + encodeURIComponent(getcitedAdmin.nonce);
-
-                // Create a temporary link and trigger download
-                var a = document.createElement('a');
-                a.href = downloadUrl;
-                a.download = 'llms.txt';
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            });
-        });
-
-        // Handle Save File button (new progressive disclosure layout)
-        var saveFileBtn = wizard.querySelector('.getcited-save-file-btn');
-        if (saveFileBtn) {
-            saveFileBtn.addEventListener('click', function() {
-                var verifyStep = stepElements['verify'];
-                var needsFixState = verifyStep.querySelector('.verify-needs-fix');
-                var fixingState = verifyStep.querySelector('.verify-fixing');
-                var manualState = verifyStep.querySelector('.verify-manual');
-                var successState = verifyStep.querySelector('.verify-success');
-                var continueBtn = verifyStep.querySelector('.verify-continue-btn');
-
-                // Show fixing state
-                if (needsFixState) needsFixState.style.display = 'none';
-                if (fixingState) fixingState.style.display = 'block';
-
-                ajax('getcited_wizard_fix_llms')
-                    .then(function(response) {
-                        if (fixingState) fixingState.style.display = 'none';
-
-                        if (response.success) {
-                            // File written successfully
-                            if (successState) successState.style.display = 'block';
-                            if (continueBtn) continueBtn.style.display = 'inline-block';
-                        } else {
-                            // Writing failed - show manual upload option
-                            if (manualState) manualState.style.display = 'block';
-                            if (continueBtn) continueBtn.style.display = 'inline-block';
-
-                            // Show WordPress.com note if detected
-                            if (verifyData && verifyData.host === 'wordpress_com') {
-                                var wpNote = manualState.querySelector('.wordpress-com-note');
-                                if (wpNote) wpNote.style.display = 'block';
-                            }
-                        }
-                    })
-                    .catch(function() {
-                        // On error, show manual state
-                        if (fixingState) fixingState.style.display = 'none';
-                        if (manualState) manualState.style.display = 'block';
-                        if (continueBtn) continueBtn.style.display = 'inline-block';
-                    });
-            });
-        }
-
-        // Handle alternative option links
-        var altLinks = wizard.querySelectorAll('.verify-alt-link');
-        altLinks.forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                var action = link.getAttribute('data-action');
-                var verifyStep = stepElements['verify'];
-
-                if (action === 'skip') {
-                    // Just continue to next step
-                    showStep(currentStep + 1);
-                    return;
-                }
-
-                if (action === 'download') {
-                    // Show manual state with download instructions
-                    var needsFixState = verifyStep.querySelector('.verify-needs-fix');
-                    var manualState = verifyStep.querySelector('.verify-manual');
-                    var continueBtn = verifyStep.querySelector('.verify-continue-btn');
-
-                    if (needsFixState) needsFixState.style.display = 'none';
-                    if (manualState) manualState.style.display = 'block';
-                    if (continueBtn) continueBtn.style.display = 'inline-block';
-
-                    // Show WordPress.com note if detected
-                    if (verifyData && verifyData.host === 'wordpress_com') {
-                        var wpNote = manualState.querySelector('.wordpress-com-note');
-                        if (wpNote) wpNote.style.display = 'block';
-                    }
-                }
-            });
-        });
-
-        // Run organization scan to auto-detect site name
-        var orgScanRan = false;
-        function runOrganizationScan() {
-            if (orgScanRan) return; // Only run once
-            orgScanRan = true;
-
-            var orgStep = stepElements['organization'];
-            if (!orgStep) return;
-
-            var nameInput = document.getElementById('wizard_org_name');
-            var statusWrap = orgStep.querySelector('.org-name-status');
-            var scanningState = orgStep.querySelector('.org-scanning');
-            var autoDetected = orgStep.querySelector('.org-auto-detected');
-            var inputWrap = orgStep.querySelector('.org-name-input-wrap');
-
-            // Show scanning state
-            if (statusWrap) statusWrap.style.display = 'block';
-            if (scanningState) scanningState.style.display = 'inline-flex';
-            if (autoDetected) autoDetected.style.display = 'none';
-            if (inputWrap) inputWrap.classList.add('scanning');
-
-            // Run the scan
-            ajax('getcited_wizard_scan')
-                .then(function(response) {
-                    if (scanningState) scanningState.style.display = 'none';
-                    if (statusWrap) statusWrap.style.display = 'none';
-                    if (inputWrap) inputWrap.classList.remove('scanning');
-
-                    if (response.success && response.data) {
-                        // Store scan data for step 5
-                        populateWizardStep5(wizard, response.data);
-
-                        // Extract site name from scan data (site.name from scanner)
-                        var scanData = response.data.scan_data || {};
-                        var siteInfo = scanData.site || {};
-                        var siteName = siteInfo.name || '';
-
-                        if (siteName && nameInput) {
-                            nameInput.value = siteName;
-                            // Show persistent "Auto-detected" message
-                            if (autoDetected) autoDetected.style.display = 'flex';
-                        }
-                        // If no name found, user can enter manually - no message shown
-                    }
-                    // If scan failed, user can enter manually - no message shown
-                })
-                .catch(function() {
-                    // On error, hide status - user can enter manually
-                    if (scanningState) scanningState.style.display = 'none';
-                    if (statusWrap) statusWrap.style.display = 'none';
-                    if (inputWrap) inputWrap.classList.remove('scanning');
-                });
-        }
-
-        // Modify showStep to trigger actions when entering specific steps
-        var originalShowStep = showStep;
-        showStep = function(index) {
-            originalShowStep(index);
-
-            // If entering organization step, run scan
-            if (steps[index] === 'organization') {
-                runOrganizationScan();
-            }
-
-            // If entering verify step, run verification
-            if (steps[index] === 'verify') {
-                runVerification();
-            }
-        };
-
-        // Initialize first step - show it immediately
+        // Initialize first step
         showStep(0);
     }
 
     /**
-     * Save wizard step data (simple version for most steps)
+     * Populate the done step with scan results from the server
      */
-    function saveWizardStep(stepName) {
-        var data = {};
+    function populateDoneStep(wizard, data) {
+        var doneStep = wizard.querySelector('[data-step="done"]');
+        if (!doneStep) return;
 
-        switch (stepName) {
-            case 'organization':
-                var nameEl = document.getElementById('wizard_org_name');
-                var logoEl = document.getElementById('wizard_org_logo');
-                data.name = nameEl ? nameEl.value : '';
-                data.logo_url = logoEl ? logoEl.value : '';
-                break;
-
-            case 'crawlers':
-                var choice = document.querySelector('input[name="crawler_choice"]:checked');
-                data.allow_all = (choice && choice.value === 'allow_all') ? 'true' : 'false';
-                break;
-
-            default:
-                // welcome step - no data to save
-                return Promise.resolve();
+        // Update crawler count text
+        if (data.crawlers) {
+            var crawlerText = doneStep.querySelector('.wizard-crawler-text');
+            if (crawlerText) {
+                crawlerText.textContent = data.crawlers.allowed + ' AI crawlers can now find your site';
+            }
         }
 
-        return ajax('getcited_wizard_save', { step: stepName, data: data });
-    }
-
-    /**
-     * Populate wizard Step 6 (complete) with llms.txt preview
-     */
-    function populateWizardStep5(wizard, scanData) {
-        var completeStep = wizard.querySelector('[data-step="complete"]');
-        if (!completeStep) return;
-
-        var llmsTxt = scanData.llms_txt || '';
-        if (!llmsTxt) return;
-
-        // Show llms.txt preview if scan data is available
-        var detailsEl = completeStep.querySelector('.wizard-preview-details');
-        var preEl = completeStep.querySelector('.wizard-preview-code');
-
-        if (detailsEl) detailsEl.style.display = 'block';
-        if (preEl) preEl.textContent = llmsTxt;
+        // Update schema text
+        if (data.schema) {
+            var schemaText = doneStep.querySelector('.wizard-schema-text');
+            if (schemaText) {
+                if (data.schema.enabled) {
+                    schemaText.textContent = 'Schema markup is active';
+                } else if (data.schema.source) {
+                    schemaText.textContent = 'Schema handled by ' + data.schema.source;
+                }
+            }
+        }
     }
 
     // Helper function to escape HTML

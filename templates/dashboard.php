@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ( function() {
 $stats            = GetCited_Dashboard::instance()->get_stats();
+$status_summary   = GetCited_Dashboard::instance()->get_status_summary();
 $health           = GetCited_Health_Check::instance();
 $visibility_score = $stats['visibility_score'];
 $llms_activity    = $stats['llms_activity'];
@@ -52,8 +53,72 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 
 	<div class="getcited-dashboard">
 
-		<!-- AI Visibility Score Hero (Full Width) -->
-		<div class="getcited-section getcited-visibility-score-section">
+		<!-- Status Summary Cards -->
+		<div class="getcited-status-summary">
+			<?php
+			$llms_live = $status_summary['llms_txt']['enabled'] && $status_summary['llms_txt']['healthy'];
+			?>
+			<div class="getcited-status-card">
+				<div class="status-card-icon">
+					<span class="dashicons dashicons-media-text"></span>
+				</div>
+				<div class="status-card-content">
+					<h3><?php esc_html_e( 'llms.txt', 'getcited' ); ?></h3>
+					<?php if ( $llms_live ) : ?>
+						<span class="status-live">
+							<a href="<?php echo esc_url( $status_summary['llms_txt']['url'] ); ?>" target="_blank"><?php esc_html_e( 'Live', 'getcited' ); ?> &rarr;</a>
+						</span>
+					<?php else : ?>
+						<span class="status-attention">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-llms-txt' ) ); ?>"><?php esc_html_e( 'Needs attention', 'getcited' ); ?></a>
+						</span>
+					<?php endif; ?>
+				</div>
+			</div>
+
+			<div class="getcited-status-card">
+				<div class="status-card-icon">
+					<span class="dashicons dashicons-visibility"></span>
+				</div>
+				<div class="status-card-content">
+					<h3><?php esc_html_e( 'AI Crawlers', 'getcited' ); ?></h3>
+					<span class="status-live">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-crawlers' ) ); ?>">
+							<?php
+							/* translators: 1: number allowed, 2: total number */
+							printf( esc_html__( '%1$d of %2$d allowed', 'getcited' ), $status_summary['crawlers']['allowed'], $status_summary['crawlers']['total'] );
+							?>
+						</a>
+					</span>
+				</div>
+			</div>
+
+			<div class="getcited-status-card">
+				<div class="status-card-icon">
+					<span class="dashicons dashicons-editor-code"></span>
+				</div>
+				<div class="status-card-content">
+					<h3><?php esc_html_e( 'Schema', 'getcited' ); ?></h3>
+					<?php if ( $status_summary['schema']['enabled'] ) : ?>
+						<span class="status-live"><?php esc_html_e( 'Active', 'getcited' ); ?></span>
+					<?php elseif ( ! empty( $status_summary['schema']['source'] ) ) : ?>
+						<span class="status-live">
+							<?php
+							/* translators: %s: Plugin name like "yoast" */
+							printf( esc_html__( 'Active via %s', 'getcited' ), esc_html( $status_summary['schema']['source'] ) );
+							?>
+						</span>
+					<?php else : ?>
+						<span class="status-attention">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=getcited-schema' ) ); ?>"><?php esc_html_e( 'Configure', 'getcited' ); ?></a>
+						</span>
+					<?php endif; ?>
+				</div>
+			</div>
+		</div>
+
+		<!-- AI Visibility Score (Compact) -->
+		<div class="getcited-section getcited-visibility-score-section compact">
 			<div class="visibility-score-container">
 				<div class="visibility-score-info">
 					<h2><?php esc_html_e( 'AI Visibility Score', 'getcited' ); ?></h2>
@@ -65,7 +130,7 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 						<?php echo esc_html( $visibility_score['recommendations'][0] ); ?>
 					</p>
 					<?php endif; ?>
-					<button type="button" class="button button-primary getcited-refresh-score">
+					<button type="button" class="button getcited-refresh-score">
 						<span class="dashicons dashicons-update"></span>
 						<?php esc_html_e( 'Refresh', 'getcited' ); ?>
 					</button>
@@ -81,7 +146,7 @@ $current_tip = GetCited_Dashboard::get_current_tip();
 					$score_class = 'score-low';
 				}
 				?>
-				<div class="getcited-score-display large circular <?php echo esc_attr( $score_class ); ?>">
+				<div class="getcited-score-display compact <?php echo esc_attr( $score_class ); ?>">
 					<span class="score"><?php echo esc_html( $total ); ?></span>
 					<span class="max">/100</span>
 				</div>

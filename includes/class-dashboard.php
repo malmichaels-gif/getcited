@@ -440,6 +440,52 @@ class GetCited_Dashboard {
     }
 
     /**
+     * Get status summary for dashboard hero cards
+     *
+     * Returns concrete, user-friendly status for the 3 summary cards:
+     * llms.txt (live/needs attention), crawlers (X of Y), schema (active/source).
+     *
+     * @return array Status summary data.
+     */
+    public function get_status_summary() {
+        $settings = GetCited_Settings::instance();
+        $health   = GetCited_Health_Check::instance()->get_status();
+
+        // Crawlers.
+        $crawler_states = $settings->get( 'crawlers' );
+        $allowed        = 0;
+        $total          = 0;
+        if ( is_array( $crawler_states ) ) {
+            $total = count( $crawler_states );
+            foreach ( $crawler_states as $status ) {
+                if ( 'allow' === $status ) {
+                    ++$allowed;
+                }
+            }
+        }
+
+        // Schema source.
+        $schema_enabled = (bool) $settings->get( 'schema_enabled' );
+        $schema_source  = $settings->get( 'schema_detected_source' );
+
+        return array(
+            'llms_txt' => array(
+                'enabled' => (bool) $settings->get( 'llms_txt_enabled' ),
+                'healthy' => isset( $health['llms_txt'] ) && 'ok' === $health['llms_txt']['status'],
+                'url'     => home_url( '/llms.txt' ),
+            ),
+            'crawlers' => array(
+                'allowed' => $allowed,
+                'total'   => $total,
+            ),
+            'schema' => array(
+                'enabled' => $schema_enabled,
+                'source'  => $schema_source ? $schema_source : '',
+            ),
+        );
+    }
+
+    /**
      * Get llms.txt activity data for dashboard
      *
      * @return array Activity data with recent requests and stats.

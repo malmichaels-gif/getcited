@@ -2732,84 +2732,54 @@
     color: var(--getcited-gray-500);
 }
 
-/* Summary Card */
-.wizard-summary-card {
+/* Status Results (done step) */
+.wizard-status-results {
     background: var(--getcited-white);
     border: 1px solid var(--getcited-gray-200);
     border-radius: var(--getcited-radius-lg);
-    padding: var(--getcited-space-lg);
+    padding: var(--getcited-space-md) var(--getcited-space-lg);
     text-align: left;
     margin-bottom: var(--getcited-space-xl);
 }
 
-.summary-card-header {
-    margin-bottom: var(--getcited-space-md);
-}
-
-.summary-card-title {
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--getcited-gray-500);
-}
-
-.summary-card-stats {
+.wizard-status-item {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: var(--getcited-space-md);
-}
-
-.summary-stat-badge {
-    display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    background: var(--getcited-gray-50);
-    border-radius: 20px;
-    font-size: 14px;
-    color: var(--getcited-gray-600);
+    gap: var(--getcited-space-sm);
+    padding: var(--getcited-space-sm) 0;
 }
 
-.summary-stat-badge strong {
-    color: var(--getcited-gray-800);
-    font-weight: 600;
-}
-
-/* Collapsible Preview */
-.wizard-preview-details {
+.wizard-status-item + .wizard-status-item {
     border-top: 1px solid var(--getcited-gray-100);
-    padding-top: var(--getcited-space-md);
 }
 
-.wizard-preview-details summary {
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--getcited-gray-500);
-    user-select: none;
-    list-style: none;
+.wizard-status-item .dashicons {
+    color: #10b981;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.wizard-status-item .status-item-content {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
+    gap: 2px;
 }
 
-.wizard-preview-details summary::-webkit-details-marker {
-    display: none;
+.wizard-status-item .status-item-content strong {
+    font-size: 14px;
+    color: var(--getcited-gray-800);
 }
 
-.wizard-preview-details summary::before {
-    content: '▸';
-    font-size: 10px;
-    transition: transform 0.2s ease;
+.wizard-status-item .status-item-content a {
+    font-size: 13px;
+    color: var(--getcited-gray-500);
+    text-decoration: none;
 }
 
-.wizard-preview-details[open] summary::before {
-    transform: rotate(90deg);
-}
-
-.wizard-preview-details summary:hover {
-    color: var(--getcited-gray-700);
+.wizard-status-item .status-item-content a:hover {
+    color: var(--getcited-primary);
 }
 
 .wizard-preview-code {
@@ -4447,6 +4417,79 @@
 }
 
 /* ==========================================================================
+   Dashboard Status Summary Cards
+   ========================================================================== */
+
+.getcited-status-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--getcited-space-md);
+    margin-bottom: var(--getcited-space-lg);
+}
+
+@media (max-width: 782px) {
+    .getcited-status-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+.getcited-status-card {
+    display: flex;
+    align-items: center;
+    gap: var(--getcited-space-md);
+    background: #fff;
+    border: 1px solid var(--getcited-border);
+    border-radius: var(--getcited-radius-lg);
+    padding: var(--getcited-space-lg);
+}
+
+.getcited-status-card .status-card-icon .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--getcited-gray-400);
+}
+
+.getcited-status-card .status-card-content h3 {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--getcited-gray-500);
+}
+
+.getcited-status-card .status-live {
+    color: #10b981;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.getcited-status-card .status-live a {
+    color: #10b981;
+    text-decoration: none;
+}
+
+.getcited-status-card .status-live a:hover {
+    text-decoration: underline;
+}
+
+.getcited-status-card .status-attention {
+    color: #f59e0b;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.getcited-status-card .status-attention a {
+    color: #f59e0b;
+    text-decoration: none;
+}
+
+.getcited-status-card .status-attention a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
    AI Visibility Score Widget
    ========================================================================== */
 
@@ -4487,6 +4530,53 @@
 
 .visibility-score-container .getcited-score-display.circular .max {
     font-size: 15px;
+}
+
+/* Compact score display for demoted dashboard position */
+.getcited-visibility-score-section.compact {
+    padding: var(--getcited-space-md) var(--getcited-space-lg);
+}
+
+.getcited-visibility-score-section.compact .visibility-score-container {
+    gap: var(--getcited-space-md);
+}
+
+.visibility-score-container .getcited-score-display.compact {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    margin: 0;
+    border-radius: 50%;
+    border: 3px solid var(--getcited-border);
+    background: white;
+    flex-shrink: 0;
+}
+
+.visibility-score-container .getcited-score-display.compact .score {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.visibility-score-container .getcited-score-display.compact .max {
+    font-size: 11px;
+    color: var(--getcited-gray-400);
+}
+
+.visibility-score-container .getcited-score-display.compact.score-high {
+    border-color: #22c55e;
+}
+
+.visibility-score-container .getcited-score-display.compact.score-medium {
+    border-color: #eab308;
+}
+
+.visibility-score-container .getcited-score-display.compact.score-low {
+    border-color: #ef4444;
 }
 
 .visibility-score-circle {
